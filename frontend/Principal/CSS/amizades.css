@@ -1,0 +1,770 @@
+/* =================================================================
+   VARIÁVEIS E CONFIGURAÇÕES GERAIS
+================================================================= */
+:root {
+    --sidebar-width: 320px; /* Sidebar mais larga conforme solicitado */
+    --header-height: 60px;
+}
+
+/* Container principal da página */
+.friends-page-container {
+    width: 100%;
+}
+
+/* =================================================================
+   LOADING SPINNERS & SKELETONS (Mantidos)
+================================================================= */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(88, 166, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--accent-primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.results-loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    grid-column: 1 / -1; /* Ocupa toda a largura do grid */
+}
+
+.results-loading .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 4px;
+    margin-bottom: 1rem;
+}
+
+/* Skeletons */
+.friends-loading {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.friend-card-skeleton {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.skeleton-avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--bg-quaternary); }
+.skeleton-line { height: 12px; border-radius: 6px; background: var(--bg-quaternary); }
+.skeleton-line.short { width: 60%; }
+.skeleton-line.medium { width: 80%; }
+.skeleton-line.long { width: 100%; height: 14px; }
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.6; }
+}
+
+/* =================================================================
+   LAYOUT ESTRUTURAL (Desktop First)
+================================================================= */
+.container {
+    display: flex;
+    /* Garante que o container ocupe a altura correta descontando o header */
+    min-height: calc(100vh - var(--header-height));
+    position: relative;
+    background-color: var(--bg-primary);
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    
+    /* Fixa a sidebar enquanto rola a página */
+    position: sticky;
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height));
+    
+    overflow-y: auto;
+    flex-shrink: 0; /* Impede a sidebar de encolher */
+    z-index: 100;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+/* Botão de fechar (apenas mobile) */
+.sidebar-close {
+    display: none; /* Escondido no desktop */
+}
+
+/* User Card na Sidebar */
+/* =================================================================
+   USER CARD NA SIDEBAR (Layout: Centralizado Vertical)
+================================================================= */
+.sidebar-user-card { 
+    margin-bottom: 0.5rem; 
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column; /* Empilha verticalmente */
+    align-items: center;    /* Centraliza horizontalmente */
+    justify-content: center;
+    padding: 2rem 1.5rem;   /* Mais espaço interno */
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    position: relative;
+    gap: 1rem; /* Espaço entre Avatar, Texto e Stats */
+    text-decoration: none; /* Remove sublinhado do link */
+}
+
+/* --- AVATAR --- */
+.avatar-container {
+    position: relative;
+    width: 80px;  /* Tamanho maior conforme a imagem */
+    height: 80px;
+    margin-bottom: 0.5rem;
+}
+
+.avatar-container img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--bg-tertiary); /* Borda sutil escura */
+}
+
+/* Status Online */
+.avatar-container .status {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-secondary);
+    background-color: var(--success); /* Verde */
+}
+
+/* --- IDENTIDADE (Nome + Cargo) --- */
+.user-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.user-identity h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.user-role {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary); /* Cinza claro */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- ESTATÍSTICAS (Números azuis embaixo) --- */
+.user-stats {
+    display: flex;
+    flex-direction: row; /* Lado a lado */
+    align-items: center;
+    justify-content: center;
+    gap: 2rem; /* Espaço generoso entre Conexões e Projetos */
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.4;
+}
+
+.stat-item strong {
+    color: var(--accent-primary); /* Azul */
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.stat-item .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Loading Overlay */
+.user-info-loading {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+    transition: opacity 0.3s ease;
+}
+
+.user-info.loaded .user-info-loading {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Menu de Navegação */
+.sidebar-menu {
+    flex: 1;
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.menu-item {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 0.8rem 1.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.menu-item:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.menu-item.active {
+    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.1) 0%, transparent 100%);
+    color: var(--accent-primary);
+    border-left-color: var(--accent-primary);
+}
+
+.menu-item i { width: 24px; text-align: center; }
+
+/* =================================================================
+   WIDGET AMIGOS ONLINE (Estilo da Imagem)
+   Adicione ao final de amizades.css
+================================================================= */
+
+/* Container do Widget */
+.sidebar-widget .online-friends {
+    background: var(--bg-secondary); /* Fundo do card */
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: none; /* Remove sombras externas para ficar flat como na imagem */
+}
+
+/* Título "Amigos Online" */
+.sidebar-widget .widget-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary); /* Cor cinza */
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color); /* Linha fina separadora */
+    text-transform: none; /* Remove caixa alta se houver */
+}
+
+/* Item da Lista (Cada amigo) */
+.sidebar-widget .friend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Empurra a bolinha para a ponta direita */
+    padding: 0.6rem 0; /* Espaçamento vertical entre os amigos */
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+/* Link (Agrupa Avatar + Nome) */
+.sidebar-widget .friend-item-link {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Distância entre a foto e o nome */
+    text-decoration: none;
+    flex-grow: 1; /* Ocupa todo o espaço até a bolinha */
+    min-width: 0; /* Evita que nomes longos quebrem o layout */
+}
+
+/* Avatar do Amigo */
+.sidebar-widget .friend-item .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0; /* Remove margens antigas */
+    border: none; /* Remove bordas antigas */
+}
+
+.sidebar-widget .friend-item .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Nome do Amigo */
+.sidebar-widget .friend-name {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-primary); /* Branco/Claro */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Bolinha de Status (Lado Direito) */
+.sidebar-widget .friend-item .status.online {
+    position: static; /* Remove posicionamento absoluto antigo */
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #22c55e; /* Verde vibrante */
+    border: none;
+    margin-left: 10px; /* Afasta um pouco do nome */
+    flex-shrink: 0; /* Impede que a bolinha amasse */
+}
+/* --- MAIN CONTENT --- */
+.main-content {
+    flex: 1; /* Ocupa todo o espaço restante */
+    padding: 2rem;
+    width: calc(100% - var(--sidebar-width)); /* Garante largura correta */
+    min-width: 0; /* Evita overflow em grids */
+}
+
+/* Container interno para limitar largura em telas ultra-wide */
+.connections-container {
+    max-width: 1200px;
+    margin: 0; /* Alinhado à esquerda perto da sidebar */
+    width: 100%;
+}
+
+.connections-section { margin-bottom: 3rem; margin-top: 0 }
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex; align-items: center; gap: 10px;
+}
+
+.section-title i { color: var(--accent-primary); }
+
+/* --- GRIDS DE CARDS --- */
+.friends-grid, .user-list {
+    display: grid;
+    /* Grid responsivo automático */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+/* --- CARDS (Amigos & Pedidos) --- */
+.friend-card, .request-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.friend-card:hover, .request-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border-color: var(--accent-primary);
+}
+
+.friend-card-header {
+    display: flex; align-items: center; gap: 1rem;
+    text-decoration: none; color: inherit; margin-bottom: 1rem;
+}
+
+.friend-avatar, .request-avatar {
+    position: relative; width: 56px; height: 56px; flex-shrink: 0;
+}
+
+.friend-avatar img, .request-avatar img {
+    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    border: 2px solid var(--bg-tertiary);
+}
+
+.friend-status {
+    position: absolute; bottom: 0; right: 0;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-secondary);
+}
+.friend-status.online { background-color: #238636; }
+.friend-status.offline { background-color: #6e7681; }
+
+.friend-info, .request-info { flex: 1; min-width: 0; }
+.friend-name, .request-info h4 {
+    font-size: 1rem; font-weight: 600; color: var(--text-primary);
+    margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.friend-email, .request-info p {
+    font-size: 0.85rem; color: var(--text-secondary); margin: 2px 0 0 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Botões */
+.friend-actions, .request-actions {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+    margin-top: auto;
+}
+
+.friend-action-btn, .request-actions .btn {
+    padding: 0.6rem;
+    border-radius: 8px;
+    font-size: 0.85rem; font-weight: 500;
+    cursor: pointer; text-align: center;
+    border: none; display: flex; align-items: center; justify-content: center; gap: 6px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.primary, .btn-primary { background: var(--accent-primary); color: white; }
+.primary:hover, .btn-primary:hover { background: var(--accent-secondary); }
+
+.secondary, .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); }
+.secondary:hover, .btn-secondary:hover { background: var(--bg-quaternary); }
+
+.danger, .btn-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid transparent; }
+.danger:hover, .btn-danger:hover { background: #ef4444; color: white; }
+
+/* Estados Vazios */
+.empty-state, .empty-friends-state {
+    grid-column: 1 / -1;
+    text-align: center; padding: 3rem;
+    background: var(--bg-secondary);
+    border-radius: 12px; border: 1px dashed var(--border-color);
+    color: var(--text-secondary);
+}
+
+/* =================================================================
+   RESPONSIVIDADE (MOBILE & TABLET)
+================================================================= */
+
+/* Overlay para fundo escuro no mobile */
+.mobile-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 99; opacity: 0; visibility: hidden;
+    transition: 0.3s; backdrop-filter: blur(2px);
+}
+.mobile-overlay.active { opacity: 1; visibility: visible; }
+
+/* Header Mobile (Só aparece no mobile) */
+.page-header-mobile {
+    display: none; /* Oculto no desktop */
+    align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem;
+    margin-bottom: 0;
+}
+.page-title-mobile { font-size: 1.25rem; font-weight: 700; margin: 0; }
+
+/* MOBILE (Max 1024px - inclui Tablets em modo retrato e celulares) */
+@media (max-width: 1024px) {
+    
+    /* Sidebar vira Menu Gaveta */
+    .sidebar {
+        position: fixed; top: 0; left: 0;
+        height: 100vh;
+        width: 85%; max-width: 320px;
+        transform: translateX(-100%); /* Escondido */
+        box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+    .sidebar.active { transform: translateX(0); }
+
+    /* Botão Fechar na Sidebar */
+    .sidebar-close {
+        display: block; position: absolute; top: 15px; right: 15px;
+        background: none; border: none; color: var(--text-secondary);
+        font-size: 1.5rem; cursor: pointer;
+    }
+
+    /* Conteúdo Principal */
+    .main-content {
+        width: 100%; padding: 1rem;
+    }
+
+    .page-header-mobile { display: flex; } /* Mostra título mobile */
+
+    /* Layout Grid Mobile */
+    .friends-grid, .user-list {
+        grid-template-columns: 1fr; /* 1 coluna */
+        gap: 1rem;
+    }
+    
+    /* Ajustes finos nos cards mobile */
+    .friend-card, .request-card { padding: 1rem; }
+    .friend-action-btn, .request-actions .btn { padding: 0.8rem; } /* Botões maiores para toque */
+}
+
+/* Botão Cancelar no Cabeçalho do Modal */
+#cancel-edit-profile-btn {
+    background-color: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary); /* Ou #8b949e se não usar variáveis */
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Efeito Hover (Ao passar o mouse) */
+#cancel-edit-profile-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Fundo levemente claro */
+    color: var(--text-primary); /* Texto fica branco */
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ===============================================
+   CORREÇÃO: Esconder Loading quando carregado
+   =============================================== */
+
+/* Quando o JS adicionar a classe .loaded no container do usuário... */
+.user-info.loaded .user-info-loading {
+    display: none !important; /* ...esconde o spinner imediatamente */
+}
+
+/* Adiciona uma transição suave se preferir (opcional) */
+.user-info-loading {
+    transition: opacity 0.3s ease;
+}
+
+/* =================================================================
+   CORREÇÃO: CARD DE PERFIL DA SIDEBAR
+   (Adicione ao final do arquivo buscar_amigos.css)
+================================================================= */
+
+.sidebar-user-card { 
+    margin-bottom: 0.5rem; 
+}
+
+/* Container do Card */
+.sidebar .user-info {
+    display: flex;
+    flex-direction: column; /* Empilha: Foto -> Texto -> Stats */
+    align-items: center;    /* Centraliza tudo horizontalmente */
+    justify-content: center;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    position: relative;
+    gap: 0.75rem;
+    text-decoration: none;
+    min-height: auto; /* Reseta altura mínima se houver conflito */
+}
+
+/* 1. Foto de Perfil (Avatar) */
+.sidebar .avatar-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 0.25rem;
+    flex-shrink: 0;
+}
+
+.sidebar .avatar-container img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--bg-tertiary);
+}
+
+/* Status Online (Bolinha Verde) */
+.sidebar .avatar-container .status {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-secondary);
+    background-color: #238636; /* Verde */
+}
+
+/* 2. Identidade (Nome e Cargo) */
+.sidebar .user-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.25rem;
+}
+
+.sidebar .user-identity h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.sidebar .user-role {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: var(--bg-tertiary);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* 3. Estatísticas (Lado a Lado) */
+.sidebar .user-stats {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem; /* Espaço entre os números */
+    margin-top: 0.5rem;
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+
+.sidebar .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.2;
+}
+
+.sidebar .stat-item strong {
+    color: var(--accent-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.sidebar .stat-item .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* Loading Overlay do Perfil */
+.sidebar .user-info-loading {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar .user-info.loaded .user-info-loading {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* =================================================================
+   CORREÇÃO: CARDS DE PEDIDOS (Enviados/Recebidos)
+   Adicione ao final de amizades.css
+================================================================= */
+
+/* Header do Card de Pedido (Foto + Texto lado a lado) */
+.request-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+    text-align: left; /* Garante alinhamento à esquerda */
+}
+
+/* Ajuste da imagem no card de pedido */
+.request-avatar {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+.request-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--bg-tertiary);
+}
+
+/* Container de Ações (Botões) */
+.request-actions {
+    display: flex; /* Mudamos de Grid para Flex */
+    gap: 0.75rem;
+    width: 100%;
+    margin-top: auto;
+}
+
+/* Faz os botões ocuparem o espaço disponível uniformemente */
+.request-actions .btn {
+    flex: 1; /* Se tiver 1 botão, ocupa 100%. Se 2, ocupam 50% cada */
+    justify-content: center;
+}
+
+/* =================================================================
+   CORREÇÃO: Spinner do Perfil no Topo (Header)
+================================================================= */
+
+/* Define o container da foto como referência para o spinner */
+.profile-pic {
+    position: relative !important; 
+    overflow: hidden; /* Garante a forma redonda */
+}
+
+/* Garante que o spinner preencha exatamente o tamanho da foto */
+.topbar-user-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-secondary);
+    z-index: 10;
+}
+
+/* Ajusta o tamanho do spinner interno para caber na foto pequena */
+.topbar-user-loading .loading-spinner {
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+}
+

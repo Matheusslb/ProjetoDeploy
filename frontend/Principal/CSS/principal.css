@@ -1,0 +1,3206 @@
+:root {
+  /* Dark Theme Default */
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --bg-quaternary: #30363d;
+  --bg-hover: rgba(48, 54, 61, 0.5);
+  /* Cor para hover sutil */
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-tertiary: #6e7681;
+  --accent-primary: #58a6ff;
+  --accent-secondary: #1f6feb;
+  --highlight: #f78166;
+  --online: #3fb950;
+  --away: #d29922;
+  --danger: #f85149;
+  --success: #238636;
+  --border-color: #30363d;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --card-radius: 8px;
+  --transition: all 0.2s ease-in-out;
+}
+
+[data-theme="light"] {
+  /* Light Theme inspirado no Facebook */
+  --bg-primary: #f0f2f5;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f0f2f5;
+  --bg-quaternary: #e4e6eb;
+  --bg-hover: rgba(228, 230, 235, 0.5);
+  /* Cor para hover sutil */
+  --text-primary: #1c1e21;
+  --text-secondary: #65676b;
+  --text-tertiary: #8d949e;
+  --accent-primary: #1877f2;
+  --accent-secondary: #166fe5;
+  --highlight: #fa383e;
+  --online: #31a24c;
+  --away: #f7b928;
+  --danger: #fa383e;
+  --success: #31a24c;
+  --border-color: #dddfe2;
+  --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+/* Header Styles */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 2rem;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* Controla a distância entre os ícones e a foto do perfil */
+}
+
+@media (max-width: 768px) {
+  .header-right {
+    gap: 0.5rem; /* Distância menor no celular */
+  }
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.menu-toggle {
+  display: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+}
+
+.menu-toggle:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+/* Altere esta regra */
+.logo .highlight {
+    color: var(--danger); /* Alterado de --highlight para --danger */
+}
+
+.search {
+  position: relative;
+  flex: 0.5;
+  min-width: 200px;
+}
+
+.search i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+}
+
+.search input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  background-color: var(--bg-tertiary);
+  border: none;
+  border-radius: 20px;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.search input:focus {
+  outline: none;
+  background-color: var(--bg-secondary);
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-icon {
+  position: relative;
+  padding: 0.75rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.nav-icon:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.nav-icon i {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+}
+
+.badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--danger);
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: bold;
+}
+
+.theme-toggle {
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.theme-toggle:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.user-dropdown {
+  position: relative;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.user:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.profile-pic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 200px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.5rem 0;
+  box-shadow: var(--shadow);
+  display: none;
+  z-index: 100;
+}
+
+.dropdown-menu a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.dropdown-menu a:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.dropdown-menu a i {
+  width: 20px;
+  text-align: center;
+}
+
+.nav-icon {
+  position: relative;
+  /* Necessário para o posicionamento do painel */
+}
+
+.notifications-panel {
+  display: none;
+  /* Começa escondido */
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 360px;
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  z-index: 1001;
+}
+
+.notifications-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notifications-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.notifications-list .empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.notification-item.unread {
+  background-color: var(--bg-hover);
+}
+
+.notification-item i {
+  color: var(--accent-primary);
+  font-size: 1.2rem;
+}
+
+.notification-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  flex-grow: 1;
+}
+
+.notification-item .timestamp {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.mark-as-read-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--accent-primary);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* --- AMIGOS ONLINE --- */
+.online-friends {
+  background-color: var(--bg-secondary);
+  border-radius: var(--card-radius);
+  padding: 1.25rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+.widget-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.friend-list .empty-state {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+  border-bottom: 0;
+}
+
+.friend-item:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.friend-item .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0; /* Impede que o avatar encolha */
+}
+
+.friend-item .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.friend-item .friend-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  flex-grow: 1;
+    margin-bottom: 10px;
+
+}
+
+.friend-item .status.online {
+  margin-left: auto;
+  /* Empurra o status para a direita */
+  width: 10px;
+  height: 10px;
+  border: none;
+    margin-bottom: 10px;
+
+  position: static;
+  flex-shrink: 0;
+}
+
+/* Container Layout */
+.container {
+  display: grid;
+  grid-template-columns: 280px 1fr 300px;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 100px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.user-info-link {
+  text-decoration: none !important;
+  /* Remove o sublinhado */
+  color: inherit;
+  /* Herda a cor do texto do elemento pai */
+  display: block;
+}
+
+.user-info-link .user-info {
+  transition: var(--transition);
+}
+
+.user-info-link:hover .user-info {
+  background-color: var(--bg-hover);
+  /* Efeito de hover sutil */
+}
+
+
+.user-info-link * {
+  text-decoration: none !important;
+}
+
+.user-info {
+  background-color: var(--bg-secondary);
+  border-radius: var(--card-radius);
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+/* DEPOIS DA CORREÇÃO */
+.avatar {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%; 
+  margin: 0 auto 1rem;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%; 
+}
+
+.status {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--bg-secondary);
+}
+
+.status.online {
+  background-color: var(--online);
+}
+
+.status.away {
+  background-color: var(--away);
+}
+
+.user-info h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.user-title {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.user-stats {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat strong {
+  display: block;
+  font-size: 1.25rem;
+  color: var(--accent-primary);
+}
+
+.stat span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.menu {
+  background-color: var(--bg-secondary);
+  border-radius: var(--card-radius);
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: 6px;
+  transition: var(--transition);
+  position: relative;
+}
+
+.menu a.active,
+.menu a:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--accent-primary);
+}
+
+.menu a i {
+  width: 20px;
+  text-align: center;
+}
+
+/* Main Content */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.posts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.post {
+  background-color: var(--bg-secondary);
+  border-radius: var(--card-radius);
+  padding: 1rem 1.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.post-author-details {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* --- CORREÇÃO DA FOTO DO AUTOR DO POST --- */
+.post-author-avatar {
+  width: 45px;
+  height: 45px;
+  flex-shrink: 0;
+  /* Impede que o contêiner encolha */
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.post-author-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- FIM DA CORREÇÃO DA FOTO --- */
+
+.post-author-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.post-author-info strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.post-author-info span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Botão de três pontos (Posts e Comentários) */
+.post-options-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- NOVOS ESTILOS PARA MENUS DE OPÇÕES (POSTS E COMENTÁRIOS) --- */
+.post-options {
+  position: relative;
+  /* Contexto para o menu dropdown */
+}
+
+.options-menu {
+  position: absolute;
+  display: none;
+  /* Controlado por JS para aparecer no clique */
+  width: 180px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  z-index: 10;
+  overflow: hidden;
+  padding: 0.25rem 0;
+}
+
+/* Posicionamento do menu do POST */
+.post-options .options-menu {
+  top: 100%;
+  /* Abaixo do botão */
+  right: 0;
+}
+
+/* Posicionamento do menu do COMENTÁRIO */
+.comment .options-menu {
+  top: 30px;
+  /* Abaixo do botão do comentário */
+  right: 5px;
+}
+
+/* Estilo para cada botão dentro do menu */
+.options-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-align: left;
+  transition: var(--transition);
+}
+
+.options-menu button:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.options-menu button.danger {
+  color: var(--danger);
+}
+
+.options-menu button.danger:hover {
+  background-color: rgba(248, 81, 73, 0.1);
+}
+
+.options-menu button i {
+  width: 16px;
+  text-align: center;
+}
+
+/* --- FIM DOS NOVOS ESTILOS --- */
+
+
+.post-content {
+  margin-bottom: 1rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.post-media img,
+.post-media video {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.post-actions {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.5rem;
+  margin-top: 1rem;
+}
+
+.post-actions .action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.post-actions .action-btn:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.post-actions .action-btn.liked {
+  color: var(--accent-primary);
+}
+
+.comments-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.comment-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment {
+  display: flex;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.comment-avatar img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-body {
+  background-color: var(--bg-tertiary);
+  padding: 0.5rem 0.75rem;
+  border-radius: 15px;
+  flex-grow: 1;
+}
+
+.comment-author {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.comment-content {
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  word-wrap: break-word;
+}
+
+.comment.destacado .comment-body {
+  background-color: #f7b92820;
+  border: 1px solid var(--away);
+}
+
+.comment-options-btn {
+  display: none;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.comment:hover .comment-options-btn {
+  display: flex;
+}
+
+.comment-actions-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.25rem;
+  padding-left: 47px;
+}
+
+.action-btn-like,
+.action-btn-reply {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px;
+}
+
+.action-btn-like.liked {
+  color: var(--accent-primary);
+}
+
+.like-count {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.comment-replies {
+  margin-left: 25px;
+  padding-left: 20px;
+  border-left: 2px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.reply-form {
+  display: none;
+  gap: 10px;
+  margin-top: 0.5rem;
+  padding-left: 47px;
+}
+
+.reply-form input {
+  flex-grow: 1;
+  background-color: var(--bg-quaternary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.reply-form button {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.comment-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.comment-form input {
+  flex-grow: 1;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 10px 15px;
+  color: var(--text-primary);
+}
+
+.comment-form button {
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Criador de Post */
+.post-creator-card {
+  background-color: var(--bg-secondary);
+  border-radius: var(--card-radius);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+}
+
+.post-creator-input-area {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.avatar-small {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#post-creator-textarea {
+  flex-grow: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  resize: none;
+  padding-top: 0.5rem;
+  line-height: 1.5;
+  min-height: 60px;
+}
+
+#post-creator-textarea:focus {
+  outline: none;
+}
+
+#post-creator-textarea::placeholder {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.post-creator-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+}
+
+.post-creator-actions .action-buttons-left {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.post-creator-actions .action-btn,
+.post-creator-actions .file-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: var(--transition);
+}
+
+.post-creator-actions .action-btn:hover,
+.post-creator-actions .file-label:hover {
+  background-color: var(--bg-quaternary);
+}
+
+.publish-btn {
+  background-color: var(--accent-primary);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.publish-btn:hover {
+  background-color: var(--accent-secondary);
+  opacity: 0.9;
+}
+
+.publish-btn:disabled {
+  background-color: var(--bg-quaternary);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+#file-preview-container,
+#edit-file-preview-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.file-preview-item {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.file-preview-item img,
+.file-preview-item video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.file-preview-item .remove-file-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 20px;
+  height: 20px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modais, Notificações, etc. */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background-color: var(--bg-secondary);
+  padding: 2rem;
+  border-radius: var(--card-radius);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: var(--shadow);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-footer .btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-secondary {
+  background-color: var(--bg-quaternary);
+  color: var(--text-primary);
+}
+
+.btn-primary {
+  background-color: var(--accent-primary);
+  color: white;
+}
+
+.notification-center {
+  position: fixed;
+  top: 80px;
+  right: 1rem;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notification {
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  transform: translateX(120%);
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+  font-size: 0.875rem;
+}
+
+.notification.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.notification.success {
+  border-left: 4px solid var(--success);
+}
+
+.notification.info {
+  border-left: 4px solid var(--accent-primary);
+}
+
+.notification.error {
+  border-left: 4px solid var(--danger);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 1200px) {
+  .container {
+    grid-template-columns: 280px 1fr;
+  }
+
+  .right-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+  }
+
+  .topbar {
+    padding: 0.5rem 1rem;
+  }
+
+  .search {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0; /* Ajustado para cobrir desde o topo */
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    z-index: 2000;
+    background-color: var(--bg-primary);
+    
+    /* Animação de deslize */
+    transform: translateX(-100%); 
+    transition: transform 0.3s ease;
+    box-shadow: none;
+  }
+
+  /* Classe que o JS adiciona para mostrar */
+  .sidebar.mobile-open {
+    transform: translateX(0); /* Traz a sidebar para a tela */
+    box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+  }
+
+  /* O fundo escuro */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1999;
+    display: none; /* Escondido por padrão */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+  }
+}
+
+.modal-content .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.modal-content .form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.modal-content .form-group input,
+.modal-content .form-group textarea,
+.modal-content .form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif; /* Garante a fonte correta */
+}
+
+.modal-content .form-group textarea {
+  resize: vertical;
+  font-family: 'Inter', sans-serif;
+}
+
+.modal-content .form-divider {
+  border: none;
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 1.5rem 0;
+}
+
+.profile-pic-editor {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.profile-pic-editor label {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+}
+
+#edit-profile-pic-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--border-color);
+}
+
+.pic-editor-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.profile-pic-editor label:hover .pic-editor-overlay {
+  opacity: 1;
+}
+
+.pic-editor-overlay i {
+  font-size: 1.5rem;
+}
+
+.pic-editor-overlay span {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.warning-text {
+  background-color: rgba(248, 81, 73, 0.1);
+  border-left: 4px solid var(--danger);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.modal-footer .btn-danger {
+  background-color: var(--danger);
+  color: white;
+}
+
+/* --- Estilos para a Página de Busca de Amigos --- */
+
+/* Caixa de pesquisa dentro do widget */
+.search-box {
+  position: relative;
+}
+
+.search-box i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-secondary);
+}
+
+/* Contêiner para os resultados da busca */
+.search-results-container {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card de resultado de usuário */
+.user-card {
+  position: relative;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--card-radius);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+}
+
+.user-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent-primary);
+}
+
+.user-card-avatar {
+  position: relative;
+  /* Define este container como referência para o status */
+  flex-shrink: 0;
+  /* Impede que o container encolha */
+}
+
+
+.user-card-avatar img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-card-info {
+  flex-grow: 1;
+  /* Ocupa o espaço disponível */
+}
+
+.user-card-info h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.user-card-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.user-card-action .btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  /* Impede que o texto do botão quebre linha */
+}
+
+.user-card-action .btn-primary {
+  background-color: var(--accent-primary);
+  color: white;
+}
+
+.user-card-action .btn-secondary {
+  background-color: var(--bg-quaternary);
+  color: var(--text-primary);
+}
+
+.user-card-action .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* --- Estilos para Ações nas Notificações --- */
+.notification-content {
+  width: 100%;
+}
+
+.notification-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.notification-actions .btn-sm {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+
+.feedback-text {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.feedback-text.success {
+  color: var(--success);
+}
+
+/* --- Estilos para a Página de Amizades --- */
+.connections-section {
+  margin-top: 2rem;
+}
+
+.connections-section h3 {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.request-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.request-card {
+  background-color: var(--bg-tertiary);
+  border-radius: var(--card-radius);
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.request-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.request-card h4 {
+  margin-bottom: 0.25rem;
+  font-size: 1.1rem;
+}
+
+.request-card .timestamp {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+.request-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.request-card-actions .btn {
+  width: 100%;
+}
+
+/* Estilo para a lista de amigos na vertical */
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Adiciona um espaçamento entre os cards */
+}
+
+/* --- Estilos para Ações nas Notificações --- */
+.notification-content {
+  width: 100%;
+}
+
+/* Container para os botões de ação */
+.notification-actions {
+  display: flex;
+  gap: 0.75rem;
+  /* Aumenta o espaço entre os botões */
+  margin-top: 0.75rem;
+}
+
+/* Estilo geral para os botões pequenos */
+.notification-actions .btn-sm {
+  padding: 0.4rem 0.85rem;
+  /* Ajusta o padding para um tamanho confortável */
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+/* Botão primário (Aceitar) */
+.notification-actions .btn-primary {
+  background-color: var(--accent-primary);
+  color: white;
+}
+
+.notification-actions .btn-primary:hover {
+  opacity: 0.85;
+}
+
+/* Botão secundário (Recusar) - estilo "outline" */
+.notification-actions .btn-secondary {
+  background-color: transparent;
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+.notification-actions .btn-secondary:hover {
+  background-color: var(--bg-quaternary);
+  color: var(--text-primary);
+  border-color: var(--bg-quaternary);
+}
+
+
+/* Texto de feedback que aparece após a ação (Ex: "Pedido aceito!") */
+.feedback-text {
+  margin-top: 0.75rem;
+  padding: 0.25rem 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--text-secondary);
+  animation: fadeIn 0.5s ease;
+}
+
+.feedback-text.success {
+  color: var(--success);
+}
+
+.feedback-text.info {
+  color: var(--accent-primary);
+}
+
+/* Ajustes no item de notificação para melhor alinhamento */
+.notification-item {
+  display: flex;
+  flex-direction: column;
+  /* Organiza o conteúdo e as ações verticalmente */
+  align-items: flex-start;
+  transition: opacity 0.4s ease, max-height 0.4s ease;
+  overflow: hidden;
+  max-height: 200px;
+  /* Altura inicial para animação */
+  border-bottom: 1px solid var(--border-color);
+  padding: 0;
+  /* Removido para o link interno controlar o espaçamento */
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item.removing {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border: none;
+}
+
+.notification-link {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+}
+
+.notification-actions-wrapper {
+  padding: 0 1rem 1rem 3.5rem;
+  /* Alinha os botões com o texto da notificação */
+}
+
+
+.user-card-action {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn.btn-danger {
+  background-color: var(--bg-quaternary);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+}
+
+.btn.btn-danger:hover {
+  background-color: var(--danger);
+  color: white;
+}
+
+.user-card-action .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  /* Espaço entre o ícone e o texto */
+}
+
+.status.offline {
+  background-color: var(--text-tertiary);
+  /* Cinza para offline */
+}
+/* Adicionar ao final de FrontEnd/Principal/CSS/principal.css */
+
+/* Melhorias no Modal de Edição */
+#edit-post-modal .modal-content {
+    max-width: 550px; /* Um pouco mais largo para acomodar as mídias */
+}
+
+#edit-post-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem; /* Aumenta o espaçamento entre os elementos */
+}
+
+#edit-post-textarea {
+    min-height: 100px;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75rem;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+#edit-post-textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px var(--accent-secondary);
+}
+
+.form-group-files {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.file-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#edit-existing-media-container,
+#edit-file-preview-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.existing-media-item,
+.file-preview-item {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+}
+
+.existing-media-item img,
+.file-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* Checkbox para remover mídia existente */
+.remove-existing-media-checkbox {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    appearance: none;
+    -webkit-appearance: none;
+    display: grid;
+    place-content: center;
+}
+
+.remove-existing-media-checkbox::before {
+    content: '✔';
+    color: white;
+    font-size: 12px;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+}
+
+.remove-existing-media-checkbox:checked::before {
+    transform: scale(1);
+}
+
+/* Botão de remover nova mídia */
+.file-preview-item .remove-file-btn {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 22px;
+    height: 22px;
+    background: var(--danger);
+    color: white;
+    border: 2px solid var(--bg-secondary);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* Adiciona ícones aos botões do modal */
+#edit-post-form .modal-footer .btn i {
+    margin-right: 0.5rem;
+}
+/* Adicione estas regras ao final do seu arquivo CSS */
+
+.publish-btn.loading {
+    cursor: wait;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem; /* Espaço entre o ícone e o texto */
+}
+
+/* Animação do ícone de carregamento (spinner) do Font Awesome */
+.fa-spinner {
+    animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+/* Adicionar ao final de FrontEnd/Principal/CSS/principal.css */
+
+/* Container para mídias existentes */
+#edit-existing-media-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.existing-media-item {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.existing-media-item img, .existing-media-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* Checkbox para remover a imagem existente */
+.remove-existing-media-checkbox {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* Estilo para o botão de remover novas mídias */
+.file-preview-item .remove-file-btn {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 20px;
+    text-align: center;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Estilo para a lista de amigos na vertical */
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Adiciona um espaçamento entre os cards */
+}
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-quaternary) var(--bg-secondary);
+
+}
+
+/* Para Chrome, Edge e Safari (Webkit) */
+html::-webkit-scrollbar {
+  width: 10px;
+}
+
+html::-webkit-scrollbar-track {
+  background: var(--bg-secondary); /* Fundo da barra */
+}
+
+html::-webkit-scrollbar-thumb {
+  background-color: var(--bg-quaternary); /* Cor do "puxador" */
+  border-radius: 5px;
+  border: 2px solid var(--bg-secondary); /* Borda da cor do fundo */
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary); /* Cor ao passar o mouse */
+}
+
+/* --- ESTILOS PARA LINKS DE PERFIL --- */
+
+/* Link no cabeçalho do post */
+.post-author-details-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+}
+.post-author-details-link:hover .post-author-info strong {
+    text-decoration: underline;
+}
+
+/* Link no comentário (avatar e nome) */
+.comment-author-link {
+    text-decoration: none;
+    color: inherit;
+}
+.comment-author-link:hover .comment-author {
+    text-decoration: underline;
+    color: var(--text-primary);
+}
+
+/* Link no card de usuário (usado em 'amizades.html' e 'buscar_amigos.html') */
+a.user-card-link {
+    text-decoration: none;
+    color: inherit;
+}
+a.user-card-link:hover h4 {
+    text-decoration: underline;
+}
+.user-card {
+    display: flex; /* Garante que o layout do card-usuário se mantenha */
+    align-items: center;
+}
+
+/* Link na lista de amigos online (sidebar) */
+.friend-item-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-grow: 1; /* Ocupa o espaço e empurra o status online para a direita */
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+     /* Corrige problemas de flexbox */
+}
+.friend-item-link .friend-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.friend-item-link:hover .friend-name {
+    text-decoration: underline;
+}
+
+/* --- Estilo para Selects dentro de Modais --- */
+.modal-content .form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    /* Seta customizada (usada no seu login/cadastro) */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%238b949e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    padding-right: 2.5rem; /* Espaço extra para a seta */
+}
+
+.modal-content .form-group select:invalid {
+    color: var(--text-secondary);
+}
+
+/* --- Estilo para a tag @username nas respostas --- */
+.comment-content .reply-tag {
+    color: var(--accent-primary);
+    font-weight: 600;
+    text-decoration: none;
+    margin-right: 0.25rem;
+}
+
+.comment-content .reply-tag:hover {
+    text-decoration: underline;
+}
+
+/* --- Animação de Flash para Comentário --- */
+
+/* Adiciona variáveis de transparência no :root */
+:root {
+    /* ... (outras variáveis) ... */
+    --accent-primary-trans-10: rgba(88, 166, 255, 0.1);
+    --accent-primary-trans-30: rgba(88, 166, 255, 0.3);
+}
+
+[data-theme="light"] {
+    /* ... (outras variáveis) ... */
+    --accent-primary-trans-10: rgba(24, 119, 242, 0.1);
+    --accent-primary-trans-30: rgba(24, 119, 242, 0.3);
+}
+
+@keyframes flash-animation {
+    0% {
+        background-color: var(--bg-secondary);
+    }
+    25% {
+        background-color: var(--accent-primary-trans-10);
+        box-shadow: 0 0 10px var(--accent-primary-trans-30);
+    }
+    75% {
+        background-color: var(--accent-primary-trans-10);
+        box-shadow: 0 0 10px var(--accent-primary-trans-30);
+    }
+    100% {
+        background-color: var(--bg-secondary);
+    }
+}
+
+.comment.highlight-flash {
+    /* Aplica a animação ao comentário */
+    animation: flash-animation 1.5s ease-out;
+}
+/* Adicionar ao final de principal.css */
+
+/* --- Estilo para Botão "Ver Respostas" --- */
+.view-replies-container {
+    padding-left: 47px; 
+    margin-top: 0.25rem;  /* REDUZIDO */
+    margin-bottom: 0.25rem; /* REDUZIDO */
+}
+
+.btn-view-replies {
+    background: none;
+    border: none;
+    color: var(--text-secondary); /* Cor sutil */
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.btn-view-replies:hover {
+    color: var(--accent-primary); /* Destaca ao passar o mouse */
+}
+
+/* --- CARROSSEL DE MÍDIAS --- */
+
+.media-carousel-container {
+    position: relative;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.media-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    border-radius: 8px;
+}
+
+.media-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.media-carousel-item {
+    flex: 0 0 auto;
+    width: 100%;
+    scroll-snap-align: start;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-tertiary);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.media-carousel-item img,
+.media-carousel-item video {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.carousel-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 10px;
+    padding: 0.5rem;
+}
+
+.carousel-btn {
+    background-color: var(--bg-quaternary);
+    border: none;
+    color: var(--text-primary);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.carousel-btn:hover {
+    background-color: var(--accent-primary);
+    color: white;
+}
+
+.carousel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.carousel-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-tertiary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.carousel-indicator.active {
+    background-color: var(--accent-primary);
+    transform: scale(1.2);
+}
+
+.carousel-counter {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Modal de Visualização de Mídias */
+.media-viewer-content {
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.9);
+    width: 90vw;
+    height: 90vh;
+    max-width: 1200px;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.media-viewer-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    z-index: 10;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.media-viewer-close {
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: var(--transition);
+}
+
+.media-viewer-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.media-carousel {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem 2rem;
+}
+
+.carousel-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.carousel-slide {
+    display: none;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-slide.active {
+    display: flex;
+}
+
+.carousel-slide img,
+.carousel-slide video {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    z-index: 5;
+    transition: var(--transition);
+}
+
+.carousel-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.carousel-prev {
+    left: 2rem;
+}
+
+.carousel-next {
+    right: 2rem;
+}
+
+.media-viewer-content .carousel-indicators {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    z-index: 5;
+}
+
+.media-viewer-content .carousel-indicator {
+    width: 10px;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.media-viewer-content .carousel-indicator.active {
+    background-color: white;
+    transform: scale(1.2);
+}
+
+/* Responsividade para o carrossel */
+@media (max-width: 768px) {
+    .media-viewer-content {
+        width: 95vw;
+        height: 95vh;
+    }
+    
+    .carousel-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .carousel-prev {
+        left: 1rem;
+    }
+    
+    .carousel-next {
+        right: 1rem;
+    }
+    
+    .media-carousel {
+        padding: 3rem 1rem 1rem;
+    }
+}
+
+/* Melhorias para múltiplas mídias na postagem */
+.post-media-grid {
+    display: grid;
+    gap: 4px;
+    margin-top: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.post-media-grid.single {
+    grid-template-columns: 1fr;
+}
+
+.post-media-grid.double {
+    grid-template-columns: 1fr 1fr;
+}
+
+.post-media-grid.triple {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.post-media-grid.multiple {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+}
+
+.post-media-item {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    background-color: var(--bg-tertiary);
+}
+
+.post-media-item img,
+.post-media-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.post-media-item:hover img,
+.post-media-item:hover video {
+    transform: scale(1.05);
+}
+
+.post-media-item.more::after {
+    content: '+ Mais';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* Layout específico para diferentes quantidades de mídias */
+.post-media-grid.double .post-media-item:first-child:nth-last-child(2),
+.post-media-grid.double .post-media-item:first-child:nth-last-child(2) ~ .post-media-item {
+    aspect-ratio: 1;
+}
+
+.post-media-grid.triple .post-media-item:first-child {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    aspect-ratio: 2 / 1;
+}
+
+.post-media-grid.triple .post-media-item:nth-child(2),
+.post-media-grid.triple .post-media-item:nth-child(3) {
+    aspect-ratio: 1;
+}
+
+.post-media-grid.multiple .post-media-item:first-child {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    aspect-ratio: 2 / 1;
+}
+
+.post-media-grid.multiple .post-media-item:nth-child(2),
+.post-media-grid.multiple .post-media-item:nth-child(3),
+.post-media-grid.multiple .post-media-item:nth-child(4) {
+    aspect-ratio: 1;
+}
+
+/* =================================================================
+   ESTILOS DO CARROSSEL NO FEED (Para > 2 mídias)
+   ================================================================= */
+
+.feed-carousel-wrapper {
+    position: relative;
+    width: 100%;
+    margin-top: 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #000; /* Fundo preto para contraste */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    /* Garante proporção consistente (opcional, remove se quiser altura automática) */
+    aspect-ratio: 16 / 9; 
+    max-height: 500px;
+}
+
+.feed-carousel-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+.feed-carousel-track::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+.feed-carousel-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    background: #000;
+}
+
+/* Efeito de fundo desfocado para preencher espaços vazios (opcional, mas fica bonito) */
+.feed-carousel-slide::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px);
+    opacity: 0.3;
+    z-index: 0;
+}
+
+.feed-carousel-slide img,
+.feed-carousel-slide video {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain; /* Garante que a imagem inteira apareça */
+    z-index: 1; /* Fica acima do fundo desfocado */
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* Botões de Navegação (Estilo Glassmorphism) */
+.feed-carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+    opacity: 0; /* Esconde por padrão */
+}
+
+/* Mostra os botões apenas quando passa o mouse no carrossel */
+.feed-carousel-wrapper:hover .feed-carousel-btn {
+    opacity: 1;
+}
+
+.feed-carousel-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.feed-carousel-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.feed-carousel-btn i {
+    font-size: 1.1rem;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5));
+}
+
+.feed-carousel-btn.prev {
+    left: 15px;
+}
+
+.feed-carousel-btn.next {
+    right: 15px;
+}
+
+/* Contador de Slides (Pílula) */
+.feed-carousel-counter {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    z-index: 10;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* =================================================================
+   ESTILOS DE ESQUELETO DE CARREGAMENTO
+   ================================================================= */
+
+.post-skeleton {
+  background-color: var(--bg-secondary);
+  border-radius: var(--card-radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  animation: pulse 1.5s infinite;
+}
+
+.skeleton-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: var(--bg-tertiary);
+}
+
+.skeleton-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background-color: var(--bg-tertiary);
+}
+
+.skeleton-line.short {
+  width: 30%;
+}
+
+.skeleton-line.medium {
+  width: 60%;
+}
+
+.skeleton-line.long {
+  width: 90%;
+}
+
+.friend-skeleton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  animation: pulse 1.5s infinite;
+}
+
+.friend-skeleton .skeleton-avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.friend-skeleton .skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background-color: var(--bg-tertiary);
+  flex: 1;
+}
+
+.notification-skeleton {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  animation: pulse 1.5s infinite;
+}
+
+.notification-skeleton .skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--bg-tertiary);
+}
+
+.notification-skeleton .skeleton-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ===== RESPONSIVIDADE MOBILE ===== */
+@media (max-width: 1200px) {
+    .container {
+        grid-template-columns: 250px 1fr;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    .right-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        padding: 0.5rem;
+    }
+    
+    .topbar {
+        padding: 0.75rem 1rem;
+    }
+    
+    .search {
+        display: none;
+    }
+    
+    .menu-toggle {
+        display: block;
+    }
+    
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        z-index: 2000;
+        transition: transform 0.3s ease;
+        background: var(--bg-primary);
+    }
+    
+    .sidebar.mobile-open {
+        transform: translateX(280px);
+    }
+    
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1999;
+        display: none;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    /* Correções das ações da postagem */
+    .post-actions {
+        flex-direction: row !important;
+        justify-content: space-around;
+        gap: 0.25rem;
+    }
+    
+    .post-actions .action-btn {
+        flex: 1;
+        min-height: 44px;
+        font-size: 0.8rem;
+        gap: 0.4rem;
+    }
+    
+    .post-header {
+        flex-direction: row !important;
+        align-items: flex-start;
+    }
+    
+    .post-author-info strong {
+        max-width: 150px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Contadores - esconder quando zero */
+    .post-actions .action-btn .count:empty,
+    .post-actions .action-btn .count[data-count="0"] {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .post-author-info strong {
+        max-width: 120px;
+    }
+    
+    .post-actions .action-btn {
+        font-size: 0.75rem;
+        padding: 0.4rem;
+    }
+}
+
+/* Prevenir zoom iOS */
+@media (max-width: 768px) {
+    input, textarea {
+        font-size: 16px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Remove ícones Home e Mensagens */
+    .nav-icons .nav-icon:nth-child(1),
+    .nav-icons .nav-icon:nth-child(2) {
+        display: none;
+    }
+    
+    /* Ajusta espaçamento dos ícones restantes */
+    .nav-icons {
+        gap: 0.5rem;
+    }
+    
+    /* Corrige foto de perfil cortada */
+    .user-dropdown {
+        position: relative;
+        z-index: 1001;
+    }
+    
+    .user {
+        padding: 0.25rem;
+        margin-right: 0;
+    }
+    
+    .profile-pic {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--bg-secondary);
+    }
+    
+    .profile-pic img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+    
+    /* Garante que o dropdown não seja cortado */
+    .dropdown-menu {
+        position: fixed;
+        top: 60px;
+        right: 10px;
+        width: 200px;
+        z-index: 1002;
+    }
+    
+    /* Ajusta a topbar para caber melhor */
+    .topbar {
+        padding: 0.5rem;
+    }
+    
+    .header-left {
+        flex: 1;
+    }
+    
+    .nav-icons {
+        flex: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustes adicionais para telas muito pequenas */
+    .profile-pic {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .nav-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .dropdown-menu {
+        right: 5px;
+        width: 180px;
+    }
+}
+
+/* ===== GARANTIR QUE FOTO NÃO SEJA CORTADA ===== */
+.user-dropdown {
+    position: relative;
+}
+
+.profile-pic {
+    overflow: visible;
+}
+
+.profile-pic img {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Adicione estas regras ao final do seu arquivo principal.css */
+
+@media (max-width: 768px) {
+    /* Remove apenas os ícones Home e Mensagens, mantém notificações */
+    .nav-icons .nav-icon:nth-child(1),
+    .nav-icons .nav-icon:nth-child(2) {
+        display: none;
+    }
+    
+    /* Garante que o ícone de notificações fique visível */
+    .nav-icons .nav-icon:nth-child(3) {
+        display: flex !important;
+    }
+    
+    /* Ajusta espaçamento dos ícones restantes */
+    .nav-icons {
+        gap: 0.5rem;
+    }
+    
+    /* Corrige a logo para ficar menor em mobile */
+    .logo {
+        font-size: 1.1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustes adicionais para telas muito pequenas */
+    .logo {
+        font-size: 1rem;
+        max-width: 120px;
+    }
+    
+    .profile-pic {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .nav-icon {
+        width: 36px;
+        height: 36px;
+    }
+}
+/* Adicione estas regras ao final do seu arquivo principal.css */
+
+@media (max-width: 768px) {
+    /* Ajusta a logo para ficar menor mas visível */
+    .logo {
+        font-size: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+    }
+    
+    /* Remove apenas os ícones Home e Mensagens */
+    .nav-icons .nav-icon:nth-child(1),
+    .nav-icons .nav-icon:nth-child(2) {
+        display: none;
+    }
+    
+    /* Corrige o alinhamento dos ícones restantes */
+    .nav-icons {
+        gap: 0.25rem;
+        align-items: center;
+    }
+    
+    /* Garante que todos os ícones visíveis tenham o mesmo tamanho e alinhamento */
+    .nav-icon, .theme-toggle {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+    }
+    
+    /* Esconde o nome do usuário no mobile, mantém apenas a foto */
+    .user span {
+        display: none !important;
+    }
+    
+    .user i.fa-chevron-down {
+        display: none !important;
+    }
+    
+    /* Ajusta o container do usuário para ficar compacto */
+    .user {
+        padding: 0.25rem;
+        margin: 0;
+        min-width: auto;
+    }
+    
+    .profile-pic {
+        width: 36px;
+        height: 36px;
+        margin: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Ajustes mais extremos para telas muito pequenas */
+    .logo {
+        font-size: 0.9rem;
+        max-width: 120px;
+    }
+    
+    .nav-icon, .theme-toggle {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .profile-pic {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .header-left {
+        gap: 0.5rem;
+    }
+}
+
+/* Garante alinhamento consistente dos ícones em todas as telas */
+.nav-icons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-icon, .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Adicione estas regras ao final do seu arquivo principal.css */
+
+@media (max-width: 768px) {
+    /* Logo inteira sem ellipsis */
+    .logo {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: visible !important; /* Remove o corte */
+        text-overflow: unset !important; /* Remove os ... */
+        max-width: none !important; /* Remove a limitação de largura */
+        width: auto !important;
+    }
+    
+    /* Remove apenas os ícones Home e Mensagens */
+    .nav-icons .nav-icon:nth-child(1),
+    .nav-icons .nav-icon:nth-child(2) {
+        display: none;
+    }
+    
+    /* Corrige o alinhamento dos ícones restantes */
+    .nav-icons {
+        gap: 0.25rem;
+        align-items: center;
+    }
+    
+    /* Garante que todos os ícones visíveis tenham o mesmo tamanho e alinhamento */
+    .nav-icon, .theme-toggle {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+    }
+    
+    /* Esconde o nome do usuário no mobile, mantém apenas a foto */
+    .user span {
+        display: none !important;
+    }
+    
+    .user i.fa-chevron-down {
+        display: none !important;
+    }
+    
+    /* Ajusta o container do usuário para ficar compacto */
+    .user {
+        padding: 0.25rem;
+        margin: 0;
+        min-width: auto;
+    }
+    
+    .profile-pic {
+        width: 36px;
+        height: 36px;
+        margin: 0;
+    }
+    
+    /* Ajusta o header para acomodar a logo inteira */
+    .header-left {
+        flex: 0 1 auto; /* Permite que encolha se necessário */
+        min-width: 0;
+    }
+    
+    .topbar {
+        padding: 0.5rem 0.75rem;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Para telas muito pequenas, reduz um pouco a logo mas mantém inteira */
+    .logo {
+        font-size: 0.85rem;
+        letter-spacing: -0.3px; /* Compacta um pouco as letras */
+    }
+    
+    .nav-icon, .theme-toggle {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .profile-pic {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .header-left {
+        gap: 0.5rem;
+    }
+}
+
+/* Se mesmo assim a logo não couber em telas muito pequenas, 
+   podemos usar uma versão ainda mais compacta apenas em casos extremos */
+@media (max-width: 360px) {
+    .logo {
+        font-size: 0.8rem;
+    }
+    
+    .topbar {
+        padding: 0.5rem;
+    }
+}
+
+/* Garante alinhamento consistente dos ícones em todas as telas */
+.nav-icons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-icon, .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* ===============================================
+   CORREÇÃO: Notificações Centralizadas (Mobile)
+   =============================================== */
+@media (max-width: 768px) {
+    .notifications-panel {
+        /* Muda de absolute (preso ao sino) para fixed (preso à tela) */
+        position: fixed !important;
+        
+        /* Posiciona logo abaixo do header */
+        top: 75px !important; 
+        right: auto !important; /* Remove alinhamento à direita */
+        
+        /* Centraliza horizontalmente */
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        
+        /* Garante largura boa para leitura */
+        width: 90% !important;
+        max-width: 380px !important;
+        max-height: 70vh; /* Evita que seja maior que a tela */
+        
+        /* Garante que fique acima de tudo */
+        z-index: 9999 !important;
+        
+        /* Sombra forte para destacar do fundo */
+        box-shadow: 0 0 0 100vmax rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.5) !important;
+    }
+}
+
+/* =================================================================
+   CORREÇÃO: Spinner do Perfil no Topo (Header)
+================================================================= */
+
+/* Define o container da foto como referência para o spinner */
+.profile-pic {
+    position: relative !important; 
+    overflow: hidden; /* Garante a forma redonda */
+}
+
+/* Garante que o spinner preencha exatamente o tamanho da foto */
+.topbar-user-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-secondary);
+    z-index: 10;
+}
+
+/* Ajusta o tamanho do spinner interno para caber na foto pequena */
+.topbar-user-loading .loading-spinner {
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+}
+
