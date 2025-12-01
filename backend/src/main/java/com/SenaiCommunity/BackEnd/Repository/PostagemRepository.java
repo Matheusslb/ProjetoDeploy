@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface PostagemRepository extends JpaRepository<Postagem, Long> {
-    List<Postagem> findTop10ByOrderByDataPostagemDesc();
+    List<Postagem> findTop11ByOrderByDataPostagemDesc();
 }
