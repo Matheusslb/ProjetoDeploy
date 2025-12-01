@@ -76,7 +76,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://127.0.0.1:5501", "http://localhost:3000", "http://127.0.0.1:5502", "https://senaicommunitydeploy-production.up.railway.app", "https://senaicommunity.up.railway.app", "https://senai-community-front.vercel.app", "https://senaicommunitydeploy.up.railway.app", "https://senaicommunityfront.vercel.app"));
+        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://127.0.0.1:5501", "http://localhost:3000", "http://127.0.0.1:5502", "https://senaicommunitydeploy-production.up.railway.app", "https://senaicommunity.up.railway.app", "https://senai-community-front.vercel.app", "https://senaicommunitydeploy.up.railway.app", "https://senaicommunityfront.vercel.app","https://senaicommunityapp.up.railway.app"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

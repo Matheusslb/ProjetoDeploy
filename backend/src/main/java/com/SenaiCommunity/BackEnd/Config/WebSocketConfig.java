@@ -37,7 +37,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         "https://senaicommunitydeploy-production.up.railway.app",
                         "https://senai-community-front.vercel.app",
                         "https://senaicommunitydeploy.up.railway.app", 
-                        "https://senaicommunityfront.vercel.app"
+                        "https://senaicommunityfront.vercel.app",
+                        "https://senaicommunityapp.up.railway.app"
                 )
                 .withSockJS();
     }
