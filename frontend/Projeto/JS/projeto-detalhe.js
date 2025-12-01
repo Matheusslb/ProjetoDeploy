@@ -198,7 +198,7 @@ let stompClient = null;
 let projectId = null;
 let userRole = null;
 let selectedFiles = [];
-const backendUrl = "https://senaicommunitydeploy.up.railway.app";
+const backendUrl = "https://senaicommunityapp.up.railway.app";
 const defaultAvatarUrl = `${backendUrl}/images/default-avatar.jpg`;
 
 // Inicialização quando o DOM estiver carregado

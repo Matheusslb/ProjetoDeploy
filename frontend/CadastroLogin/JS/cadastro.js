@@ -146,7 +146,7 @@ function setupFormSubmission() {
         btn.classList.add('loading');
 
         try {
-            await axios.post('https://senaicommunitydeploy.up.railway.app/cadastro/alunos', formData, {
+            await axios.post('https://senaicommunityapp.up.railway.app/cadastro/alunos', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             
@@ -219,7 +219,7 @@ function handleCredentialResponse(response) {
 
     // CORREÇÃO: URL alterada para coincidir com o LoginController.java
     // O endpoint /autenticacao/login/google cria o usuário se não existir.
-    axios.post('https://senaicommunitydeploy.up.railway.app/autenticacao/login/google', {
+    axios.post('https://senaicommunityapp.up.railway.app/autenticacao/login/google', {
         token: response.credential
     })
     .then(function (res) {

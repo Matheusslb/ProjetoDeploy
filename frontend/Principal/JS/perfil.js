@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const backendUrl = window.backendUrl || "https://senaicommunitydeploy.up.railway.app";
+    const backendUrl = window.backendUrl || "https://senaicommunityapp.up.railway.app";
     const defaultAvatarUrl = window.defaultAvatarUrl || `${backendUrl}/images/default-avatar.jpg`;
 
     let currentUser = null;
