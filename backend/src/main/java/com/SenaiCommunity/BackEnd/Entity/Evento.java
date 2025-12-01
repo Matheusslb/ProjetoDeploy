@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +30,16 @@ public class Evento {
 
     @Column(nullable = false)
     private LocalDate data;
+    
+
+    @Column
+    private LocalTime horaInicio; // NOVO
+
+    @Column
+    private LocalTime horaFim;
+
+    @Column
+    private String descricao;
 
     @Column(nullable = false, length = 150)
     private String local;
@@ -43,6 +54,12 @@ public class Evento {
 
     @Column(name = "imagem_capa")
     private String imagemCapa;
+
+    @Column(nullable = false)
+    private boolean notificacaoInicioEnviada = false;
+
+    @Column(nullable = false)
+    private boolean notificacaoFimEnviada = false;
 
     // NOVO: Lista de interessados para notificações/lembretes
     @ManyToMany

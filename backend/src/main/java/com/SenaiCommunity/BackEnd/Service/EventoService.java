@@ -42,6 +42,9 @@ public class EventoService {
         evento.setLocal(dto.getLocal());
         evento.setFormato(dto.getFormato());
         evento.setCategoria(dto.getCategoria());
+        evento.setHoraInicio(dto.getHoraInicio()); // NOVO
+        evento.setHoraFim(dto.getHoraFim());
+        evento.setDescricao(dto.getDescricao());
         return evento;
     }
 
@@ -53,6 +56,15 @@ public class EventoService {
         dto.setLocal(evento.getLocal());
         dto.setFormato(evento.getFormato());
         dto.setCategoria(evento.getCategoria());
+        dto.setHoraInicio(evento.getHoraInicio()); // NOVO
+        dto.setHoraFim(evento.getHoraFim());
+        dto.setDescricao(evento.getDescricao());
+
+        if (evento.getInteressados() != null) {
+            dto.setNumeroInteressados(evento.getInteressados().size());
+        } else {
+            dto.setNumeroInteressados(0);
+        }
 
         if (evento.getImagemCapa() != null) {
             dto.setImagemCapaUrl(evento.getImagemCapa());
@@ -85,12 +97,26 @@ public class EventoService {
 
         validarConteudo(dto);
 
+        // Verifica se houve mudança de data ou horário antes de atualizar os dados
+        boolean horarioMudou = !evento.getData().equals(dto.getData()) ||
+                !evento.getHoraInicio().equals(dto.getHoraInicio()) ||
+                (dto.getHoraFim() != null && !dto.getHoraFim().equals(evento.getHoraFim()));
+
         // Atualiza dados básicos
         evento.setNome(dto.getNome());
         evento.setData(dto.getData());
         evento.setLocal(dto.getLocal());
         evento.setFormato(dto.getFormato());
         evento.setCategoria(dto.getCategoria());
+        evento.setHoraInicio(dto.getHoraInicio());
+        evento.setHoraFim(dto.getHoraFim());
+        evento.setDescricao(dto.getDescricao());
+
+        // SE o horário mudou, resetamos as notificações para que sejam enviadas novamente
+        if (horarioMudou) {
+            evento.setNotificacaoInicioEnviada(false);
+            evento.setNotificacaoFimEnviada(false);
+        }
 
         // Se enviou nova imagem, substitui a antiga
         if (imagem != null && !imagem.isEmpty()) {

@@ -71,18 +71,6 @@ body {
   box-shadow: var(--shadow);
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem; /* Controla a distância entre os ícones e a foto do perfil */
-}
-
-@media (max-width: 768px) {
-  .header-right {
-    gap: 0.5rem; /* Distância menor no celular */
-  }
-}
-
 .header-left {
   display: flex;
   align-items: center;
@@ -399,41 +387,87 @@ body {
   font-size: 0.9rem;
   font-weight: 500;
   flex-grow: 1;
-    margin-bottom: 10px;
-
+  margin-bottom: 0; /* Alterado de 10px para 0 */
+  line-height: 1.2; /* Ajuda na centralização do texto */
 }
 
 .friend-item .status.online {
-  margin-left: auto;
-  /* Empurra o status para a direita */
+  margin-left: auto; /* Mantém a bolinha na direita */
   width: 10px;
   height: 10px;
   border: none;
-    margin-bottom: 10px;
-
+  margin-bottom: 0; /* Alterado de 10px para 0 */
   position: static;
   flex-shrink: 0;
+  border-radius: 50%; /* Garante que seja redonda */
+  background-color: var(--online); /* Garante a cor verde */
 }
-
 /* Container Layout */
+/* 1. Ajuste no Container (Grid) */
 .container {
-  display: grid;
-  grid-template-columns: 280px 1fr 300px;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  max-width: 1600px;
-  margin: 0 auto;
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    
+    /* ADICIONE ISTO: */
+    /* Impede que as colunas laterais estiquem até o fim da página. */
+    /* Isso é essencial para o position: sticky funcionar no Grid. */
+    align-items: start; 
 }
 
-/* Sidebar Styles */
+/* 2. Ajuste na Sidebar Esquerda (Menu) */
 .sidebar {
-  position: sticky;
-  top: 80px;
-  height: calc(100vh - 100px);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+    /* Fixação */
+    position: sticky;
+    top: 80px; /* Altura do Header */
+    
+    /* Tamanho exato da tela visível (Viewport - Header) */
+    height: calc(100vh - 80px);
+    
+    /* Habilita rolagem interna se o menu for maior que a tela */
+    overflow-y: auto;
+    
+    /* Mantém o layout flex interno */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    
+    /* Estética da rolagem */
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-quaternary) var(--bg-secondary);
+}
+
+/* 3. Ajuste na Sidebar Direita (Eventos/Sugestões) */
+.right-sidebar {
+    /* Fixação */
+    position: sticky;
+    top: 80px; /* Altura do Header */
+    
+    /* Tamanho exato da tela visível */
+    height: calc(100vh - 80px);
+    
+    /* Habilita rolagem interna */
+    overflow-y: auto;
+    
+    /* Garante que ela apareça */
+    display: block; 
+    
+    /* Estética da rolagem */
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-quaternary) var(--bg-secondary);
+}
+
+/* (Opcional) Ajuste para telas menores onde a direita some */
+@media (max-width: 1200px) {
+  .container {
+    grid-template-columns: 280px 1fr; /* Remove a coluna da direita do grid */
+  }
+  .right-sidebar {
+    display: none; /* Esconde a sidebar direita */
+  }
 }
 
 .user-info-link {
@@ -568,10 +602,18 @@ body {
 
 /* Main Content */
 .main-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  min-width: 0;
+    flex: 1;
+    /* Libera para ocupar a tela toda */
+    width: 100%;
+    max-width: 100%; /* Remove a trava de 1000px/1600px */
+    
+    padding: 1.5rem 2rem; /* Um pouco mais de espaço nas bordas */
+    margin: 0;
+    
+    /* Configuração crítica para o scroll funcionar */
+    overflow-y: auto; 
+    overflow-x: hidden;
+    height: 100%; 
 }
 
 .posts-container {
@@ -799,17 +841,48 @@ body {
   padding: 0.5rem 0.75rem;
   border-radius: 15px;
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza verticalmente se for curto */
+  padding: 0.6rem 0.8rem;  /* Padding equilibrado */
 }
+
+/* Remove margem padrão e ajusta espaçamento interno */
+.comment-content {
+    margin-top: 0.25rem !important; /* Pequeno espaço entre nome e texto */
+    margin-bottom: 0 !important;    /* Remove espaço abaixo */
+    padding-top: 0 !important;      /* Garante que não haja padding extra no topo */
+    line-height: 1.4;               /* Melhora a leitura */
+}
+
+/* Estilo para o link do Avatar */
+.comment-avatar-link {
+    text-decoration: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: block; /* Garante que o link envolva a imagem corretamente */
+}
+
+/* Estilo para o link do Nome do Autor */
+.comment-author-link {
+    text-decoration: none;
+    color: inherit; /* Mantém a cor do tema */
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+.comment-author-link:hover {
+    text-decoration: underline; /* Sublinha ao passar o mouse */
+    color: var(--text-primary);
+}
+
+/* Ajuste fino para o corpo do comentário */
 
 .comment-author {
   font-size: 0.85rem;
   font-weight: 600;
-}
-
-.comment-content {
-  font-size: 0.9rem;
-  margin-top: 0.25rem;
-  word-wrap: break-word;
 }
 
 .comment.destacado .comment-body {
@@ -1223,42 +1296,18 @@ body {
 
   .sidebar {
     position: fixed;
-    top: 0; /* Ajustado para cobrir desde o topo */
-    left: 0;
+    top: 60px;
+    left: -280px;
     width: 280px;
-    height: 100vh;
-    z-index: 2000;
-    background-color: var(--bg-primary);
-    
-    /* Animação de deslize */
-    transform: translateX(-100%); 
+    height: calc(100vh - 60px);
+    z-index: 800;
+    transform: translateX(-100%);
     transition: transform 0.3s ease;
-    box-shadow: none;
+    background-color: var(--bg-primary);
   }
 
-  /* Classe que o JS adiciona para mostrar */
   .sidebar.mobile-open {
-    transform: translateX(0); /* Traz a sidebar para a tela */
-    box-shadow: 4px 0 15px rgba(0,0,0,0.5);
-  }
-
-  /* O fundo escuro */
-  .sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1999;
-    display: none; /* Escondido por padrão */
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .sidebar-overlay.active {
-    display: block;
-    opacity: 1;
+    transform: translateX(280px);
   }
 }
 
@@ -2059,7 +2108,7 @@ a.user-card-link:hover h4 {
     /* Aplica a animação ao comentário */
     animation: flash-animation 1.5s ease-out;
 }
-/* Adicionar ao final de principal.css */
+/* Adicione estas regras ao final do seu arquivo CSS */
 
 /* --- Estilo para Botão "Ver Respostas" --- */
 .view-replies-container {
@@ -3202,5 +3251,1378 @@ a.user-card-link:hover h4 {
     width: 20px;
     height: 20px;
     border-width: 2px;
+}
+
+/* --- Estilo de Estado Vazio da Sidebar (Amigos Online) --- */
+.online-friends-empty-wrapper {
+    padding: 1rem; /* Espaçamento entre a borda do card e a caixa tracejada */
+}
+
+.online-friends-dashed-box {
+    border: 1px dashed var(--border-color); /* Borda tracejada */
+    border-radius: 6px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    background-color: transparent;
+}
+
+/* --- Correção do Modal de Edição de Perfil no Mobile --- */
+@media (max-width: 768px) {
+  #edit-profile-modal .modal-content {
+    width: 95%;          /* Ocupa quase toda a largura da tela */
+    max-height: 85vh;    /* Limita a altura a 85% da tela */
+    overflow-y: auto;    /* Habilita a barra de rolagem interna */
+    padding: 1.25rem 1rem; /* Reduz o padding para ganhar espaço */
+    margin: auto;        /* Centraliza */
+  }
+
+  /* Ajusta a área da foto para não ficar gigante */
+  #edit-profile-modal .profile-pic-editor img {
+    width: 100px;
+    height: 100px;
+  }
+
+  /* Melhora os inputs para toque */
+  #edit-profile-modal .form-group input,
+  #edit-profile-modal .form-group textarea {
+    font-size: 16px; /* Evita que o iPhone dê zoom ao clicar */
+    padding: 0.8rem; /* Aumenta a área de toque */
+  }
+
+  /* Arruma os botões do rodapé */
+  #edit-profile-modal .modal-footer {
+    display: flex;
+    flex-direction: column; /* Empilha os botões verticalmente */
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;     /* Separação visual do conteúdo */
+  }
+
+  #edit-profile-modal .modal-footer .btn {
+    width: 100%;           /* Botão ocupa a largura total */
+    justify-content: center;
+    padding: 0.8rem;       /* Botão mais alto para facilitar o clique */
+    margin: 0;
+  }
+}
+
+/* Estilo para botão em estado de carregamento */
+.btn-loading {
+    cursor: not-allowed !important;
+    opacity: 0.7;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Espaço entre o ícone e o texto */
+}
+
+.btn-loading i.fa-spinner {
+    animation: fa-spin 1s infinite linear;
+}
+
+/* =================================================================
+   MODAL DE EDIÇÃO DE COMENTÁRIO - ESTILO MODERNO
+   ================================================================= */
+
+/* Fundo com desfoque (Blur) */
+#edit-comment-modal.modal-overlay {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background-color: rgba(0, 0, 0, 0.6);
+    transition: all 0.3s ease;
+}
+
+/* O Card do Modal */
+#edit-comment-modal .modal-content {
+    background: linear-gradient(145deg, var(--bg-secondary), var(--bg-tertiary));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 95%;
+    max-width: 500px;
+    transform: scale(0.95);
+    animation: modalPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes modalPopIn {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Cabeçalho */
+#edit-comment-modal .modal-header {
+    border-bottom: none;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+#edit-comment-modal .modal-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Ícone decorativo antes do título (via CSS) */
+#edit-comment-modal .modal-header h3::before {
+    content: '\f044'; /* Código do ícone de edição do FontAwesome */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 1rem;
+    color: var(--accent-primary);
+    background: rgba(88, 166, 255, 0.15);
+    padding: 8px;
+    border-radius: 8px;
+}
+
+/* Área de Texto (Textarea) */
+#edit-comment-form textarea {
+    width: 100%;
+    min-height: 140px;
+    background-color: var(--bg-primary); /* Fundo mais escuro para contraste */
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 1rem;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Efeito de Foco no Textarea */
+#edit-comment-form textarea:focus {
+    outline: none;
+    background-color: var(--bg-secondary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 4px rgba(88, 166, 255, 0.15); /* Glow suave */
+}
+
+/* Rodapé (Botões) */
+#edit-comment-modal .modal-footer {
+    margin-top: 2rem;
+    gap: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 1.5rem;
+}
+
+/* Botões Modernos */
+#edit-comment-modal .btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#edit-comment-modal .btn:active {
+    transform: scale(0.96);
+}
+
+/* Botão Salvar */
+#edit-comment-modal .btn-primary {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    box-shadow: 0 4px 12px rgba(31, 111, 235, 0.3);
+    border: none;
+}
+
+#edit-comment-modal .btn-primary:hover {
+    box-shadow: 0 6px 15px rgba(31, 111, 235, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Botão Cancelar */
+#edit-comment-modal .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+#edit-comment-modal .btn-secondary:hover {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--text-tertiary);
+}
+
+/* =================================================================
+   ESTILO PARA COMENTÁRIOS LONGOS (LER MAIS)
+================================================================= */
+
+/* Classe utilitária para cortar o texto em 4 linhas */
+.comment-content.text-clamped {
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* Número de linhas visíveis antes de cortar */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Garante que quebras de linha sejam respeitadas */
+.comment-content {
+    white-space: pre-wrap; /* Mantém parágrafos originais */
+    word-break: break-word; /* Evita quebra de layout no mobile */
+}
+
+/* Botão de Ler Mais / Ler Menos */
+.comment-read-more-btn {
+    background: none;
+    border: none;
+    color: var(--accent-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+    margin-top: 2px;
+    display: inline-block;
+}
+
+.comment-read-more-btn:hover {
+    text-decoration: underline;
+}
+
+/* Botão de Ler Mais / Ler Menos */
+.comment-read-more-btn {
+    background: none;
+    border: none;
+    color: var(--accent-primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+    margin-top: 2px;
+    
+    /* Alterações para alinhar à esquerda */
+    display: block;          /* Garante comportamento de bloco */
+    width: fit-content;      /* O botão terá apenas a largura do texto "Ler mais" */
+    align-self: flex-start;  /* Força o botão para o início do eixo (esquerda) dentro do Flexbox */
+    text-align: left;        /* Garante que o texto dentro do botão fique à esquerda */
+}
+
+.comment-read-more-btn:hover {
+    text-decoration: underline;
+}
+/* =================================================================
+   ACESSIBILIDADE GLOBAL (Substitua o bloco antigo por este)
+   ================================================================= */
+
+/* 1. Tamanhos de Fonte */
+html[data-font-size="small"] { font-size: 14px; }
+html[data-font-size="medium"] { font-size: 16px; }
+html[data-font-size="large"] { font-size: 20px; }
+
+/* 2. Redução de Movimento */
+body.reduce-motion *,
+body.reduce-motion *::before,
+body.reduce-motion *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+}
+
+/* 3. Alto Contraste (Sobrescrevendo Variáveis) */
+hhtml.acessibilidade-alto-contraste {
+    /* Força cores de fundo e texto globais */
+    --bg-primary: #000000 !important;
+    --bg-secondary: #000000 !important;
+    --bg-tertiary: #000000 !important;
+    --bg-quaternary: #000000 !important;
+    --bg-hover: #1a1a1a !important;
+    
+    --text-primary: #ffffff !important;
+    --text-secondary: #ffff00 !important; /* Amarelo para destaque */
+    --text-tertiary: #00ff00 !important;  /* Verde para informações extras */
+    
+    --border-color: #ffffff !important;   /* Bordas brancas nítidas */
+    
+    /* Remove filtros globais que causam cinza */
+    filter: none !important;
+}
+
+/* 1. Aplica bordas brancas e fundo preto em todos os cartões e containers */
+html.acessibilidade-alto-contraste {
+    /* Cores Base - Fundo Preto Absoluto */
+    --bg-primary: #000000 !important;
+    --bg-secondary: #000000 !important;
+    --bg-tertiary: #000000 !important;
+    --bg-quaternary: #1a1a1a !important; /* Ligeiramente mais claro para hover */
+    
+    /* Textos */
+    --text-primary: #ffffff !important;   /* Texto padrão: Branco */
+    --text-secondary: #ffff00 !important; /* Texto secundário: Amarelo Neon */
+    --text-tertiary: #00ff00 !important;  /* Detalhes: Verde Neon */
+    
+    /* Acentos */
+    --accent-primary: #ffff00 !important; /* Amarelo */
+    --accent-secondary: #ffdd00 !important;
+    --border-color: #ffffff !important;   /* Bordas Brancas finas */
+    --danger: #ff0000 !important;         /* Vermelho puro para erros */
+    
+    /* Remove sombras e filtros */
+    filter: none !important;
+    box-shadow: none !important;
+}
+
+/* 1. ESTRUTURA GERAL (Limpeza) */
+html.acessibilidade-alto-contraste * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+html.acessibilidade-alto-contraste body {
+    background-color: #000000 !important;
+}
+
+/* Bordas Brancas Finas para separar áreas */
+html.acessibilidade-alto-contraste .sidebar,
+html.acessibilidade-alto-contraste .topbar,
+html.acessibilidade-alto-contraste .post,
+html.acessibilidade-alto-contraste .widget-card,
+html.acessibilidade-alto-contraste .modal-content,
+html.acessibilidade-alto-contraste .user-info,
+html.acessibilidade-alto-contraste .search input,
+html.acessibilidade-alto-contraste textarea,
+html.acessibilidade-alto-contraste .dropdown-menu,
+html.acessibilidade-alto-contraste .friend-card,
+html.acessibilidade-alto-contraste .projeto-card,
+html.acessibilidade-alto-contraste .chat-sidebar,
+html.acessibilidade-alto-contraste .chat-header-area,
+html.acessibilidade-alto-contraste .chat-input-area {
+    background-color: #000000 !important;
+    border: 1px solid #ffffff !important;
+    border-radius: 4px !important;
+}
+
+/* 2. BOTÕES (CORREÇÃO CRÍTICA DE LEGIBILIDADE) */
+
+/* Botões Primários (Ação Principal) -> Fundo Amarelo, Texto PRETO */
+html.acessibilidade-alto-contraste .btn-primary,
+html.acessibilidade-alto-contraste .btn-entrar,
+html.acessibilidade-alto-contraste .publish-btn,
+html.acessibilidade-alto-contraste .btn-new-project,
+html.acessibilidade-alto-contraste button[type="submit"] {
+    background: #ffff00 !important;
+    background-color: #ffff00 !important;
+    color: #000000 !important; /* TEXTO PRETO OBRIGATÓRIO */
+    border: 2px solid #ffff00 !important;
+    font-weight: 800 !important;
+}
+
+/* Hover de Botões Primários -> Inverte */
+html.acessibilidade-alto-contraste .btn-primary:hover,
+html.acessibilidade-alto-contraste .btn-entrar:hover,
+html.acessibilidade-alto-contraste .publish-btn:hover {
+    background: #000000 !important;
+    color: #ffff00 !important;
+}
+
+/* Botões Secundários/Outline -> Fundo Preto, Borda/Texto Amarelo */
+html.acessibilidade-alto-contraste .btn-secondary,
+html.acessibilidade-alto-contraste .action-btn,
+html.acessibilidade-alto-contraste .btn-ver-detalhes,
+html.acessibilidade-alto-contraste .btn-ghost {
+    background: transparent !important;
+    border: 1px solid #ffff00 !important;
+    color: #ffff00 !important;
+}
+
+/* Hover de Botões Secundários */
+html.acessibilidade-alto-contraste .btn-secondary:hover,
+html.acessibilidade-alto-contraste .action-btn:hover {
+    background: #ffff00 !important;
+    color: #000000 !important;
+}
+
+/* Botões Desabilitados (Ex: "Criador", "Já é membro") */
+html.acessibilidade-alto-contraste button:disabled,
+html.acessibilidade-alto-contraste .btn.disabled,
+html.acessibilidade-alto-contraste .btn-entrar.disabled {
+    background: #333333 !important;
+    color: #ffffff !important;
+    border: 1px dashed #ffffff !important;
+    opacity: 1 !important; /* Mantém visível */
+    cursor: not-allowed;
+}
+
+/* 3. CHAT E MENSAGENS (CORREÇÃO DE LEGIBILIDADE) */
+
+/* Mensagem DELE (Esquerda) -> Fundo Preto, Borda Branca, Texto Branco */
+html.acessibilidade-alto-contraste .message-group.outro .message-content,
+html.acessibilidade-alto-contraste .message:not(.own) .message-bubble {
+    background-color: #000000 !important;
+    border: 1px solid #ffffff !important;
+    color: #ffffff !important;
+}
+
+/* Mensagem MINHA (Direita) -> Fundo Amarelo, TEXTO PRETO */
+html.acessibilidade-alto-contraste .message-group.me .message-content,
+html.acessibilidade-alto-contraste .message.own .message-bubble {
+    background-color: #ffff00 !important;
+    color: #000000 !important; /* TEXTO PRETO */
+    border: 2px solid #ffff00 !important;
+    font-weight: 600 !important;
+}
+
+/* Garante que links dentro da minha mensagem sejam pretos sublinhados */
+html.acessibilidade-alto-contraste .message.own .message-bubble a,
+html.acessibilidade-alto-contraste .message-group.me .message-content a {
+    color: #000000 !important;
+    text-decoration: underline !important;
+}
+
+/* 4. INPUTS E FORMULÁRIOS */
+html.acessibilidade-alto-contraste input,
+html.acessibilidade-alto-contraste textarea,
+html.acessibilidade-alto-contraste select {
+    background-color: #000000 !important;
+    border: 2px solid #ffffff !important;
+    color: #ffffff !important;
+}
+
+html.acessibilidade-alto-contraste input:focus,
+html.acessibilidade-alto-contraste textarea:focus {
+    border-color: #ffff00 !important; /* Borda amarela ao focar */
+    outline: none !important;
+}
+
+/* Placeholder (Texto de dica) */
+html.acessibilidade-alto-contraste ::placeholder {
+    color: #ffff00 !important; /* Amarelo para diferenciar do texto digitado */
+    opacity: 0.7;
+}
+
+/* 5. LINKS E MENU LATERAL */
+html.acessibilidade-alto-contraste a {
+    color: #ffff00 !important;
+    text-decoration: none !important;
+}
+
+/* Item de Menu Ativo */
+html.acessibilidade-alto-contraste .menu-item.active,
+html.acessibilidade-alto-contraste .menu-item.active i {
+    color: #ffff00 !important;
+    font-weight: bold !important;
+    border-left: 4px solid #ffff00 !important; /* Indicador lateral */
+    background: transparent !important; /* Remove degradê */
+}
+
+/* Hover no Menu */
+html.acessibilidade-alto-contraste .menu-item:hover {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* 6. PROTEÇÃO DE MÍDIA (Imagens e Vídeos Coloridos) */
+html.acessibilidade-alto-contraste img,
+html.acessibilidade-alto-contraste video,
+html.acessibilidade-alto-contraste .avatar img,
+html.acessibilidade-alto-contraste .profile-pic img {
+    filter: none !important;
+    border: 1px solid #333 !important;
+    opacity: 1 !important;
+}
+
+/* 7. BADGES E STATUS (Bolinhas) */
+html.acessibilidade-alto-contraste .badge,
+html.acessibilidade-alto-contraste .status-dot,
+html.acessibilidade-alto-contraste .status {
+    border: 1px solid #ffffff !important; /* Adiciona borda branca para separar do fundo preto */
+}
+
+/* Mantém cores semânticas críticas apenas em ícones pequenos */
+html.acessibilidade-alto-contraste .status.online { background-color: #00ff00 !important; }
+html.acessibilidade-alto-contraste .badge { background-color: #ff0000 !important; color: white !important; }
+
+/* 8. TAGS DE PROJETO E CATEGORIAS */
+html.acessibilidade-alto-contraste .tech-tag,
+html.acessibilidade-alto-contraste .projeto-status {
+    background-color: #000000 !important;
+    border: 1px solid #ffff00 !important;
+    color: #ffff00 !important;
+}
+
+/* 1. CORREÇÃO DOS BALÕES DE COMENTÁRIOS */
+html.acessibilidade-alto-contraste .comment-body {
+    background-color: #000000 !important;  /* Fundo Preto */
+    border: 1px solid #ffffff !important;  /* Borda Branca fina */
+    color: #ffffff !important;             /* Texto Branco */
+    box-shadow: none !important;
+}
+
+/* Links dentro dos comentários (Nome e Menções) */
+html.acessibilidade-alto-contraste .comment-author-link,
+html.acessibilidade-alto-contraste .comment-content a,
+html.acessibilidade-alto-contraste .reply-tag {
+    color: #ffff00 !important; /* Amarelo */
+    text-decoration: underline !important;
+    font-weight: bold !important;
+}
+
+/* 2. CORREÇÃO DOS BOTÕES "ENVIAR MENSAGEM" E AÇÕES DE AMIZADE */
+/* Afeta: Tela de Buscar Amigos, Minhas Conexões e Cards de Usuário */
+
+html.acessibilidade-alto-contraste .btn-message,           /* Botão Enviar Mensagem (Buscar) */
+html.acessibilidade-alto-contraste .user-card-action .btn, /* Botões dentro dos cards */
+html.acessibilidade-alto-contraste .friend-actions .btn,   /* Ações de Amigos */
+html.acessibilidade-alto-contraste .request-actions .btn,  /* Ações de Solicitação */
+html.acessibilidade-alto-contraste .friend-action-btn {    /* Botões de ícone */
+    background: #ffff00 !important;       /* Fundo Amarelo Sólido (Remove gradientes) */
+    background-color: #ffff00 !important;
+    color: #000000 !important;            /* Texto PRETO Obrigatório */
+    border: 2px solid #ffff00 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+
+/* Ícones dentro desses botões também devem ser pretos */
+html.acessibilidade-alto-contraste .btn-message i,
+html.acessibilidade-alto-contraste .user-card-action .btn i,
+html.acessibilidade-alto-contraste .friend-actions .btn i {
+    color: #000000 !important;
+}
+
+/* Estado Hover (Inverte as cores: Fundo Preto / Texto Amarelo) */
+html.acessibilidade-alto-contraste .btn-message:hover,
+html.acessibilidade-alto-contraste .user-card-action .btn:hover,
+html.acessibilidade-alto-contraste .friend-actions .btn:hover,
+html.acessibilidade-alto-contraste .request-actions .btn:hover,
+html.acessibilidade-alto-contraste .friend-action-btn:hover {
+    background: #000000 !important;
+    background-color: #000000 !important;
+    color: #ffff00 !important;
+    border-color: #ffff00 !important;
+}
+
+/* Ícones no Hover ficam amarelos */
+html.acessibilidade-alto-contraste .btn-message:hover i,
+html.acessibilidade-alto-contraste .user-card-action .btn:hover i {
+    color: #ffff00 !important;
+}
+
+/* 3. CORREÇÃO DE INPUTS DE CHAT E PESQUISA QUE ESTAVAM SUMINDO */
+html.acessibilidade-alto-contraste input[type="text"],
+html.acessibilidade-alto-contraste .search-box input {
+    background-color: #000000 !important;
+    border: 1px solid #ffffff !important;
+    color: #ffffff !important;
+}
+
+html.acessibilidade-alto-contraste ::placeholder {
+    color: #ffff00 !important; /* Placeholder Amarelo */
+    opacity: 0.8 !important;
+}
+
+/* 4. Fonte Legível (CORREÇÃO DOS ÍCONES) */
+/* O seletor :not(i) impede que a fonte Arial seja aplicada nos ícones FontAwesome */
+html.acessibilidade-fonte-legivel body,
+html.acessibilidade-fonte-legivel *:not(i):not(.fas):not(.far):not(.fab):not(.fa) {
+    font-family: 'Verdana', 'Arial', sans-serif !important;
+    letter-spacing: 0.05em !important;
+    line-height: 1.6 !important;
+}
+
+/* 5. Destacar Links (CORREÇÃO DA COR) */
+html.acessibilidade-destacar-links a {
+    text-decoration: underline !important;
+    font-weight: 700 !important;
+    background-color: transparent !important; /* Remove fundo amarelo */
+    color: #58a6ff !important; /* Cor Azul claro */
+}
+/* Garante que botões/links tenham borda azul também */
+html.acessibilidade-destacar-links button,
+html.acessibilidade-destacar-links .btn {
+    border: 2px solid #58a6ff !important;
+    color: #58a6ff !important;
+}
+
+/* =================================================================
+   RESPONSIVIDADE MOBILE - PRINCIPAL
+   ================================================================= */
+
+@media (max-width: 1200px) {
+    .container {
+        grid-template-columns: 250px 1fr;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    .right-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        padding: 0.5rem;
+        gap: 1rem;
+    }
+    
+    .topbar {
+        padding: 0.75rem 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+    
+    .search {
+        display: none;
+    }
+    
+    .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100vh;
+        z-index: 2000;
+        transition: transform 0.3s ease;
+        background: var(--bg-primary);
+        overflow-y: auto;
+        padding: 1rem;
+    }
+    
+    .sidebar.mobile-open {
+        transform: translateX(280px);
+    }
+    
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1999;
+        display: none;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    /* Ajustes do post creator */
+    .post-creator-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .post-creator-input-area {
+        gap: 0.75rem;
+    }
+    
+    .avatar-small {
+        width: 40px;
+        height: 40px;
+    }
+    
+    #post-creator-textarea {
+        font-size: 1rem;
+        min-height: 50px;
+    }
+    
+    .post-creator-actions {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .action-buttons-left {
+        justify-content: space-between;
+    }
+    
+    .post-creator-actions .action-btn,
+    .post-creator-actions .file-label {
+        flex: 1;
+        justify-content: center;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .publish-btn {
+        width: 100%;
+        padding: 0.75rem;
+    }
+    
+    /* Ajustes dos posts */
+    .post {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .post-header {
+        align-items: flex-start;
+    }
+    
+    .post-author-details {
+        gap: 0.5rem;
+    }
+    
+    .post-author-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .post-author-info strong {
+        font-size: 0.9rem;
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .post-author-info span {
+        font-size: 0.75rem;
+    }
+    
+    .post-content {
+        font-size: 0.95rem;
+        line-height: 1.4;
+    }
+    
+    .post-actions {
+        gap: 0.25rem;
+    }
+    
+    .post-actions .action-btn {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        gap: 0.25rem;
+        min-height: 44px;
+    }
+    
+    .post-actions .action-btn .count {
+        font-size: 0.75rem;
+    }
+    
+    /* Ajustes dos comentários */
+    .comments-section {
+        padding-top: 0.75rem;
+    }
+    
+    .comment {
+        gap: 0.5rem;
+    }
+    
+    .comment-avatar img {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .comment-body {
+        padding: 0.5rem;
+    }
+    
+    .comment-author {
+        font-size: 0.8rem;
+    }
+    
+    .comment-content {
+        font-size: 0.85rem;
+    }
+    
+    .comment-actions-footer {
+        padding-left: 40px;
+        gap: 0.75rem;
+    }
+    
+    .action-btn-like,
+    .action-btn-reply {
+        font-size: 0.7rem;
+    }
+    
+    .like-count {
+        font-size: 0.7rem;
+    }
+    
+    .reply-form,
+    .comment-form {
+        padding-left: 40px;
+    }
+    
+    .comment-form input {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    .comment-form button {
+        width: 35px;
+        height: 35px;
+    }
+    
+    /* Carrossel mobile */
+    .feed-carousel-wrapper {
+        aspect-ratio: 1 / 1;
+        max-height: 400px;
+    }
+    
+    .feed-carousel-btn {
+        width: 35px;
+        height: 35px;
+        opacity: 0.8;
+    }
+    
+    .feed-carousel-counter {
+        top: 10px;
+        right: 10px;
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+    
+    /* Notificações mobile */
+    .notifications-panel {
+        position: fixed;
+        top: 70px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 90% !important;
+        max-width: 400px !important;
+        max-height: 60vh;
+        z-index: 1001;
+    }
+    
+    /* Modais mobile */
+    .modal-content {
+        width: 95%;
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    #edit-post-modal .modal-content {
+        max-width: 95%;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Friends widget mobile */
+    .online-friends {
+        padding: 1rem;
+    }
+    
+    .friend-item {
+        padding: 0.4rem;
+    }
+    
+    .friend-item .avatar {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .friend-name {
+        font-size: 0.8rem;
+    }
+    
+    /* Hide right sidebar completely */
+    .right-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .topbar {
+        padding: 0.5rem;
+    }
+    
+    .logo {
+        font-size: 1rem;
+        max-width: 150px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .nav-icons {
+        gap: 0.25rem;
+    }
+    
+    .nav-icon, .theme-toggle {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .user span {
+        display: none !important;
+    }
+    
+    .user i.fa-chevron-down {
+        display: none !important;
+    }
+    
+    .profile-pic {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .post-creator-input-area {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .avatar-small {
+        align-self: flex-start;
+    }
+    
+    #post-creator-textarea {
+        width: 100%;
+        min-height: 60px;
+    }
+    
+    .post {
+        padding: 0.75rem;
+    }
+    
+    .post-author-info strong {
+        max-width: 100px;
+    }
+    
+    .post-actions .action-btn {
+        font-size: 0.75rem;
+        padding: 0.4rem;
+    }
+    
+    .comments-section {
+        padding-top: 0.5rem;
+    }
+    
+    .comment-replies {
+        margin-left: 15px;
+        padding-left: 15px;
+    }
+    
+    /* Ajustes finos para telas muito pequenas */
+    .container {
+        padding: 0.25rem;
+    }
+    
+    .main-content {
+        gap: 1rem;
+    }
+}
+
+/* Prevenir zoom iOS em inputs */
+@media (max-width: 768px) {
+    input, textarea, select {
+        font-size: 16px !important;
+    }
+}
+
+/* Loading states para mobile */
+@media (max-width: 768px) {
+    .posts-loading {
+        padding: 2rem 1rem;
+    }
+    
+    .post-skeleton {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+    
+    .skeleton-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .friend-skeleton {
+        padding: 0.4rem;
+    }
+    
+    .friend-skeleton .skeleton-avatar {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* Melhorias de usabilidade para touch */
+@media (max-width: 768px) {
+    .nav-icon, 
+    .theme-toggle, 
+    .post-options-btn,
+    .comment-options-btn,
+    .action-btn,
+    .publish-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .post-actions .action-btn {
+        min-height: 44px;
+    }
+    
+    /* Melhor contraste para mobile */
+    .post {
+        border: 1px solid var(--border-color);
+        margin-bottom: 0.75rem;
+    }
+    
+    .post-creator-card {
+        border: 1px solid var(--border-color);
+    }
+}
+
+/* Ajustes específicos para orientação paisagem */
+@media (max-width: 768px) and (orientation: landscape) {
+    .sidebar {
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    .notifications-panel {
+        max-height: 50vh;
+    }
+    
+    .modal-content {
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+}
+
+/* =================================================================
+   CORREÇÃO DE LAYOUT (Estilo Amizades)
+================================================================= */
+
+/* Sobrescreve o grid antigo para usar Flexbox igual ao Amizades */
+.container {
+    display: flex !important; /* Força Flexbox */
+    grid-template-columns: none !important;
+    gap: 0 !important; /* O gap é controlado pela sidebar margin ou padding */
+    padding: 0 !important; /* Remove padding do container geral */
+    min-height: calc(100vh - 80px); /* Altura total menos header */
+    background-color: var(--bg-primary);
+    position: relative;
+    max-width: 100% !important;
+}
+
+/* Ajusta a sidebar para ser fixa e ter largura estilo Amizades */
+.sidebar {
+    width: 320px;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 80px; /* Altura do header */
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+    flex-shrink: 0;
+    z-index: 100;
+    padding: 0 !important; /* Remove padding interno antigo */
+    gap: 0 !important;
+}
+
+/* Ajusta o conteúdo principal */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+    width: calc(100% - 320px - 300px); /* 100% - SidebarEsq - SidebarDir */
+    min-width: 0;
+    max-width: 1000px; /* Limite para não ficar muito largo */
+    margin: 0 auto;
+}
+
+/* Sidebar Direita (Opcional - estilo Principal) */
+.right-sidebar {
+    width: 300px;
+    padding: 1.5rem;
+    display: block;
+    position: sticky;
+    top: 80px;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+/* =================================================================
+   CORREÇÃO DE NOTIFICAÇÕES (Mobile e Desktop)
+================================================================= */
+.notifications-panel {
+    /* Garante que o painel flutue corretamente */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 360px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    z-index: 1001; /* Z-index alto */
+    display: none;
+}
+
+/* MOBILE: Notificações Centralizadas e Fixas */
+@media (max-width: 768px) {
+    .notifications-panel {
+        position: fixed !important;
+        top: 70px !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        width: 90% !important;
+        max-width: 380px !important;
+        max-height: 70vh !important;
+        z-index: 9999 !important; /* Acima de tudo no mobile */
+        box-shadow: 0 0 0 100vmax rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.5) !important;
+    }
+    
+    /* Esconde Sidebar Direita no Mobile */
+    .right-sidebar {
+        display: none !important;
+    }
+
+    /* Sidebar Esquerda (Menu Gaveta) no Mobile */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 85%;
+        max-width: 320px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        z-index: 2000;
+        border-right: 1px solid var(--border-color);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    }
+
+    .sidebar.active, .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    /* Ajuste do Main Content no Mobile */
+    .main-content {
+        width: 100%;
+        padding: 1rem;
+    }
+}
+
+/* =================================================================
+   ESTILOS DOS EFEITOS DE LOADING DA SIDEBAR
+================================================================= */
+.user-info-loading {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+    transition: opacity 0.3s ease;
+}
+
+.user-info.loaded .user-info-loading {
+    display: none !important;
+}
+
+/* Spinner Padrão */
+.loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(88, 166, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--accent-primary);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* =================================================================
+   CORREÇÃO DO HEADER MOBILE
+================================================================= */
+@media (max-width: 768px) {
+    /* CORREÇÃO: Usa a classe .d-none-mobile para esconder itens */
+    /* Não usamos mais :nth-child para evitar esconder o sino de notificação */
+    .d-none-mobile {
+        display: none !important;
+    }
+
+    /* Ajuste para garantir que os ícones restantes fiquem alinhados */
+    .nav-icons {
+        gap: 0.25rem;
+        align-items: center;
+    }
+
+    /* Garante tamanho clicável para os ícones no mobile */
+    .nav-icon, .theme-toggle {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+    }
+    
+    /* Garante que o ícone de notificação esteja visível e clicável */
+    #notifications-icon {
+        display: flex !important;
+    }
+
+    /* Esconde nome do usuário */
+    .user span { display: none !important; }
+    .user i.fa-chevron-down { display: none !important; }
+    
+    .user {
+        padding: 0.25rem;
+        margin: 0;
+        min-width: auto;
+    }
+    
+    .profile-pic {
+        width: 36px;
+        height: 36px;
+        margin: 0;
+    }
+}
+
+/* Garante que o painel de notificações funcione no mobile */
+@media (max-width: 768px) {
+    .notifications-panel {
+        position: fixed !important;
+        top: 70px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 90% !important;
+        max-width: 380px !important;
+        max-height: 70vh !important;
+        z-index: 9999 !important;
+        box-shadow: 0 0 0 100vmax rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.5) !important;
+    }
+}
+
+/* =================================================================
+   CORREÇÃO DEFINITIVA: LAYOUT DE APP (ROLAGEM INDEPENDENTE)
+   Adicione ao final de principal.css
+================================================================= */
+
+/* 1. Trava a rolagem da janela inteira (O scroll do navegador some) */
+html, body {
+    height: 100vh; /* Força a altura exata da tela */
+    overflow: hidden; /* Impede a página inteira de rolar */
+}
+
+/* 2. Configura o Header para ficar fixo no topo visualmente */
+.topbar {
+    position: relative; /* Ocupa espaço no fluxo normal */
+    z-index: 1000;
+}
+
+/* 3. Transforma o Container na área útil restante da tela */
+.container {
+    /* Altura = Tela inteira - Altura do Header (aprox 80px) */
+    height: calc(100vh - 83px); 
+    
+    display: flex !important; /* Garante layout em colunas */
+    align-items: stretch; /* Faz todas as colunas terem 100% de altura */
+    overflow: hidden; /* O container em si não rola */
+    padding-bottom: 0 !important; /* Remove padding extra em baixo */
+    margin-bottom: 0 !important;
+}
+
+/* 4. Configura as Laterais (Menu e Direita) para rolarem sozinhas */
+.sidebar, .right-sidebar {
+    height: 100%; /* Ocupa toda a altura do container */
+    overflow-y: auto; /* CRIA O SCROLL INDEPENDENTE AQUI */
+    
+    /* Removemos o sticky, pois agora a coluna inteira é fixa */
+    position: relative; 
+    top: 0;
+    
+    /* Melhoria visual da barra de rolagem */
+    scrollbar-width: thin;
+    padding-bottom: 20px; /* Espaço no final do scroll */
+}
+
+/* 5. Configura o Feed (Meio) para rolar sozinho também */
+.main-content {
+    flex: 1; /* Ocupa o espaço central */
+    height: 100%; /* Ocupa toda a altura do container */
+    overflow-y: auto; /* O FEED GANHA SEU PRÓPRIO SCROLL AGORA */
+    
+    min-width: 0; /* Previne quebra de layout flex */
+    padding: 1.5rem; /* Mantém o espaçamento interno */
+}
+
+/* --- Ajuste Mobile --- */
+@media (max-width: 768px) {
+    /* No mobile, voltamos ao comportamento padrão para a rolagem funcionar com o dedo */
+    html, body {
+        height: auto;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+    
+    .container {
+        height: auto;
+        display: block !important;
+    }
+    
+    .main-content {
+        height: auto;
+        overflow-y: visible;
+    }
+    
+    .sidebar {
+        position: fixed; /* Volta a ser menu gaveta */
+        height: 100vh;
+        z-index: 2000;
+    }
+}
+
+/* Item base do menu */
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease-in-out;
+    border-left: 3px solid transparent; /* Borda invisível para não pular layout */
+    margin-bottom: 2px;
+}
+
+/* Efeito ao passar o mouse */
+.menu-item:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+/* ESTADO ATIVO (A PÁGINA SELECIONADA) */
+.menu-item.active {
+    background: linear-gradient(90deg, rgba(88, 166, 255, 0.1) 0%, transparent 100%);
+    color: var(--accent-primary);
+    border-left-color: var(--accent-primary);
+}
+
+/* Garante que o ícone também fique azul */
+.menu-item.active i {
+    color: var(--accent-primary);
 }
 

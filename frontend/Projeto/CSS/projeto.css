@@ -24,171 +24,312 @@
     background-color: var(--bg-primary);
 }
 
-/* --- SIDEBAR DESKTOP (Copiado do Buscar Amigos) --- */
+/* =================================================================
+   SIDEBAR & USER CARD (Padronizado - Igual Amizades)
+================================================================= */
+
+/* --- ESTRUTURA DA SIDEBAR (Forçando alinhamento ao topo) --- */
 .sidebar {
     width: var(--sidebar-width);
     background: var(--bg-secondary);
     border-right: 1px solid var(--border-color);
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start !important; /* Força itens no topo */
+    
     position: sticky;
     top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    height: 100%; /* Ocupa altura total disponível */
+    min-height: calc(100vh - var(--header-height));
+    
     overflow-y: auto;
+    flex-shrink: 0;
     z-index: 100;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
 }
 
-.sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); position: relative; }
-.sidebar-close { display: none; }
-.sidebar-menu { flex: 1; padding: 1rem 0; }
-
-/* Estilo dos Itens do Menu */
-.menu-item {
-    display: flex; align-items: center; padding: 0.8rem 1.5rem;
-    color: var(--text-secondary); text-decoration: none;
-    transition: 0.2s; border-left: 3px solid transparent;
-}
-.menu-item:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-.menu-item.active {
-    background: linear-gradient(90deg, rgba(var(--accent-rgb), 0.1) 0%, transparent 100%);
-    color: var(--accent-primary); border-left-color: var(--accent-primary);
-}
-.menu-item i { width: 24px; margin-right: 12px; font-size: 1.1rem; }
-
-/* Card de Perfil na Sidebar */
-.sidebar-user-card { margin-bottom: 0.5rem; }
-.sidebar .user-info {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 1.5rem; background: var(--bg-secondary); border-radius: 12px;
-    border: 1px solid var(--border-color); position: relative; gap: 0.75rem;
-}
-.sidebar .avatar-container { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
-.sidebar .avatar-container img {
-    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-    border: 3px solid var(--bg-tertiary);
-}
-.sidebar .user-identity { text-align: center; }
-.sidebar .user-identity h2 { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin: 0; }
-.sidebar .user-role {
-    font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);
-    text-transform: uppercase; background-color: var(--bg-tertiary);
-    padding: 2px 8px; border-radius: 4px;
-}
-.sidebar .user-stats {
-    display: flex; justify-content: center; gap: 1.5rem; margin-top: 0.5rem;
-    width: 100%; border-top: 1px solid var(--border-color); padding-top: 1rem;
-}
-.sidebar .stat-item { display: flex; flex-direction: column; align-items: center; }
-.sidebar .stat-item strong { color: var(--accent-primary); font-size: 1.1rem; }
-/* =================================================================
-   WIDGET AMIGOS ONLINE (ESTILO ATUALIZADO)
-================================================================= */
-.sidebar-widget {
+.sidebar-header {
     padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
 }
 
-.online-friends {
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    padding: 0; /* Padding zero para a borda do título ir de ponta a ponta */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+/* Botão de fechar (mobile) */
+.sidebar-close {
+    display: none;
 }
 
-/* Título do Widget com Linha Separadora */
-.widget-title {
-    padding: 1rem 1.2rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text-primary); /* Cor de destaque */
-    border-bottom: 1px solid var(--border-color); /* A linha separadora */
-    margin: 0;
-}
+/* --- USER CARD NA SIDEBAR --- */
+.sidebar-user-card { margin-bottom: 0.5rem; }
 
-/* Container da Lista */
-.friend-list {
-    padding: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-    min-height: 80px; /* Altura mínima para não ficar espremido */
-}
-
-/* Estilo do "Nenhum amigo online" (Caixa interna) */
-.friend-list .empty-state, 
-.friend-list .results-loading {
-    border: 1px dashed var(--border-color); /* Borda tracejada sutil */
-    border-radius: 8px;
-    padding: 1.5rem 1rem;
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    background: rgba(255, 255, 255, 0.02); /* Fundo muito leve */
-    margin: 0;
+.user-info {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    padding: 2rem 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    position: relative;
+    gap: 1rem;
+    text-decoration: none;
 }
 
-/* Ícone dentro do estado vazio (opcional, caso tenha) */
-.friend-list .empty-state i {
-    font-size: 1.5rem;
-    opacity: 0.5;
+.user-info-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* Avatar */
+.avatar-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
     margin-bottom: 0.5rem;
 }
 
-/* Itens da Lista (Quando houver amigos) */
-.friend-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
-    border-radius: 8px;
-    transition: background 0.2s;
-    text-decoration: none;
+.avatar-container img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--bg-tertiary);
 }
 
-.friend-item:hover {
+.avatar-container .status {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-secondary);
+    background-color: var(--success, #22c55e); 
+}
+
+/* Identidade */
+.user-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    text-align: center;
+}
+
+.user-identity h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.user-role {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Stats */
+.user-stats {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 0.5rem;
+    width: 100%;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.4;
+}
+
+.stat-item strong {
+    color: var(--accent-primary);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.stat-item .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Loading Overlay do Perfil */
+.user-info-loading {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 12px;
+    transition: opacity 0.3s ease;
+}
+
+.user-info.loaded .user-info-loading {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* --- MENU DA SIDEBAR (Sem esticar) --- */
+.sidebar-menu {
+    flex: 0 0 auto !important; /* IMPORTANTE: Não deixa crescer */
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.menu-item {
+    display: flex; 
+    align-items: center; 
+    gap: 1rem;
+    padding: 0.8rem 1.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.menu-item:hover {
     background: var(--bg-tertiary);
-}
-
-.friend-item-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-    text-decoration: none;
     color: var(--text-primary);
 }
 
-.friend-item .avatar img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
+.menu-item.active {
+    background: linear-gradient(90deg, rgba(88, 166, 255, 0.1) 0%, transparent 100%);
+    color: var(--accent-primary);
+    border-left-color: var(--accent-primary);
 }
 
-.friend-name {
-    font-size: 0.9rem;
+.menu-item i { width: 24px; text-align: center; }
+
+/* --- WIDGET AMIGOS ONLINE --- */
+.sidebar-widget {
+    margin-top: 1.5rem; /* IMPORTANTE: Fica colado no menu */
+    flex: 0 0 auto;
+}
+
+.sidebar-widget .online-friends {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: none;
+}
+
+.sidebar-widget .widget-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    text-transform: none;
+}
+
+/* Correção visual para os itens de amigos online */
+.sidebar-widget .friend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    width: 100%;
+}
+
+.sidebar-widget .friend-item-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    flex-grow: 1;
+    min-width: 0;
+    color: inherit;
+}
+
+.sidebar-widget .friend-item .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.sidebar-widget .friend-item .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.sidebar-widget .friend-name {
+    font-size: 0.95rem;
     font-weight: 500;
+    color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 140px;
+    margin: 0;
+    line-height: 1.2;
 }
 
-.friend-item .status {
-    width: 8px;
-    height: 8px;
+.sidebar-widget .friend-item .status.online {
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background-color: #10b981; /* Verde online */
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+    background-color: #22c55e;
+    border: none;
+    margin-left: 10px;
+    flex-shrink: 0;
+}
+
+/* RESPONSIVIDADE (Tablets e Mobile) */
+@media (max-width: 1024px) {
+    .container {
+        flex-direction: column; /* Empilha tudo no mobile */
+        padding: 0;
+        gap: 0;
+    }
+
+    .sidebar {
+        position: fixed; 
+        top: 0; 
+        left: 0;
+        height: 100vh;
+        width: 85%; 
+        max-width: 320px;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+        z-index: 1000;
+        border-right: none;
+    }
+    .sidebar.active { transform: translateX(0); }
+
+    .sidebar-close {
+        display: block; 
+        position: absolute; 
+        top: 15px; 
+        right: 15px;
+        background: none; 
+        border: none; 
+        color: var(--text-secondary);
+        font-size: 1.5rem; 
+        cursor: pointer;
+    }
 }
 
 /* =================================================================
@@ -252,6 +393,7 @@
 
 /* --- FILTROS --- */
 .projetos-filters select {
+    
     /* 1. Remove o estilo padrão feio do navegador */
     appearance: none;
     -webkit-appearance: none;
@@ -306,7 +448,9 @@
     color: var(--text-primary);
     padding: 10px;
 }
-.search-projetos { flex-grow: 1; position: relative; min-width: 250px; }
+.search-projetos { gap: 1.5rem;          /* Aumentado de 1rem para 1.5rem (Separa os itens) */
+    margin-bottom: 1.5rem; /* Aumentado para afastar dos cards abaixo */
+    flex-wrap: wrap; flex-grow: 1; position: relative; min-width: 250px; }
 .search-projetos input {
     width: 100%; padding: 0.8rem 1rem 0.8rem 2.5rem;
     background: var(--bg-secondary); border: 1px solid var(--border-color);
@@ -651,7 +795,7 @@
 .mobile-overlay.active { opacity: 1; visibility: visible; }
 
 /* Header Mobile (Título apenas mobile) */
-.page-header-mobile { display: none; align-items: center; margin-bottom: 1rem; }
+.page-header-mobile { display: none; align-items: center; margin-bottom: 1rem; margin-bottom: 0; }
 .page-title-mobile { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); }
 
 /* MOBILE (Max 768px) */
@@ -669,15 +813,19 @@
 
     /* Ajustes de Conteúdo */
     .main-content { padding: 1rem; width: 100%; }
-    .page-header-mobile { display: flex; }
+    .page-header-mobile { display: flex; margin-bottom: 0; }
 
     /* Layout Projetos Mobile */
     .projetos-header { flex-direction: column; align-items: stretch; text-align: center; padding: 1.5rem; }
     .btn-new-project { justify-content: center; width: 100%; margin-top: 0.5rem; }
     
-    .projetos-filters { flex-direction: column; }
-    .search-projetos, .projetos-filters select { width: 100%; }
-
+   .projetos-filters { 
+        flex-direction: column; 
+        gap: 1.2rem; /* Espaço vertical claro entre input e select no celular */
+    }
+    .search-projetos, .projetos-filters select { 
+        width: 100%; 
+    }
     /* Grid vira 1 coluna */
     .projetos-grid { grid-template-columns: 1fr; gap: 1rem; }
 }
@@ -712,3 +860,933 @@
     color: #34d399; 
     border: 1px solid rgba(16, 185, 129, 0.3); 
 }
+
+/* =================================================================
+   CORREÇÃO DEFINITIVA DOS MODAIS NO MOBILE
+   (Adicione isto no FINAL do arquivo projeto.css)
+================================================================= */
+
+/* Estilo da área de edição de foto */
+.profile-pic-editor {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.profile-pic-editor img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--bg-tertiary);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* Sobreposição de "Alterar Foto" */
+.pic-editor-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: white;
+    font-size: 0.8rem;
+    pointer-events: none; /* Permite clicar na imagem */
+}
+
+.profile-pic-editor label:hover .pic-editor-overlay {
+    opacity: 1;
+}
+
+/* --- REGRAS ESPECÍFICAS PARA MOBILE (Max 768px) --- */
+@media (max-width: 768px) {
+    
+    /* Força o modal a caber na tela e ter scroll interno */
+    .modal-content {
+        width: 95% !important;      
+        max-width: 95% !important;
+        max-height: 85vh !important; /* Deixa espaço para margens */
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Impede que o container todo role */
+    }
+
+    /* Cabeçalho Fixo no topo */
+    .modal-header {
+        padding: 1rem;
+        flex-shrink: 0; 
+        position: sticky;
+        top: 0;
+        background: var(--bg-secondary);
+        z-index: 10;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Corpo com Scroll (Onde estão os inputs) */
+    /* IMPORTANTE: Isso faz o formulário rolar dentro do modal */
+    #edit-profile-form, 
+    .modal-body {
+        padding: 1rem;
+        overflow-y: auto !important; 
+        flex-grow: 1;     
+        max-height: calc(85vh - 130px); /* Subtrai header e footer aprox */
+    }
+
+    /* Rodapé Fixo embaixo */
+    .modal-footer {
+        padding: 1rem;
+        flex-shrink: 0;
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    /* Botão Grande para facilitar o toque */
+    .modal-footer button {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    /* Ajuste da foto no mobile */
+    .profile-pic-editor img {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+/* =================================================================
+   MELHORIA DO BOTÃO CANCELAR (MODAL)
+================================================================= */
+
+#cancel-edit-profile-btn {
+    background-color: transparent;      /* Remove o fundo cinza padrão */
+    border: 1px solid var(--border-color); /* Borda sutil */
+    color: var(--text-secondary);       /* Texto cinza claro */
+    padding: 0.4rem 1rem;               /* Espaçamento interno */
+    border-radius: 6px;                 /* Bordas arredondadas */
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    /* Garante alinhamento vertical do texto */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Efeito ao passar o mouse (fica mais claro) */
+#cancel-edit-profile-btn:hover {
+    color: var(--text-primary);        /* Texto fica branco */
+    border-color: var(--text-secondary); /* Borda fica mais visível */
+    background-color: rgba(255, 255, 255, 0.05); /* Fundo leve */
+}
+
+/* Ajuste específico para não ficar colado no mobile */
+@media (max-width: 768px) {
+    #cancel-edit-profile-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* =================================================================
+   EFEITOS DE CARREGAMENTO (SPINNER) - PADRÃO BUSCAR_AMIGOS
+================================================================= */
+
+/* Container para grids com loading */
+.projetos-grid-container {
+    position: relative;
+    min-height: 200px;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(88, 166, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--accent-primary);
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Estados de Carregamento */
+.results-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    z-index: 10;
+    text-align: center;
+    padding: 2rem;
+}
+
+.results-loading p {
+    color: var(--text-secondary);
+    margin-top: 1rem;
+    font-size: 0.95rem;
+}
+
+/* Estados Vazios */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-tertiary);
+    margin-top: 0.5rem;
+}
+
+/* Loading para botões */
+.btn.loading {
+    color: transparent !important;
+    position: relative;
+    pointer-events: none;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    border-top-color: currentColor;
+    animation: spin 1s ease infinite;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Loading para elementos de perfil */
+.user-info-loading, .topbar-user-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: inherit;
+    z-index: 5;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.user-info.loaded .user-info-loading,
+.user.loaded .topbar-user-loading {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* =================================================================
+   RESPONSIVIDADE PARA LOADING
+================================================================= */
+@media (max-width: 768px) {
+    .results-loading {
+        padding: 1.5rem;
+    }
+    
+    .loading-spinner {
+        width: 32px;
+        height: 32px;
+        border-width: 3px;
+    }
+    
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem;
+    }
+}
+
+/* =================================================================
+   ESTILO DO MODAL DE DETALHES (PREVIEW DO PROJETO)
+================================================================= */
+
+/* 1. Layout Geral do Preview */
+.project-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* 2. Imagem de Capa (Maior e mais destacada) */
+.preview-image {
+    width: 100%;
+    height: 220px !important; /* Força altura fixa elegante */
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    border: 1px solid var(--border-color);
+    margin-bottom: 0.5rem !important;
+}
+
+/* 3. Cabeçalho (Título e Status) */
+.preview-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.preview-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin: 0;
+}
+
+/* Badge de Status maior */
+.preview-header .projeto-status {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+}
+
+/* 4. Seções de Texto (Descrição, Info, etc) */
+.preview-section h4 {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+    border-left: 3px solid var(--accent-primary); /* Detalhe visual na esquerda */
+    padding-left: 10px;
+}
+
+.preview-section p {
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+/* 5. Grid de Informações (Transforma a lista em caixinhas) */
+.preview-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+    gap: 1rem;
+}
+
+.info-item {
+    background: var(--bg-tertiary);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.info-item strong {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.info-item span {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* 6. Tecnologias e Membros */
+.preview-tags, .preview-members {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.preview-tags .tech-tag {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.preview-members img {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--bg-secondary);
+}
+
+.no-tech, .no-members {
+    color: var(--text-tertiary);
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+/* --- AJUSTES MOBILE ESPECÍFICOS (Melhoria do Modal) --- */
+@media (max-width: 768px) {
+    /* Garante que o modal use bem a tela do celular */
+    .modal-content {
+        width: 95% !important;
+        max-width: 95% !important;
+        max-height: 90vh !important;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto; /* Scroll suave no conteúdo */
+    }
+
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
+        
+        /* Botões lado a lado */
+        display: flex;
+        gap: 1rem;
+    }
+
+    .modal-footer button {
+        flex: 1; /* Botões ocupam 50% cada */
+        height: 48px; /* Altura boa para toque */
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Botão Fechar mais discreto (Ghost Button) */
+    .modal-footer .btn-secondary {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+    }
+}
+
+/* 1. Correção do Spinner do Menu Superior (Estava deslocado) */
+.topbar-user-loading .loading-spinner {
+    width: 20px;       /* Menor para caber na bolinha */
+    height: 20px;
+    border-width: 2px; /* Borda mais fina */
+    margin-bottom: 0;  /* REMOVE A MARGEM que empurrava pra cima */
+}
+
+/* 2. Correção da Lista de Amigos (Estava "flutuando" errado) */
+.friend-list {
+    position: relative; /* Cria o contexto para o loader */
+    min-height: 120px;  /* Garante altura mínima para o loading caber */
+}
+
+/* Força o loader da lista de amigos a se comportar como bloco normal, não overlay absoluto */
+.friend-list .results-loading {
+    position: absolute !important; /* Fixa dentro do pai (.friend-list) */
+    inset: 0;                      /* Ocupa todo o espaço do pai */
+    background: var(--bg-secondary);
+    border: none;                  /* Remove borda extra se houver conflito */
+    padding: 1rem;
+    z-index: 5;
+    
+    /* Garante centralização */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ajusta o tamanho do spinner dentro da lista de amigos */
+.friend-list .loading-spinner {
+    width: 24px;
+    height: 24px;
+    border-width: 3px;
+    margin-bottom: 0.5rem; /* Margem menor que a padrão */
+}
+
+@media (max-width: 768px) {
+    
+    /* Esconde a barra de pesquisa do topo para dar espaço aos ícones */
+    .topbar .search {
+        display: none !important; 
+    }
+
+    /* Garante que o container de ícones tenha espaço e alinhamento */
+    .nav-icons {
+        display: flex !important;
+        gap: 10px;
+        margin-right: 5px;
+        margin-left: auto; /* Empurra para a direita */
+    }
+
+    /* Força o ícone de notificação a aparecer */
+    #notifications-icon {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        color: var(--text-primary);
+    }
+
+    /* Ajuste do Dropdown de Usuário para o toque */
+    .user-dropdown {
+        margin-left: 5px;
+        position: relative; /* Importante para o menu sair daqui */
+    }
+
+    /* Aumenta a área de toque da foto de perfil */
+    .user-dropdown .user {
+        padding: 5px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent; /* Remove flash azul no Android */
+    }
+
+    /* Posicionamento fixo e seguro do menu dropdown */
+    .dropdown-menu {
+        position: fixed; /* Fixado na tela */
+        top: 70px;       /* Abaixo do header */
+        right: 10px;     /* Canto direito */
+        width: 220px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        border-radius: 12px;
+        display: none; /* Começa escondido */
+        z-index: 9999;
+    }
+
+    /* Aumenta botões do menu para facilitar o toque */
+    .dropdown-menu a {
+        padding: 14px 16px;
+        font-size: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .dropdown-menu a:last-child { border-bottom: none; }
+}
+
+/* =================================================================
+   MODAL MODERNO DE DETALHES DO PROJETO (UNIFICADO COM PERFIL)
+================================================================= */
+
+/* Overlay */
+.project-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+    z-index: 3000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    animation: fadeInModal 0.3s forwards;
+}
+
+@keyframes fadeInModal { to { opacity: 1; } }
+
+/* Card do Modal */
+.project-modal-card {
+    background: var(--bg-secondary);
+    width: 100%;
+    max-width: 700px;
+    max-height: 85vh;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    animation: slideUpModal 0.3s forwards;
+}
+
+@keyframes slideUpModal { to { transform: translateY(0); } }
+
+/* Área da Imagem (Hero) */
+.pm-hero {
+    height: 220px;
+    width: 100%;
+    background-color: var(--bg-tertiary);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.pm-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: linear-gradient(to top, var(--bg-secondary), transparent);
+}
+
+/* Botão Fechar */
+.pm-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    transition: 0.2s;
+}
+
+.pm-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* Conteúdo com Scroll */
+.pm-content {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding: 1.5rem 2rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.pm-content::-webkit-scrollbar { width: 8px; }
+.pm-content::-webkit-scrollbar-track { background: transparent; }
+.pm-content::-webkit-scrollbar-thumb { background-color: var(--bg-quaternary); border-radius: 4px; border: 2px solid var(--bg-secondary); }
+
+/* Cabeçalho */
+.pm-header {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 1.5rem;
+    margin-top: 0; 
+}
+
+/* Status */
+.pm-status {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.5px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+.pm-status.planejamento { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
+.pm-status.andamento, .pm-status.progresso { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+.pm-status.concluido { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+
+.pm-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.pm-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+/* Grid de Informações */
+.pm-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: var(--bg-tertiary);
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.pm-info-item h4 {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+}
+
+.pm-info-item span {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Seções */
+.pm-section-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+    border-left: 3px solid var(--accent-primary);
+    padding-left: 0.75rem;
+}
+
+.pm-tags, .pm-members {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+}
+
+.pm-tag {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+.pm-member {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--bg-tertiary);
+    padding: 6px 14px 6px 6px;
+    border-radius: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.pm-member img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.pm-member span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* Footer */
+.pm-footer {
+    padding: 1.25rem 2rem;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.pm-btn {
+    background: var(--accent-primary);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pm-btn:hover { background: var(--accent-secondary); transform: translateY(-2px); }
+.pm-btn-secondary { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
+.pm-btn-secondary:hover { background: var(--bg-tertiary); }
+.pm-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; background: var(--bg-quaternary); }
+
+/* Mobile */
+@media (max-width: 768px) {
+    .project-modal-card {
+        max-height: 90vh;
+        width: 100%;
+        border-radius: 16px 16px 0 0;
+        margin-top: auto;
+        margin-bottom: 0;
+        border-bottom: none;
+    }
+    .project-modal-overlay { align-items: flex-end; padding: 0; }
+    .pm-hero { height: 180px; }
+    .pm-content { padding: 1.5rem; }
+    .pm-title { font-size: 1.4rem; }
+    .pm-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .pm-info-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+    .pm-info-item:last-child { border-bottom: none; }
+    .pm-footer { padding: 1rem 1.5rem; flex-direction: column; }
+    .pm-btn { width: 100%; justify-content: center; }
+}
+
+/* =================================================================
+   ESTILO MODERNO: MODAL NOVO PROJETO
+================================================================= */
+
+/* =================================================================
+   ESTILO MODERNO: MODAL NOVO PROJETO (CORRIGIDO PARA FORM)
+================================================================= */
+
+/* 1. Container Principal do Modal */
+.new-project-content {
+    padding: 0;
+    width: 100%;
+    max-width: 650px;
+    height: 90vh;        /* Altura fixa de 90% da tela */
+    max-height: 90vh;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;    /* Impede que o modal cresça além dos 90vh */
+    position: relative;
+}
+
+/* 2. Cabeçalho (Fixo no topo) */
+.new-project-content .modal-header {
+    flex-shrink: 0;      /* Não deixa encolher */
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    z-index: 10;
+}
+
+/* 3. O FORMULÁRIO É A CHAVE (Ele vira o container flexível) */
+#novo-projeto-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;             /* Ocupa todo o espaço restante abaixo do header */
+    overflow: hidden;    /* Mantém o scroll preso aqui dentro */
+    min-height: 0;       /* Essencial para o Flexbox funcionar no Firefox/Chrome */
+}
+
+/* 4. Capa do Projeto (Fixa no topo do form) */
+.project-cover-wrapper {
+    flex-shrink: 0;
+    width: 100%;
+    height: 160px;
+    background-color: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.project-cover-label {
+    width: 100%; height: 100%; display: block; cursor: pointer; position: relative;
+}
+.project-cover-label img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+.cover-overlay {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.4);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: white; opacity: 0; transition: opacity 0.3s;
+}
+.project-cover-label:hover .cover-overlay { opacity: 1; }
+
+/* 5. Corpo com Inputs (ONDE O SCROLL ACONTECE) */
+.new-project-content .modal-body {
+    flex: 1;             /* Cresce para ocupar o espaço */
+    overflow-y: auto;    /* A barra de rolagem aparece AQUI */
+    padding: 1.5rem;
+}
+
+/* Estilo dos inputs */
+.form-row { display: flex; gap: 1rem; }
+.form-group.half { flex: 1; }
+
+.new-project-content label {
+    font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem; font-weight: 600;
+}
+.new-project-content input, 
+.new-project-content select, 
+.new-project-content textarea {
+    background: var(--bg-tertiary); border: 1px solid var(--border-color);
+    border-radius: 8px; padding: 0.75rem 1rem; color: var(--text-primary); width: 100%;
+}
+
+/* 6. Rodapé (Fixo no fundo do form) */
+.new-project-content .modal-footer {
+    flex-shrink: 0;      /* Não deixa encolher ou sumir */
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    z-index: 10;
+}
+
+/* === AJUSTE MOBILE === */
+@media (max-width: 768px) {
+    .new-project-content {
+        width: 100% !important;
+        height: 100vh !important; /* Tela cheia no celular */
+        max-height: 100vh !important;
+        border-radius: 0;
+    }
+    .form-row { flex-direction: column; gap: 0; }
+    .project-cover-wrapper { height: 120px; }
+    
+    /* No mobile, botões um em cima do outro */
+    .new-project-content .modal-footer {
+        flex-direction: column-reverse; 
+    }
+    .new-project-content .modal-footer button {
+        width: 100%;
+        padding: 0.8rem;
+    }
+}
+

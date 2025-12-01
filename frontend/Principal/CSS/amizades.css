@@ -89,15 +89,27 @@
     display: flex;
     flex-direction: column;
     
-    /* Fixa a sidebar enquanto rola a página */
-    position: sticky;
-    top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    /* ALTERAÇÃO: Mudamos de sticky para relative para respeitar o layout App */
+    position: relative; 
+    top: 0;
     
-    overflow-y: auto;
-    flex-shrink: 0; /* Impede a sidebar de encolher */
+    /* CORREÇÃO: Usar min-height garante que ela acompanhe o container pai */
+    min-height: 100%; 
+    height: auto;
+    
+    /* overflow-y: auto; -> Remover ou comentar se a sidebar for relative, 
+       pois ela vai crescer com a página e usar a rolagem principal */
+    overflow-y: visible; 
+    
+    flex-shrink: 0;
     z-index: 100;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-quaternary) var(--bg-secondary);
+}
+.sidebar-widget {
+    margin-top: 1.5rem;
 }
 
 .sidebar-header {
@@ -234,12 +246,16 @@
 
 /* Menu de Navegação */
 .sidebar-menu {
-    flex: 1;
+    flex: 0; /* ALTERADO DE 1 PARA 0 */
     padding: 1rem 0;
     display: flex;
     flex-direction: column;
     gap: 4px;
+    padding-top: 0;
+    padding-bottom: 0;
 }
+
+
 
 .menu-item {
     display: flex; align-items: center; gap: 1rem;
@@ -264,48 +280,49 @@
 .menu-item i { width: 24px; text-align: center; }
 
 /* =================================================================
-   WIDGET AMIGOS ONLINE (Estilo da Imagem)
-   Adicione ao final de amizades.css
+   WIDGET AMIGOS ONLINE (Correção de Alinhamento)
 ================================================================= */
 
 /* Container do Widget */
 .sidebar-widget .online-friends {
-    background: var(--bg-secondary); /* Fundo do card */
+    background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: none; /* Remove sombras externas para ficar flat como na imagem */
+    box-shadow: none;
 }
 
-/* Título "Amigos Online" */
+/* Título */
 .sidebar-widget .widget-title {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--text-secondary); /* Cor cinza */
+    color: var(--text-secondary);
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border-color); /* Linha fina separadora */
-    text-transform: none; /* Remove caixa alta se houver */
+    border-bottom: 1px solid var(--border-color);
+    text-transform: none;
 }
 
-/* Item da Lista (Cada amigo) */
+/* Item da Lista (Container Geral) */
 .sidebar-widget .friend-item {
     display: flex;
-    align-items: center;
-    justify-content: space-between; /* Empurra a bolinha para a ponta direita */
-    padding: 0.6rem 0; /* Espaçamento vertical entre os amigos */
+    align-items: center; /* Centraliza verticalmente TUDO na linha */
+    justify-content: space-between;
+    padding: 0.6rem 0;
     border-radius: 8px;
     transition: background-color 0.2s;
+    width: 100%;
 }
 
-/* Link (Agrupa Avatar + Nome) */
+/* Link (Avatar + Nome) */
 .sidebar-widget .friend-item-link {
     display: flex;
-    align-items: center;
-    gap: 12px; /* Distância entre a foto e o nome */
+    align-items: center; /* Centraliza Nome em relação ao Avatar */
+    gap: 12px;
     text-decoration: none;
-    flex-grow: 1; /* Ocupa todo o espaço até a bolinha */
-    min-width: 0; /* Evita que nomes longos quebrem o layout */
+    flex-grow: 1;
+    min-width: 0;
+    color: inherit; /* Garante que não fique azul/roxo de link padrão */
 }
 
 /* Avatar do Amigo */
@@ -314,36 +331,42 @@
     height: 36px;
     border-radius: 50%;
     overflow: hidden;
-    margin: 0; /* Remove margens antigas */
-    border: none; /* Remove bordas antigas */
+    margin: 0;
+    border: none;
+    flex-shrink: 0; /* Impede que o avatar amasse */
+    display: flex;  /* Remove espaços em branco fantasmas */
 }
 
 .sidebar-widget .friend-item .avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block; /* Essencial para alinhamento vertical exato */
 }
 
 /* Nome do Amigo */
 .sidebar-widget .friend-name {
     font-size: 0.95rem;
     font-weight: 500;
-    color: var(--text-primary); /* Branco/Claro */
+    color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin: 0;       /* Remove margens padrão de <p> ou <h3> */
+    line-height: 1.2; /* Altura de linha ajustada para centralizar */
+    padding-top: 1px; /* Ajuste óptico fino (opcional) */
 }
 
 /* Bolinha de Status (Lado Direito) */
 .sidebar-widget .friend-item .status.online {
-    position: static; /* Remove posicionamento absoluto antigo */
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background-color: #22c55e; /* Verde vibrante */
+    background-color: #22c55e;
     border: none;
-    margin-left: 10px; /* Afasta um pouco do nome */
-    flex-shrink: 0; /* Impede que a bolinha amasse */
+    margin-left: 10px;
+    flex-shrink: 0;
+    position: static; /* Garante que respeite o flexbox */
 }
 /* --- MAIN CONTENT --- */
 .main-content {
@@ -360,7 +383,7 @@
     width: 100%;
 }
 
-.connections-section { margin-bottom: 3rem; margin-top: 0 }
+.connections-section { margin-bottom: 3rem; }
 
 .section-title {
     font-size: 1.25rem;
@@ -471,60 +494,118 @@
 ================================================================= */
 
 /* Overlay para fundo escuro no mobile */
+/* Overlay para fundo escuro no mobile */
 .mobile-overlay {
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0;
     background: rgba(0,0,0,0.6);
-    z-index: 99; opacity: 0; visibility: hidden;
-    transition: 0.3s; backdrop-filter: blur(2px);
+    z-index: 1999; /* Fica abaixo da sidebar (2000), mas acima do header (1000) */
+    opacity: 0; 
+    visibility: hidden;
+    transition: all 0.3s ease; 
+    backdrop-filter: blur(2px);
 }
-.mobile-overlay.active { opacity: 1; visibility: visible; }
 
-/* Header Mobile (Só aparece no mobile) */
+.mobile-overlay.active { 
+    opacity: 1; 
+    visibility: visible; 
+}
+
+/* Header Mobile */
 .page-header-mobile {
-    display: none; /* Oculto no desktop */
-    align-items: center; justify-content: space-between;
+    display: none; 
+    align-items: center; 
+    justify-content: space-between;
     margin-bottom: 1.5rem;
-    margin-bottom: 0;
 }
 .page-title-mobile { font-size: 1.25rem; font-weight: 700; margin: 0; }
 
-/* MOBILE (Max 1024px - inclui Tablets em modo retrato e celulares) */
+/* MOBILE (Max 1024px - inclui Tablets e Celulares) */
 @media (max-width: 1024px) {
     
-    /* Sidebar vira Menu Gaveta */
+    /* Configuração da Sidebar como Menu Gaveta */
     .sidebar {
-        position: fixed; top: 0; left: 0;
+        position: fixed !important; /* Força fixed para sobrepor tudo */
+        top: 0; 
+        left: 0;
         height: 100vh;
-        width: 85%; max-width: 320px;
-        transform: translateX(-100%); /* Escondido */
+        width: 85%; 
+        max-width: 320px;
+        background-color: var(--bg-secondary);
+        
+        /* Começa escondido para a esquerda */
+        transform: translateX(-100%); 
+        
         box-shadow: 4px 0 24px rgba(0,0,0,0.5);
-        z-index: 1000;
+        z-index: 2000; /* Acima do overlay */
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-right: none;
+        overflow-y: auto; /* Permite rolar o menu se for alto */
     }
-    .sidebar.active { transform: translateX(0); }
+    
+    /* Classe adicionada via JS para abrir */
+    .sidebar.mobile-open { 
+        transform: translateX(0); 
+    }
 
-    /* Botão Fechar na Sidebar */
+    /* Botão Fechar (X) dentro da Sidebar */
     .sidebar-close {
-        display: block; position: absolute; top: 15px; right: 15px;
-        background: none; border: none; color: var(--text-secondary);
-        font-size: 1.5rem; cursor: pointer;
+        display: flex; /* Torna visível */
+        align-items: center;
+        justify-content: center;
+        position: absolute; 
+        top: 15px; 
+        right: 15px;
+        background: rgba(255,255,255,0.1); 
+        border: none; 
+        border-radius: 50%;
+        color: var(--text-primary);
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem; 
+        cursor: pointer;
+        z-index: 2001;
+    }
+    
+    .sidebar-close:hover {
+        background: rgba(255,255,255,0.2);
     }
 
-    /* Conteúdo Principal */
+    /* Ajuste do Main Content para ocupar 100% */
     .main-content {
-        width: 100%; padding: 1rem;
+        width: 100%; 
+        padding: 1rem;
+        margin: 0;
     }
 
-    .page-header-mobile { display: flex; } /* Mostra título mobile */
+    .page-header-mobile { display: flex; }
 
-    /* Layout Grid Mobile */
+    /* Ajuste dos Grids para Mobile (1 coluna) */
     .friends-grid, .user-list {
-        grid-template-columns: 1fr; /* 1 coluna */
+        grid-template-columns: 1fr;
         gap: 1rem;
     }
     
-    /* Ajustes finos nos cards mobile */
     .friend-card, .request-card { padding: 1rem; }
-    .friend-action-btn, .request-actions .btn { padding: 0.8rem; } /* Botões maiores para toque */
+}
+
+/* =================================================================
+   CORREÇÃO DO MODAL DE PERFIL (EVITAR QUEBRAS NO MOBILE)
+================================================================= */
+@media (max-width: 768px) {
+    #edit-profile-modal .modal-content {
+        width: 95% !important;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .profile-pic-editor img {
+        width: 100px;
+        height: 100px;
+    }
 }
 
 /* Botão Cancelar no Cabeçalho do Modal */
@@ -614,6 +695,7 @@
     border: 2px solid var(--bg-secondary);
     background-color: #238636; /* Verde */
 }
+
 
 /* 2. Identidade (Nome e Cargo) */
 .sidebar .user-identity {
@@ -768,3 +850,331 @@
     border-width: 2px;
 }
 
+/* =================================================================
+   CORREÇÃO DEFINITIVA DOS MODAIS NO MOBILE
+   (Adicione isto no FINAL do arquivo projeto.css)
+================================================================= */
+
+/* Estilo da área de edição de foto */
+.profile-pic-editor {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.profile-pic-editor img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--bg-tertiary);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* Sobreposição de "Alterar Foto" */
+.pic-editor-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    color: white;
+    font-size: 0.8rem;
+    pointer-events: none; /* Permite clicar na imagem */
+}
+
+.profile-pic-editor label:hover .pic-editor-overlay {
+    opacity: 1;
+}
+
+/* --- REGRAS ESPECÍFICAS PARA MOBILE (Max 768px) --- */
+@media (max-width: 768px) {
+    
+    /* Força o modal a caber na tela e ter scroll interno */
+    .modal-content {
+        width: 95% !important;      
+        max-width: 95% !important;
+        max-height: 85vh !important; /* Deixa espaço para margens */
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Impede que o container todo role */
+    }
+
+    /* Cabeçalho Fixo no topo */
+    .modal-header {
+        padding: 1rem;
+        flex-shrink: 0; 
+        position: sticky;
+        top: 0;
+        background: var(--bg-secondary);
+        z-index: 10;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Corpo com Scroll (Onde estão os inputs) */
+    /* IMPORTANTE: Isso faz o formulário rolar dentro do modal */
+    #edit-profile-form, 
+    .modal-body {
+        padding: 1rem;
+        overflow-y: auto !important; 
+        flex-grow: 1;     
+        max-height: calc(85vh - 130px); /* Subtrai header e footer aprox */
+    }
+
+    /* Rodapé Fixo embaixo */
+    .modal-footer {
+        padding: 1rem;
+        flex-shrink: 0;
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border-color);
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    /* Botão Grande para facilitar o toque */
+    .modal-footer button {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1rem;
+    }
+
+    /* Ajuste da foto no mobile */
+    .profile-pic-editor img {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+/* ... (Mantenha todo o seu CSS anterior aqui) ... */
+
+/* =================================================================
+   ESTILOS DO NOVO MODAL DE LISTA E BOTÃO VER MAIS
+================================================================= */
+
+/* Botão "Ver Mais" */
+.btn-ver-mais {
+    grid-column: 1 / -1; /* Ocupa toda a largura da grid */
+    margin: 1rem auto 0 auto;
+    background-color: transparent;
+    border: 1px solid var(--accent-primary);
+    color: var(--accent-primary);
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-ver-mais:hover {
+    background-color: var(--accent-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
+}
+
+.btn-ver-mais:after {
+    content: '\f078'; /* Ícone seta para baixo (FontAwesome) */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+}
+
+/* Ajustes Específicos do Modal de Lista */
+.modal-content-lista {
+    width: 90%;
+    max-width: 600px; /* Um pouco mais largo que o padrão */
+    max-height: 85vh; /* Altura máxima */
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body-lista {
+    padding: 1.5rem;
+    overflow-y: auto; /* Scroll vertical */
+    flex: 1; /* Ocupa o espaço restante */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Botão fechar (X) */
+.close-btn-lista {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-btn-lista:hover {
+    color: var(--danger);
+}
+
+/* Scrollbar Bonita no Modal */
+.modal-body-lista::-webkit-scrollbar {
+    width: 8px;
+}
+.modal-body-lista::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+.modal-body-lista::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
+}
+
+/* =================================================================
+   ESTILO DO ESTADO VAZIO (SEM AMIGOS)
+================================================================= */
+
+/* Container Principal */
+.empty-friends-state {
+    grid-column: 1 / -1; /* Ocupa toda a largura do grid */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    background: var(--bg-secondary);
+    border: 2px dashed var(--border-color); /* Borda tracejada mais grossa */
+    border-radius: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+/* Efeito ao passar o mouse na caixa inteira */
+.empty-friends-state:hover {
+    border-color: var(--accent-primary);
+    background: var(--bg-tertiary);
+}
+
+/* Ícone de Amigos (Fundo cinza circular) */
+.empty-friends-state i.fa-user-friends {
+    font-size: 2.5rem;
+    color: var(--accent-primary);
+    background: rgba(var(--accent-rgb), 0.1); /* Fundo colorido suave */
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+}
+
+/* Título */
+.empty-friends-state h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+/* Texto de descrição */
+.empty-friends-state p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    max-width: 350px;
+    line-height: 1.5;
+}
+
+/* --- O BOTÃO "ENCONTRAR PESSOAS" QUE VOCÊ QUERIA --- */
+.empty-friends-state .btn-primary {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, #2563eb 100%); /* Degradê */
+    color: white;
+    border: none;
+    padding: 12px 32px; /* Botão mais gordinho */
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 50px; /* Bordas redondas (Pílula) */
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); /* Sombra azul brilhante */
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+/* Efeito ao passar o mouse no botão */
+.empty-friends-state .btn-primary:hover {
+    transform: translateY(-3px); /* Sobe um pouquinho */
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5); /* Sombra aumenta */
+    filter: brightness(1.1);
+}
+
+.empty-friends-state .btn-primary i {
+    font-size: 1.1rem;
+    background: none; /* Remove fundo do ícone dentro do botão */
+    color: white;
+    width: auto;
+    height: auto;
+    margin: 0;
+}
+
+/* =================================================================
+   CORREÇÃO: SCROLL LATERAL NO DESKTOP
+   (Adicione isto ao final do arquivo amizades.css)
+================================================================= */
+
+@media (min-width: 1025px) {
+    .sidebar {
+        /* 1. Fixa a sidebar no topo (abaixo do header) */
+        position: sticky !important;
+        top: var(--header-height); /* 60px */
+        
+        /* 2. Define a altura exata: Tela inteira menos o Header */
+        height: calc(100vh - var(--header-height)) !important;
+        min-height: 0 !important; /* Reseta min-height antigo */
+        
+        /* 3. Ativa o scroll interno se o conteúdo for maior que a tela */
+        overflow-y: auto !important;
+        overflow-x: hidden;
+        
+        /* 4. Remove a borda direita se preferir um visual mais limpo */
+        border-right: 1px solid var(--border-color);
+        padding-bottom: 20px; /* Espaço extra no final */
+    }
+
+    /* --- ESTILIZAÇÃO DA BARRA DE ROLAGEM (Scrollbar Fina) --- */
+    
+    /* Largura da barra */
+    .sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    /* Fundo da barra (transparente para ficar clean) */
+    .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    /* A parte que corre (Thumb) */
+    .sidebar::-webkit-scrollbar-thumb {
+        background-color: var(--bg-quaternary);
+        border-radius: 10px;
+        border: 2px solid var(--bg-secondary); /* Cria um respiro visual */
+    }
+
+    /* Cor ao passar o mouse */
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background-color: var(--text-secondary);
+    }
+    
+    /* Firefox (Compatibilidade) */
+    .sidebar {
+        scrollbar-width: thin;
+        scrollbar-color: var(--bg-quaternary) var(--bg-secondary);
+    }
+}

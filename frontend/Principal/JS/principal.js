@@ -1,7 +1,49 @@
 // =================================================================
-// BLOCO DE CONTROLE DE TEMA (Executa primeiro em todas as páginas)
+// 1. BLOCO DE ACESSIBILIDADE GLOBAL (COLE ISTE NO TOPO DO ARQUIVO)
+// =================================================================
+window.aplicarAcessibilidadeGlobal = function() {
+
+    const html = document.documentElement;
+    const body = document.body;
+    // 1. Tamanho da Fonte (Aplica no HTML)
+    const savedFontSize = localStorage.getItem('fontSize') || 'medium';
+    html.setAttribute('data-font-size', savedFontSize);
+    // 2. Alto Contraste (Aplica no HTML para ser mais rápido)
+    if (localStorage.getItem('highContrast') === 'true') {
+        html.classList.add('acessibilidade-alto-contraste');
+    } else {
+        html.classList.remove('acessibilidade-alto-contraste');
+    }
+    // 3. Configurações que dependem do BODY
+    if (body) {
+        // Redução de Movimento
+        if (localStorage.getItem('reduceMotion') === 'true') {
+            body.classList.add('reduce-motion');
+        } else {
+            body.classList.remove('reduce-motion');
+        }
+        // Fonte Legível
+        if (localStorage.getItem('readableFont') === 'true') {
+            html.classList.add('acessibilidade-fonte-legivel');
+        } else {
+            html.classList.remove('acessibilidade-fonte-legivel');
+        }
+        // Destacar Links
+        if (localStorage.getItem('highlightLinks') === 'true') {
+            html.classList.add('acessibilidade-destacar-links');
+        } else {
+            html.classList.remove('acessibilidade-destacar-links');
+        }
+    }
+};
+// Executa IMEDIATAMENTE (antes da página aparecer)
+window.aplicarAcessibilidadeGlobal();
+// =================================================================
+// SEU CÓDIGO ANTIGO COMEÇA AQUI (NÃO APAGUE O RESTO)
 // =================================================================
 document.addEventListener("DOMContentLoaded", () => {
+    // ADICIONE ESTA LINHA DENTRO DO SEU DOMContentLoaded:
+    window.aplicarAcessibilidadeGlobal();   
   function setInitialTheme() {
     const savedTheme = localStorage.getItem("theme") || "dark";
     document.documentElement.setAttribute("data-theme", savedTheme);
@@ -14,6 +56,210 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("theme", newTheme);
     updateThemeIcon(newTheme);
   }
+
+  
+    initMobileFeatures();
+
+  // Adicione estas funções dentro do DOMContentLoaded em principal.js
+
+// Mobile sidebar toggle
+function setupMobileSidebar() {
+    const menuToggle = document.getElementById('mobile-menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarClose = document.getElementById('sidebar-close');
+    // Nota: O ID no HTML principal é 'mobile-overlay', verifique se está igual
+    const sidebarOverlay = document.getElementById('mobile-overlay'); 
+
+    function toggleMenu() {
+        sidebar.classList.toggle('mobile-open'); 
+        
+        if (sidebarOverlay) {
+            sidebarOverlay.classList.toggle('active'); // O overlay geralmente usa active
+        }
+        
+        // Previne scroll do corpo quando menu está aberto
+        document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+    }
+
+    // Remove event listeners antigos para evitar duplicação (cloneNode)
+    if (menuToggle) {
+        const newToggle = menuToggle.cloneNode(true);
+        menuToggle.parentNode.replaceChild(newToggle, menuToggle);
+        newToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu();
+        });
+    }
+
+    if (sidebarClose) {
+        const newClose = sidebarClose.cloneNode(true);
+        sidebarClose.parentNode.replaceChild(newClose, sidebarClose);
+        newClose.addEventListener('click', toggleMenu);
+    }
+
+    if (sidebarOverlay) {
+        const newOverlay = sidebarOverlay.cloneNode(true);
+        sidebarOverlay.parentNode.replaceChild(newOverlay, sidebarOverlay);
+        newOverlay.addEventListener('click', toggleMenu);
+    }
+    
+    // Fechar ao clicar em links
+    if (sidebar) {
+        sidebar.querySelectorAll('.menu-item').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    setTimeout(toggleMenu, 150);
+                }
+            });
+        });
+    }
+}
+
+// Além disso, na função updateUIWithUserData, certifique-se de remover o loading:
+// Dentro da função updateUIWithUserData(user) {...}:
+const userInfoContainer = document.querySelector('.user-info');
+if (userInfoContainer) {
+    userInfoContainer.classList.add('loaded'); // Isso esconde o spinner cinza
+}
+// Mobile responsive adjustments
+function setupMobileResponsive() {
+    // Hide certain elements on mobile
+    const hideOnMobile = document.querySelectorAll('.d-none-mobile');
+    
+    function checkMobile() {
+        const isMobile = window.innerWidth <= 768;
+        hideOnMobile.forEach(el => {
+            el.style.display = isMobile ? 'none' : 'flex';
+        });
+        
+        // Adjust post actions for mobile
+        const postActions = document.querySelectorAll('.post-actions');
+        postActions.forEach(actions => {
+            if (isMobile) {
+                actions.style.flexDirection = 'row';
+                actions.style.justifyContent = 'space-around';
+            } else {
+                actions.style.flexDirection = 'row';
+                actions.style.justifyContent = 'space-around';
+            }
+        });
+    }
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+}
+
+// Enhanced mobile post creator
+function setupMobilePostCreator() {
+    const postTextarea = document.getElementById('post-creator-textarea');
+    const publishBtn = document.getElementById('publish-post-btn');
+    
+    if (postTextarea && publishBtn) {
+        postTextarea.addEventListener('input', function() {
+            // Auto-resize
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            
+            // Enable/disable button
+            const hasContent = this.value.trim().length > 0;
+            publishBtn.disabled = !hasContent;
+            publishBtn.style.opacity = hasContent ? '1' : '0.7';
+        });
+        
+        // Mobile file upload enhancement
+        const fileInput = document.getElementById('post-file-input');
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    showNotification(`${this.files.length} arquivo(s) selecionado(s)`, 'info');
+                }
+            });
+        }
+    }
+}
+
+// Touch-optimized carousel
+function setupMobileCarousel() {
+    // Add touch events to carousels
+    document.addEventListener('touchstart', handleTouchStart, false);        
+    document.addEventListener('touchmove', handleTouchMove, false);
+    
+    let xDown = null;                                                        
+    let yDown = null;
+    
+    function handleTouchStart(evt) {                                         
+        xDown = evt.touches[0].clientX;                                      
+        yDown = evt.touches[0].clientY;                                      
+    };                                                
+    
+    function handleTouchMove(evt) {
+        if (!xDown || !yDown) return;
+        
+        const xUp = evt.touches[0].clientX;
+        const yUp = evt.touches[0].clientY;
+        const xDiff = xDown - xUp;
+        const yDiff = yDown - yUp;
+        
+        if (Math.abs(xDiff) > Math.abs(yDiff)) {
+            if (xDiff > 0) {
+                // Swipe left - next
+                if (currentMediaIndex < currentMediaItems.length - 1) {
+                    nextMedia();
+                }
+            } else {
+                // Swipe right - previous
+                if (currentMediaIndex > 0) {
+                    prevMedia();
+                }
+            }
+        }
+        
+        xDown = null;
+        yDown = null;
+    };
+}
+
+// Enhanced loading states for mobile
+function showMobileLoadingState() {
+    const postsContainer = document.querySelector('.posts-container');
+    if (postsContainer && window.innerWidth <= 768) {
+        postsContainer.innerHTML = `
+            <div class="posts-loading" id="posts-loading">
+                <div class="post-skeleton">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line long"></div>
+                    </div>
+                </div>
+                <div class="post-skeleton">
+                    <div class="skeleton-avatar"></div>
+                    <div class="skeleton-content">
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line medium"></div>
+                        <div class="skeleton-line long"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// Initialize all mobile features
+function initMobileFeatures() {
+    setupMobileSidebar();
+    setupMobileResponsive();
+    setupMobilePostCreator();
+    // setupMobileNotifications(); // REMOVIDO - CONFLITAVA COM O LISTENER GLOBAL
+    setupMobileCarousel();
+    
+    // Show loading state initially on mobile
+    if (window.innerWidth <= 768) {
+        showMobileLoadingState();
+    }
+}
+
   function updateThemeIcon(theme) {
     const themeToggleIcon = document.querySelector(".theme-toggle i");
     if (themeToggleIcon) {
@@ -33,15 +279,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
-
 // =================================================================
 // LÓGICA GLOBAL (Executa em TODAS as páginas)
 // =================================================================
-const backendUrl = "https://senaicommunitydeploy-production.up.railway.app";
+const backendUrl = "https://senaicommunitydeploy.up.railway.app";
 const jwtToken = localStorage.getItem("token");
 const defaultAvatarUrl = `${backendUrl}/images/default-avatar.jpg`;
 const messageBadgeElement = document.getElementById("message-badge");
+const defaultProjectUrl = `${backendUrl}/images/default-project.jpg`;
 
 // Variáveis globais para que outros scripts (como mensagem.js) possam acessá-las
 let stompClient = null;
@@ -68,6 +313,7 @@ window.getAvatarUrl = function(fotoPerfil) {
     }
     return `${window.backendUrl}/api/arquivos/${fotoPerfil}`;
 }
+window.defaultProjectUrl = defaultProjectUrl;
 window.defaultAvatarUrl = defaultAvatarUrl;
 window.showNotification = showNotification;
 window.axios = axios; // Assume que Axios está carregado globalmente
@@ -112,10 +358,40 @@ const globalElements = {
   deleteConfirmPassword: document.getElementById("delete-confirm-password"),
 };
 
+function highlightActiveSidebarItem() {
+    // 1. Pega o nome da página atual (ex: "amizades.html" ou "principal.html")
+    const currentPage = window.location.pathname.split("/").pop() || "principal.html";
+    
+    // 2. Seleciona todos os links do menu lateral
+    const menuItems = document.querySelectorAll('.sidebar-menu .menu-item');
+    
+    // 3. Remove a classe 'active' de todos e adiciona no correto
+    menuItems.forEach(item => {
+        // Remove active de todos primeiro
+        item.classList.remove('active');
+        
+        // Pega o href do link (ex: "amizades.html")
+        const itemHref = item.getAttribute('href');
+        
+        // Verifica se o link corresponde à página atual
+        if (itemHref === currentPage || (currentPage === "" && itemHref === "principal.html")) {
+            item.classList.add('active');
+        }
+        
+        // Caso especial: Se estiver em "buscar_amigos.html", destaca "Encontrar Pessoas"
+        if (currentPage === "buscar_amigos.html" && itemHref === "buscar_amigos.html") {
+             item.classList.add('active');
+        }
+    });
+}
+
 /**
  * Função de inicialização global. Carrega usuário, conecta WS, busca amigos e notificações.
  */
 async function initGlobal() {
+
+
+
   if (!jwtToken) {
     window.location.href = "login.html";
     return;
@@ -130,10 +406,8 @@ async function initGlobal() {
 
     // 2. Atualiza a UI (sidebar/topbar)
     updateUIWithUserData(currentUser);
-
-    // 3. Buscar contagem de projetos do usuário
-    await fetchUserProjectsCount();
-
+    
+   
     // 4. Conecta ao WebSocket
     connectWebSocket(); // Define window.stompClient
 
@@ -155,27 +429,6 @@ async function initGlobal() {
 
 // --- FUNÇÕES GLOBAIS (Auth, UI, WebSocket, Notificações) ---
 
-// NOVA FUNÇÃO: Buscar contagem de projetos do usuário
-async function fetchUserProjectsCount() {
-  try {
-    const response = await axios.get(`${backendUrl}/projetos`);
-    const allProjects = response.data;
-    
-    // Filtra os projetos em que o usuário atual é membro
-    const myProjects = allProjects.filter(proj => 
-      proj.membros && proj.membros.some(membro => membro.usuarioId === currentUser.id)
-    );
-    
-    if (globalElements.projectsCount) {
-      globalElements.projectsCount.textContent = myProjects.length;
-    }
-  } catch (error) {
-    console.error("Erro ao buscar projetos do usuário:", error);
-    if (globalElements.projectsCount) {
-      globalElements.projectsCount.textContent = "0";
-    }
-  }
-}
 
 function updateUIWithUserData(user) {
   if (!user) return;
@@ -204,10 +457,33 @@ function updateUIWithUserData(user) {
   if (globalElements.sidebarUserImg)
     globalElements.sidebarUserImg.src = userImage;
 
+  const projectsCountElement = document.getElementById("projects-count");
+  if (projectsCountElement) {
+      // Usa o valor vindo do Backend ou 0 se for nulo
+      projectsCountElement.textContent = user.totalProjetos || 0;
+  }
+
   // Atualiza a imagem do criador de post (se existir na página)
   const postCreatorImg = document.getElementById("post-creator-img");
   if (postCreatorImg) postCreatorImg.src = userImage;
 }
+
+// Função global para expandir/recolher comentários
+window.toggleCommentReadMore = (btn) => {
+    // O botão é irmão (sibling) do parágrafo .comment-content
+    // Estrutura: .comment-body > .comment-author, .comment-content, button
+    const commentParagraph = btn.previousElementSibling; 
+    
+    if (commentParagraph && commentParagraph.classList.contains('text-clamped')) {
+        // Expandir
+        commentParagraph.classList.remove('text-clamped');
+        btn.textContent = "Ler menos";
+    } else if (commentParagraph) {
+        // Recolher
+        commentParagraph.classList.add('text-clamped');
+        btn.textContent = "Ler mais";
+    }
+};
 
 function connectWebSocket() {
   const socket = new SockJS(`${backendUrl}/ws`);
@@ -356,14 +632,29 @@ async function fetchInitialOnlineFriends() {
 
 function atualizarStatusDeAmigosNaUI() {
     if (!globalElements.onlineFriendsList) return;
+    
     if (!friendsLoaded) {
-        globalElements.onlineFriendsList.innerHTML = '<p class="empty-state">Carregando...</p>';
+        // Mantém o loading como está
+        globalElements.onlineFriendsList.innerHTML = `
+            <div class="results-loading" style="padding: 1rem;">
+                <div class="loading-spinner"></div>
+                <p style="font-size: 0.8rem; margin-top: 0.5rem;">Carregando...</p>
+            </div>`;
         return;
     }
-    const onlineFriends = userFriends.filter(friend => latestOnlineEmails.includes(friend.email)); //
+
+    const onlineFriends = userFriends.filter(friend => latestOnlineEmails.includes(friend.email));
     globalElements.onlineFriendsList.innerHTML = '';
+
     if (onlineFriends.length === 0) {
-        globalElements.onlineFriendsList.innerHTML = '<p class="empty-state">Nenhum amigo online.</p>';
+        // --- AQUI ESTÁ A MUDANÇA PARA O ESTILO DA IMAGEM ---
+        globalElements.onlineFriendsList.innerHTML = `
+            <div class="online-friends-empty-wrapper">
+                <div class="online-friends-dashed-box">
+                    Nenhum amigo online.
+                </div>
+            </div>
+        `;
     } else {
         onlineFriends.forEach(friend => {
             const friendElement = document.createElement('div');
@@ -372,14 +663,14 @@ function atualizarStatusDeAmigosNaUI() {
             const friendAvatar = friend.fotoPerfil 
                 ? (friend.fotoPerfil.startsWith('http') 
                     ? friend.fotoPerfil 
-                    : `${backendUrl}/api/arquivos/${friend.fotoPerfil}`) 
-                : defaultAvatarUrl;
+                    : `${window.backendUrl}/api/arquivos/${friend.fotoPerfil}`) 
+                : window.defaultAvatarUrl;
             
             const friendId = friend.idUsuario; 
 
             friendElement.innerHTML = `
                 <a href="perfil.html?id=${friendId}" class="friend-item-link">
-                    <div class="avatar"><img src="${friendAvatar}" alt="Avatar de ${friend.nome}" onerror="this.src='${defaultAvatarUrl}';"></div>
+                    <div class="avatar"><img src="${friendAvatar}" alt="Avatar" onerror="this.src='${window.defaultAvatarUrl}';"></div>
                     <span class="friend-name">${friend.nome}</span>
                 </a>
                 <div class="status online"></div>
@@ -418,126 +709,196 @@ function renderNotifications(notifications) {
   });
 }
 
+/* --- No arquivo FrontEnd/Principal/JS/principal.js --- */
+
 function createNotificationElement(notification) {
-        const item = document.createElement('div');
-        item.className = 'notification-item';
-        item.id = `notification-item-${notification.id}`;
-        if (!notification.lida) item.classList.add('unread');
+    const item = document.createElement('div');
+    item.className = 'notification-item';
+    item.id = `notification-item-${notification.id}`;
+    if (!notification.lida) item.classList.add('unread');
+
+    const data = new Date(notification.dataCriacao).toLocaleString('pt-BR');
     
-        const data = new Date(notification.dataCriacao).toLocaleString('pt-BR');
-        let actionButtonsHtml = '';
-        let iconClass = 'fa-info-circle';
-        let notificationLink = '#'; // Link padrão
+    let actionButtonsHtml = '';
+    let iconClass = 'fa-info-circle'; // Ícone padrão
+    let notificationLink = '#'; 
 
-        // IDs vindos do Backend
-        const postId = notification.idReferencia;
-        const commentId = notification.idReferenciaSecundaria; 
+    // IDs vindos do Backend
+    const idRef = notification.idReferencia; // ID do Usuário (msg), Projeto ou Post
+    const idSec = notification.idReferenciaSecundaria; // ID do Comentário, se houver
 
-        if (notification.tipo === 'PEDIDO_AMIZADE') {
-            iconClass = 'fa-user-plus';
-            notificationLink = 'amizades.html'; // Link para amizades
-            if (!notification.lida) {
-                 actionButtonsHtml = `
-                  <div class="notification-actions">
-                     <button class="btn btn-sm btn-primary" onclick="window.aceitarSolicitacao(${notification.idReferencia}, ${notification.id})">Aceitar</button>
-                     <button class="btn btn-sm btn-secondary" onclick="window.recusarSolicitacao(${notification.idReferencia}, ${notification.id})">Recusar</button>
-                  </div>`;
-            }
-        } else if (notification.tipo === 'NOVO_COMENTARIO' || notification.tipo === 'CURTIDA_POST' || notification.tipo === 'CURTIDA_COMENTARIO') {
-            
-            if (notification.tipo.startsWith('CURTIDA')) {
-                iconClass = 'fa-heart';
-            } else {
-                iconClass = 'fa-comment';
-            }
+    // --- LÓGICA DE ÍCONES E LINKS POR TIPO ---
 
-            // Constrói o link para o post
-            // (Assumindo que a página de perfil também pode mostrar o post)
-            notificationLink = `principal.html?postId=${postId}`;
+    if (notification.tipo === 'ALERTA_VAGA') {
+    iconClass = 'fa-briefcase'; // Ícone de maleta
+    notificationLink = `vaga.html?id=${idRef}`; 
+}
 
-            // Se for sobre um comentário, adiciona o hash
-            if (commentId) {
-                notificationLink += `#comment-${commentId}`;
-            }
-        }
-    
-        item.innerHTML = `
-            <a href="${notificationLink}" class="notification-link" onclick="window.markNotificationAsRead(event, ${notification.id})">
-                <div class="notification-icon-wrapper"><i class="fas ${iconClass}"></i></div>
-                <div class="notification-content">
-                    <p>${notification.mensagem}</p>
-                    <span class="timestamp">${data}</span>
-                </div>
-            </a>
-            <div class="notification-actions-wrapper">${actionButtonsHtml}</div>
-        `;
-    
-        const actionsWrapper = item.querySelector('.notification-actions-wrapper');
-        if (actionsWrapper) {
-            actionsWrapper.addEventListener('click', e => e.stopPropagation());
-        }
-        return item;
+    // 6. NOTIFICAÇÕES DE EVENTOS (Início, Fim e Lembrete)
+    else if (notification.tipo === 'EVENTO_INICIO') {
+        iconClass = 'fa-stopwatch'; // Ícone de cronômetro/urgência
+        notificationLink = `evento.html?id=${idRef}`; 
     }
-    async function checkAndHighlightComment() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const postId = urlParams.get('postId');
-        const hash = window.location.hash; // Pega o #comment-123
+    else if (notification.tipo === 'EVENTO_FIM') {
+        iconClass = 'fa-flag-checkered'; // Ícone de chegada/fim
+        notificationLink = `evento.html?id=${idRef}`;
+    }
+    else if (notification.tipo === 'EVENTO') { // Lembrete genérico ou confirmação
+        iconClass = 'fa-calendar-check'; // Ícone de calendário
+        notificationLink = `evento.html?id=${idRef}`;
+    }
 
-        // Só continua se tiver um postId na URL
-        if (!postId) return; 
-
-        let commentId = null;
-        if (hash && hash.startsWith('#comment-')) {
-            commentId = hash.substring(1); // "comment-123"
-        }
-
-        // 1. Encontrar o Post
-        let postElement = document.getElementById(`post-${postId}`);
-        let attempts = 0;
-
-        // Tenta encontrar o post por até 5 segundos (esperando o fetch das postagens)
-        while (!postElement && attempts < 25) {
-            await new Promise(resolve => setTimeout(resolve, 200));
-            postElement = document.getElementById(`post-${postId}`);
-            attempts++;
-        }
-
-        if (!postElement) {
-            console.warn(`Post ${postId} não encontrado para destacar.`);
-            return;
-        }
-
-        // 2. Rolar até o Post e Abrir os Comentários
-        postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // 1. PEDIDO DE AMIZADE
+    if (notification.tipo === 'PEDIDO_AMIZADE') {
+        iconClass = 'fa-user-plus';
+        notificationLink = 'amizades.html';
         
-        const commentsSection = postElement.querySelector('.comments-section');
-        if (commentsSection && commentsSection.style.display === 'none') {
-            // Clica no botão de comentários (usando a função global)
-            window.toggleComments(postId);
-            // Espera a UI atualizar
-            await new Promise(resolve => setTimeout(resolve, 100));
+        if (!notification.lida) {
+             actionButtonsHtml = `
+              <div class="notification-actions">
+                 <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); window.aceitarSolicitacao(${idRef}, ${notification.id})">Aceitar</button>
+                 <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); window.recusarSolicitacao(${idRef}, ${notification.id})">Recusar</button>
+              </div>`;
         }
-
-        // 3. Se houver um commentId, encontrar e destacar o comentário
-        if (commentId) {
-            const commentElement = document.getElementById(commentId);
-            if (commentElement) {
-                // Rola até o comentário
-                commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Adiciona a classe de "flash"
-                commentElement.classList.add('highlight-flash');
-                
-                // Remove a classe após a animação
-                setTimeout(() => {
-                    commentElement.classList.remove('highlight-flash');
-                }, 2000); // 2 segundos
-            } else {
-                console.warn(`Comentário ${commentId} não encontrado no post ${postId}.`);
-            }
+    } 
+    // 2. MENSAGEM PRIVADA (Novo)
+    else if (notification.tipo === 'MENSAGEM_PRIVADA' || notification.tipo === 'NOVA_MENSAGEM') {
+        iconClass = 'fa-envelope'; // Ícone de carta/envelope
+        // Redireciona para o chat e abre a conversa com o remetente
+        notificationLink = `mensagem.html?start_chat=${idRef}`;
+    }
+    // 3. MENSAGEM DE PROJETO / ATUALIZAÇÃO DE PROJETO (Novo)
+    else if (notification.tipo === 'MENSAGEM_PROJETO' || notification.tipo === 'CONVITE_PROJETO' || notification.tipo === 'ATUALIZACAO_PROJETO') {
+        iconClass = 'fa-project-diagram'; // Ícone de projeto/diagrama
+        // Redireciona para os detalhes do projeto
+        notificationLink = `projeto-detalhe.html?id=${idRef}`;
+    }
+    // 4. INTERAÇÕES SOCIAIS (Comentários/Likes)
+    else if (notification.tipo === 'NOVO_COMENTARIO' || notification.tipo === 'CURTIDA_POST' || notification.tipo === 'CURTIDA_COMENTARIO') {
+        if (notification.tipo.startsWith('CURTIDA')) {
+            iconClass = 'fa-heart';
+        } else {
+            iconClass = 'fa-comment';
+        }
+        
+        notificationLink = `principal.html?postId=${idRef}`;
+        if (idSec) {
+            notificationLink += `#comment-${idSec}`;
         }
     }
-    // Função para mostrar/ocultar respostas aninhadas
+
+    // --- CRIAÇÃO DO HTML ---
+    // Usa a função handleNotificationClick que criamos no passo anterior
+    item.innerHTML = `
+        <a href="${notificationLink}" class="notification-link" onclick="window.handleNotificationClick(event, ${notification.id}, '${notificationLink}')">
+            <div class="notification-icon-wrapper">
+                <i class="fas ${iconClass}"></i>
+            </div>
+            <div class="notification-content">
+                <p>${notification.mensagem}</p>
+                <span class="timestamp">${data}</span>
+            </div>
+        </a>
+        <div class="notification-actions-wrapper">${actionButtonsHtml}</div>
+    `;
+
+    const actionsWrapper = item.querySelector('.notification-actions-wrapper');
+    if (actionsWrapper) {
+        actionsWrapper.addEventListener('click', e => e.stopPropagation());
+    }
+    
+    return item;
+}
+
+/* --- Adicionar no FrontEnd/Principal/JS/principal.js --- */
+
+window.handleNotificationClick = function(event, notificationId, targetUrl) {
+    // 1. Previne o comportamento padrão do link para controlarmos a ordem
+    event.preventDefault(); 
+
+    // 2. Remove visualmente a marcação de "não lida" imediatamente (UI Otimista)
+    const item = document.getElementById(`notification-item-${notificationId}`);
+    if(item) item.classList.remove('unread');
+    
+    // 3. Atualiza o contador de notificações (decrementa 1)
+    const badge = document.getElementById('notifications-badge');
+    if(badge) {
+        let count = parseInt(badge.textContent) || 0;
+        if(count > 0) badge.textContent = count - 1;
+        if(count - 1 <= 0) badge.style.display = 'none';
+    }
+
+    // 4. Envia requisição para o backend marcar como lida (sem await para não travar a navegação)
+    axios.put(`${window.backendUrl}/api/notificacoes/${notificationId}/ler`)
+        .catch(err => console.error("Erro ao marcar notificação:", err));
+
+    // 5. Redireciona o usuário para a página correta
+    if (targetUrl && targetUrl !== '#' && targetUrl !== 'null') {
+        window.location.href = targetUrl;
+    }
+};
+
+async function checkAndHighlightComment() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('postId');
+    const hash = window.location.hash; // Pega o #comment-123
+
+    // Só continua se tiver um postId na URL
+    if (!postId) return; 
+
+    let commentId = null;
+    if (hash && hash.startsWith('#comment-')) {
+        commentId = hash.substring(1); // "comment-123"
+    }
+
+    // 1. Encontrar o Post
+    let postElement = document.getElementById(`post-${postId}`);
+    let attempts = 0;
+
+    // Tenta encontrar o post por até 5 segundos (esperando o fetch das postagens)
+    while (!postElement && attempts < 25) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        postElement = document.getElementById(`post-${postId}`);
+        attempts++;
+    }
+
+    if (!postElement) {
+        console.warn(`Post ${postId} não encontrado para destacar.`);
+        return;
+    }
+
+    // 2. Rolar até o Post e Abrir os Comentários
+    postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    const commentsSection = postElement.querySelector('.comments-section');
+    if (commentsSection && commentsSection.style.display === 'none') {
+        // Clica no botão de comentários (usando a função global)
+        window.toggleComments(postId);
+        // Espera a UI atualizar
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    // 3. Se houver um commentId, encontrar e destacar o comentário
+    if (commentId) {
+        const commentElement = document.getElementById(commentId);
+        if (commentElement) {
+            // Rola até o comentário
+            commentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Adiciona a classe de "flash"
+            commentElement.classList.add('highlight-flash');
+            
+            // Remove a classe após a animação
+            setTimeout(() => {
+                commentElement.classList.remove('highlight-flash');
+            }, 2000); // 2 segundos
+        } else {
+            console.warn(`Comentário ${commentId} não encontrado no post ${postId}.`);
+        }
+    }
+}
+
+// Função para mostrar/ocultar respostas aninhadas
 window.toggleReplies = (buttonElement, commentId) => {
     const repliesContainer = document.getElementById(`replies-for-${commentId}`);
     if (!repliesContainer) return;
@@ -661,177 +1022,489 @@ function openDeleteAccountModal() {
 }
 
 // --- SETUP DE EVENT LISTENERS GLOBAIS ---
+/* Substitua toda a função setupGlobalEventListeners no final do principal.js */
+
 function setupGlobalEventListeners() {
-  const menuToggle = document.querySelector(".menu-toggle");
-const sidebar = document.querySelector(".sidebar");
-const overlay = document.getElementById("sidebar-overlay");
-
-if (menuToggle && sidebar && overlay) {
-    // Abrir menu
-    menuToggle.addEventListener("click", (e) => {
-        e.stopPropagation(); // Evita conflitos
-        sidebar.classList.toggle("mobile-open");
-        overlay.classList.toggle("active");
-    });
-
-    // Fechar ao clicar no overlay (fundo escuro)
-    overlay.addEventListener("click", () => {
-        sidebar.classList.remove("mobile-open");
-        overlay.classList.remove("active");
-    });
-}
-  document.body.addEventListener("click", (e) => {
-    if (
-      globalElements.notificationsPanel &&
-      !globalElements.notificationsPanel.contains(e.target) &&
-      !globalElements.notificationsIcon.contains(e.target)
-    ) {
-      globalElements.notificationsPanel.style.display = "none";
-    }
-    closeAllMenus();
-  });
-
-  if (globalElements.notificationsIcon) {
-    globalElements.notificationsIcon.addEventListener("click", (event) => {
-      event.stopPropagation();
-      const panel = globalElements.notificationsPanel;
-      const isVisible = panel.style.display === "block";
-      panel.style.display = isVisible ? "none" : "block";
-      if (!isVisible) markAllNotificationsAsRead(); //
-    });
-  }
-
-  if (globalElements.userDropdownTrigger) {
-    globalElements.userDropdownTrigger.addEventListener("click", (event) => {
-      event.stopPropagation();
-      const menu = globalElements.userDropdownTrigger.nextElementSibling;
-      if (menu && menu.classList.contains("dropdown-menu")) {
-        const isVisible = menu.style.display === "block";
-        closeAllMenus();
-        if (!isVisible) menu.style.display = "block";
-      }
-    });
-  }
-
-  if (globalElements.logoutBtn) {
-    globalElements.logoutBtn.addEventListener("click", () => {
-      localStorage.clear();
-      window.location.href = "login.html";
-    });
-  }
-
-  // --- Listeners de Modais de Perfil ---
-  //
-  if (globalElements.editProfileBtn)
-    globalElements.editProfileBtn.addEventListener(
-      "click",
-      openEditProfileModal
-    );
-  if (globalElements.deleteAccountBtn)
-    globalElements.deleteAccountBtn.addEventListener(
-      "click",
-      openDeleteAccountModal
-    );
-  if (globalElements.cancelEditProfileBtn)
-    globalElements.cancelEditProfileBtn.addEventListener(
-      "click",
-      () => (globalElements.editProfileModal.style.display = "none")
-    );
-  if (globalElements.editProfilePicInput)
-    globalElements.editProfilePicInput.addEventListener("change", () => {
-      const file = globalElements.editProfilePicInput.files[0];
-      if (file)
-        globalElements.editProfilePicPreview.src = URL.createObjectURL(file);
-    });
-  if (globalElements.editProfileForm)
-    globalElements.editProfileForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      // Lógica de update de foto
-      if (globalElements.editProfilePicInput.files[0]) {
-        const formData = new FormData();
-        formData.append("foto", globalElements.editProfilePicInput.files[0]);
-        try {
-          const response = await axios.put(
-            `${backendUrl}/usuarios/me/foto`,
-            formData
-          );
-          currentUser = response.data;
-          updateUIWithUserData(currentUser);
-          showNotification("Foto de perfil atualizada!", "success");
-        } catch (error) {
-          let errorMessage = "Erro ao atualizar a foto.";
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            }
-            showNotification(errorMessage, "error");
-        }
-      }
-      // Lógica de update de dados
-      const password = globalElements.editProfilePassword.value;
-      if (
-        password &&
-        password !== globalElements.editProfilePasswordConfirm.value
-      ) {
-        showNotification("As novas senhas não coincidem.", "error");
-        return;
-      }
-      const updateData = {
-        nome: globalElements.editProfileName.value,
-        bio: globalElements.editProfileBio.value,
-        dataNascimento: globalElements.editProfileDob.value
-          ? new Date(globalElements.editProfileDob.value).toISOString()
-          : null,
-        senha: password || null,
-      };
-      try {
-        const response = await axios.put(
-          `${backendUrl}/usuarios/me`,
-          updateData
-        );
-        currentUser = response.data;
-        updateUIWithUserData(currentUser);
-        showNotification("Perfil atualizado com sucesso!", "success");
-        globalElements.editProfileModal.style.display = "none";
-      } catch (error) {
-        showNotification("Erro ao atualizar o perfil.", "error");
-      }
-    });
-
-  // Deletar conta
-  if (globalElements.cancelDeleteAccountBtn)
-    globalElements.cancelDeleteAccountBtn.addEventListener(
-      "click",
-      () => (globalElements.deleteAccountModal.style.display = "none")
-    );
-  if (globalElements.deleteAccountForm)
-    globalElements.deleteAccountForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const password = globalElements.deleteConfirmPassword.value;
-      if (!password) {
-        showNotification(
-          "Por favor, digite sua senha para confirmar.",
-          "error"
-        );
-        return;
-      }
-      try {
-        await axios.post(`${backendUrl}/autenticacao/login`, {
-          email: currentUser.email,
-          senha: password,
-        });
+    // Fechar menus ao clicar fora
+    document.body.addEventListener("click", (e) => {
         if (
-          confirm("Você tem ABSOLUTA CERTEZA? Esta ação não pode ser desfeita.")
+            globalElements.notificationsPanel &&
+            !globalElements.notificationsPanel.contains(e.target) &&
+            !globalElements.notificationsIcon.contains(e.target)
         ) {
-          await axios.delete(`${backendUrl}/usuarios/me`);
-          alert("Sua conta foi excluída com sucesso.");
-          localStorage.clear();
-          window.location.href = "login.html";
+            globalElements.notificationsPanel.style.display = "none";
         }
-      } catch (error) {
-        showNotification("Senha incorreta. A conta não foi excluída.", "error");
-      }
+        closeAllMenus();
+    });
+
+    // 1. Notificações
+    const notifIcon = document.getElementById('notifications-icon');
+    if (notifIcon && notifIcon.parentNode) { // Verificação de segurança adicionada
+        const newIcon = notifIcon.cloneNode(true);
+        notifIcon.parentNode.replaceChild(newIcon, notifIcon);
+        
+        globalElements.notificationsIcon = newIcon;
+        // Re-seleciona os filhos dentro do novo ícone clonado
+        globalElements.notificationsPanel = newIcon.querySelector('#notifications-panel');
+        globalElements.notificationsList = newIcon.querySelector('#notifications-list');
+        globalElements.notificationsBadge = newIcon.querySelector('#notifications-badge');
+
+        globalElements.notificationsIcon.addEventListener("click", (event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            const panel = globalElements.notificationsPanel;
+            if (panel) {
+                const isVisible = panel.style.display === "block";
+                closeAllMenus();
+                panel.style.display = isVisible ? "none" : "block";
+                if (!isVisible) markAllNotificationsAsRead();
+            }
+        });
+    }
+
+    // 2. Dropdown de Usuário
+    if (globalElements.userDropdownTrigger) {
+        // Clonagem para remover listeners antigos
+        const oldTrigger = globalElements.userDropdownTrigger;
+        if(oldTrigger.parentNode) {
+            const newTrigger = oldTrigger.cloneNode(true);
+            oldTrigger.parentNode.replaceChild(newTrigger, oldTrigger);
+            globalElements.userDropdownTrigger = newTrigger;
+
+            newTrigger.addEventListener("click", (event) => {
+                event.stopPropagation();
+                const menu = newTrigger.nextElementSibling;
+                if (menu && menu.classList.contains("dropdown-menu")) {
+                    const isVisible = menu.style.display === "block";
+                    closeAllMenus();
+                    if (!isVisible) menu.style.display = "block";
+                }
+            });
+        }
+    }
+
+    // 3. Botão Editar Perfil (Menu Superior)
+    if (globalElements.editProfileBtn && globalElements.editProfileBtn.parentNode) {
+        const newProfileBtn = globalElements.editProfileBtn.cloneNode(true);
+        globalElements.editProfileBtn.parentNode.replaceChild(newProfileBtn, globalElements.editProfileBtn);
+        globalElements.editProfileBtn = newProfileBtn;
+
+        newProfileBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = "perfil.html";
+        });
+    }
+
+    // 4. Botão SAIR (Logout) - O ERRO ESTAVA AQUI GERALMENTE
+    if (globalElements.logoutBtn && globalElements.logoutBtn.parentNode) {
+        const newLogoutBtn = globalElements.logoutBtn.cloneNode(true);
+        globalElements.logoutBtn.parentNode.replaceChild(newLogoutBtn, globalElements.logoutBtn);
+        globalElements.logoutBtn = newLogoutBtn;
+
+        newLogoutBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        });
+    }
+
+    // Modais de Perfil
+    if (globalElements.cancelEditProfileBtn) {
+        globalElements.cancelEditProfileBtn.addEventListener("click", () => {
+            if(globalElements.editProfileModal) globalElements.editProfileModal.style.display = "none";
+        });
+    }
+
+    if (globalElements.editProfilePicInput) {
+        globalElements.editProfilePicInput.addEventListener("change", () => {
+            const file = globalElements.editProfilePicInput.files[0];
+            if (file && globalElements.editProfilePicPreview) {
+                globalElements.editProfilePicPreview.src = URL.createObjectURL(file);
+            }
+        });
+    }
+
+    // Deletar conta
+    if (globalElements.cancelDeleteAccountBtn) {
+        globalElements.cancelDeleteAccountBtn.addEventListener("click", () => {
+            if(globalElements.deleteAccountModal) globalElements.deleteAccountModal.style.display = "none";
+        });
+    }
+
+    if (globalElements.deleteAccountForm) {
+        // Clone para limpar submit anterior
+        const oldForm = globalElements.deleteAccountForm;
+        if(oldForm.parentNode) {
+            const newForm = oldForm.cloneNode(true);
+            oldForm.parentNode.replaceChild(newForm, oldForm);
+            globalElements.deleteAccountForm = newForm;
+            
+            // Re-mapear inputs dentro do novo formulário se necessário, 
+            // mas como usamos IDs globais para input, podemos acessá-los direto.
+            
+            newForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const passwordInput = document.getElementById("delete-confirm-password");
+                const password = passwordInput ? passwordInput.value : "";
+                
+                if (!password) {
+                    showNotification("Por favor, digite sua senha para confirmar.", "error");
+                    return;
+                }
+                try {
+                    await axios.post(`${backendUrl}/autenticacao/login`, {
+                        email: currentUser.email,
+                        senha: password,
+                    });
+                    if (confirm("Você tem ABSOLUTA CERTEZA? Esta ação não pode ser desfeita.")) {
+                        await axios.delete(`${backendUrl}/usuarios/me`);
+                        alert("Sua conta foi excluída com sucesso.");
+                        localStorage.clear();
+                        window.location.href = "login.html";
+                    }
+                } catch (error) {
+                    showNotification("Senha incorreta. A conta não foi excluída.", "error");
+                }
+            });
+        }
+    }
+}
+
+// =================================================================
+// FUNÇÕES DE RENDERIZAÇÃO (GLOBAL)
+// =================================================================
+
+window.createCommentElement = (comment, post, allComments) => {
+    const commentAuthorName = comment.autor?.nome || comment.nomeAutor || "Usuário";
+    
+    // URL da foto
+    const rawAvatarUrl = comment.autor?.urlFotoPerfil || comment.urlFotoAutor;
+    const commentAuthorAvatar = window.getAvatarUrl(rawAvatarUrl);
+    
+    // IDs para lógica e link
+    const autorIdDoComentario = comment.autor?.id || comment.autorId;
+    const autorIdDoPost = post.autor?.id || post.autorId;
+    
+    // Link para o perfil
+    const profileLink = `perfil.html?id=${autorIdDoComentario}`;
+
+    const isAuthor = window.currentUser && String(autorIdDoComentario) === String(window.currentUser.id);
+    const isPostOwner = window.currentUser && String(autorIdDoPost) === String(window.currentUser.id);
+    
+    let optionsMenu = "";
+
+    // Menu de opções (Editar/Excluir)
+    if (isAuthor || isPostOwner) {
+        // Escapa aspas para evitar erro no JS inline
+        const safeContent = comment.conteudo ? comment.conteudo.replace(/'/g, "\\'") : "";
+        
+        optionsMenu = `
+            <button class="comment-options-btn" onclick="event.stopPropagation(); window.openCommentMenu(${comment.id})">
+                <i class="fas fa-ellipsis-h"></i>
+            </button>
+            <div class="options-menu" id="comment-menu-${comment.id}" onclick="event.stopPropagation();">
+                ${isAuthor ? `<button onclick="window.openEditCommentModal(${comment.id}, '${safeContent}')"><i class="fas fa-pen"></i> Editar</button>` : ""}
+                ${isAuthor || isPostOwner ? `<button class="danger" onclick="window.deleteComment(${comment.id})"><i class="fas fa-trash"></i> Excluir</button>` : ""}
+                ${isPostOwner ? `<button onclick="window.highlightComment(${comment.id})"><i class="fas fa-star"></i> ${comment.destacado ? "Remover Destaque" : "Destacar"}</button>` : ""}
+            </div>`;
+    }
+
+    // Tag de resposta (@Usuario)
+    let tagHtml = '';
+    if (comment.parentId && allComments) {
+        const parentComment = allComments.find(c => c.id === comment.parentId);
+        if (parentComment && parentComment.parentId) { 
+            const parentAuthorId = parentComment.autorId || parentComment.autor?.id;
+            tagHtml = `<a href="perfil.html?id=${parentAuthorId}" class="reply-tag">@${comment.replyingToName || 'Usuario'}</a>`;
+        }
+    }
+
+    // --- CORREÇÃO DE ESPAÇO: TRIM() ---
+    // Remove espaços vazios no inicio e fim
+    const rawContent = (comment.conteudo || "").trim(); 
+
+    // --- LÓGICA DE TEXTO LONGO (LER MAIS) ---
+    const CHAR_LIMIT = 300;
+    let contentHtml = `${tagHtml} ${rawContent}`;
+    let readMoreBtnHtml = '';
+    let clampClass = '';
+
+    if (rawContent.length > CHAR_LIMIT) {
+        clampClass = 'text-clamped';
+        readMoreBtnHtml = `<button class="comment-read-more-btn" onclick="window.toggleCommentReadMore(this)">Ler mais</button>`;
+    }
+
+    return `
+            <div class="comment-container">
+                <div class="comment ${comment.destacado ? "destacado" : ""}" id="comment-${comment.id}">
+                    
+                    <a href="${profileLink}" class="comment-avatar-link">
+                        <div class="comment-avatar">
+                            <img src="${commentAuthorAvatar}" alt="Avatar" onerror="this.src='${window.defaultAvatarUrl}'">
+                        </div>
+                    </a>
+                    
+                    <div class="comment-body">
+                        <a href="${profileLink}" class="comment-author-link">
+                            <span class="comment-author">${commentAuthorName}</span>
+                        </a>
+
+                        <p class="comment-content ${clampClass}">${contentHtml}</p>
+                        ${readMoreBtnHtml}
+                    </div>
+
+                    ${optionsMenu}
+                </div>
+                
+                <div class="comment-actions-footer">
+                    <button class="action-btn-like ${comment.curtidoPeloUsuario ? "liked" : ""}" onclick="window.toggleLike(event, ${post.id}, ${comment.id})">Curtir</button>
+                    <button class="action-btn-reply" onclick="window.toggleReplyForm(${comment.id})">Responder</button>
+                    <span class="like-count" id="like-count-comment-${comment.id}"><i class="fas fa-heart"></i> ${comment.totalCurtidas || 0}</span>
+                </div>
+                
+                <div class="reply-form" id="reply-form-${comment.id}">
+                    <input type="text" id="reply-input-${comment.id}" placeholder="Escreva sua resposta..."><button onclick="window.sendComment(${post.id}, ${comment.id})"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>`;
+};
+
+window.renderCommentWithReplies = (comment, allComments, post, isAlreadyInReplyThread = false) => {
+    let commentHtml = window.createCommentElement(comment, post, allComments);
+    const replies = allComments
+        .filter((reply) => reply.parentId === comment.id)
+        .sort((a, b) => new Date(a.dataCriacao) - new Date(b.dataCriacao));
+
+    if (replies.length > 0 && !isAlreadyInReplyThread) {
+        const plural = replies.length > 1 ? 'respostas' : 'resposta';
+        commentHtml += `
+            <div class="view-replies-container">
+                <button class="btn-view-replies" onclick="window.toggleReplies(this, ${comment.id})">
+                    <i class="fas fa-comment-dots"></i> Ver ${replies.length} ${plural}
+                </button>
+            </div>
+            <div class="comment-replies" id="replies-for-${comment.id}" style="display: none;">`;
+        
+        replies.forEach((reply) => {
+            commentHtml += window.renderCommentWithReplies(reply, allComments, post, true);
+        });
+        commentHtml += `</div>`;
+    } else if (replies.length > 0 && isAlreadyInReplyThread) {
+        replies.forEach((reply) => {
+            commentHtml += window.renderCommentWithReplies(reply, allComments, post, true);
+        });
+    }
+    return commentHtml;
+};
+
+// =================================================================
+// LÓGICA DE MODAIS DE EDIÇÃO (GLOBAL)
+// =================================================================
+let selectedFilesForEdit = [];
+let urlsParaRemover = [];
+
+function updateEditFilePreview() {
+    const container = document.getElementById("edit-file-preview-container");
+    if(!container) return;
+    
+    container.innerHTML = "";
+    selectedFilesForEdit.forEach((file, index) => {
+        const item = document.createElement("div");
+        item.className = "file-preview-item";
+        const previewElement = document.createElement("img");
+        previewElement.src = URL.createObjectURL(file);
+        item.appendChild(previewElement);
+        
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "remove-file-btn";
+        removeBtn.innerHTML = "&times;";
+        removeBtn.onclick = () => {
+            selectedFilesForEdit.splice(index, 1);
+            updateEditFilePreview();
+        };
+        item.appendChild(removeBtn);
+        container.appendChild(item);
     });
 }
+
+window.openEditPostModal = async (postId) => {
+    const modal = document.getElementById("edit-post-modal");
+    const existingMediaContainer = document.getElementById("edit-existing-media-container");
+    const idInput = document.getElementById("edit-post-id");
+    const textArea = document.getElementById("edit-post-textarea");
+    
+    if (!modal || !existingMediaContainer) return;
+    
+    selectedFilesForEdit = [];
+    urlsParaRemover = [];
+    updateEditFilePreview();
+    existingMediaContainer.innerHTML = "<div class='loading-spinner'></div>";
+    
+    modal.style.display = "flex";
+
+    try {
+        const response = await axios.get(`${window.backendUrl}/postagem/${postId}`);
+        const post = response.data;
+        
+        idInput.value = post.id;
+        textArea.value = post.conteudo;
+        existingMediaContainer.innerHTML = "";
+
+        if(post.urlsMidia) {
+            post.urlsMidia.forEach((url) => {
+                const item = document.createElement("div");
+                item.className = "existing-media-item";
+                
+                const fullUrl = url.startsWith('http') ? url : `${window.backendUrl}${url}`;
+                const preview = document.createElement("img");
+                preview.src = fullUrl;
+                
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "remove-existing-media-checkbox";
+                checkbox.title = "Marque para remover esta imagem";
+                checkbox.onchange = (e) => {
+                    if (e.target.checked) {
+                        urlsParaRemover.push(url);
+                        item.style.opacity = "0.5";
+                        item.style.border = "2px solid red";
+                    } else {
+                        urlsParaRemover = urlsParaRemover.filter((u) => u !== url);
+                        item.style.opacity = "1";
+                        item.style.border = "none";
+                    }
+                };
+                
+                item.appendChild(preview);
+                item.appendChild(checkbox);
+                existingMediaContainer.appendChild(item);
+            });
+        }
+    } catch (error) {
+        window.showNotification("Erro ao carregar postagem.", "error");
+        modal.style.display = "none";
+    }
+};
+
+window.openEditCommentModal = (commentId, content) => {
+    const modal = document.getElementById("edit-comment-modal");
+    if(modal) {
+        document.getElementById("edit-comment-id").value = commentId;
+        const textarea = document.getElementById("edit-comment-textarea");
+        
+        // Decodifica o conteúdo caso venha com entities HTML
+        textarea.value = content;
+        
+        modal.style.display = "flex";
+
+        // MELHORIA UX: Foca no final do texto automaticamente
+        setTimeout(() => {
+            textarea.focus();
+            const val = textarea.value;
+            textarea.value = ''; 
+            textarea.value = val; // Truque para mover o cursor para o final
+        }, 50);
+    }
+};
+
+// Configuração dos Listeners de Modal (Executa ao carregar a página)
+document.addEventListener("DOMContentLoaded", () => {
+
+    highlightActiveSidebarItem();
+
+    // Listener do Formulário de Edição de Post
+    const editPostForm = document.getElementById("edit-post-form");
+    if (editPostForm) {
+        // Remover listeners antigos clonando o elemento (opcional, mas seguro)
+        const newForm = editPostForm.cloneNode(true);
+        editPostForm.parentNode.replaceChild(newForm, editPostForm);
+        
+        newForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const btn = newForm.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = "Salvando...";
+
+            try {
+                const postId = document.getElementById("edit-post-id").value;
+                const postagemDTO = {
+                    conteudo: document.getElementById("edit-post-textarea").value,
+                    urlsParaRemover: urlsParaRemover,
+                };
+                
+                const formData = new FormData();
+                formData.append("postagem", new Blob([JSON.stringify(postagemDTO)], { type: "application/json" }));
+                selectedFilesForEdit.forEach((file) => formData.append("arquivos", file));
+
+                await axios.put(`${window.backendUrl}/postagem/${postId}`, formData);
+                
+                document.getElementById("edit-post-modal").style.display = "none";
+                window.showNotification("Postagem editada com sucesso.", "success");
+                
+                // Atualiza a postagem na tela sem recarregar
+                if(typeof window.fetchAndReplacePost === 'function') {
+                    window.fetchAndReplacePost(postId);
+                } else {
+                    window.location.reload();
+                }
+            } catch (error) {
+                window.showNotification("Erro ao editar postagem.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        });
+        
+        // Listener do Input de Arquivo no Modal
+        const fileInput = document.getElementById("edit-post-files");
+        if(fileInput) {
+            fileInput.addEventListener("change", (event) => {
+                Array.from(event.target.files).forEach((file) => selectedFilesForEdit.push(file));
+                updateEditFilePreview();
+            });
+        }
+        
+        // Botão Cancelar
+        const cancelBtn = document.getElementById("cancel-edit-post-btn");
+        if(cancelBtn) {
+            cancelBtn.addEventListener("click", () => {
+                document.getElementById("edit-post-modal").style.display = "none";
+            });
+        }
+    }
+
+    // Listener do Formulário de Edição de Comentário
+    const editCommentForm = document.getElementById("edit-comment-form");
+    if(editCommentForm) {
+        editCommentForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const commentId = document.getElementById("edit-comment-id").value;
+            const content = document.getElementById("edit-comment-textarea").value;
+            try {
+                await axios.put(`${window.backendUrl}/comentarios/${commentId}`, 
+                    { conteudo: content },
+                    { headers: { "Content-Type": "application/json" } }
+                );
+                window.showNotification("Comentário editado.", "success");
+                document.getElementById("edit-comment-modal").style.display = "none";
+                // Recarrega a página ou o post para ver a mudança
+                const postElement = document.getElementById(`comment-${commentId}`).closest('.post');
+                if(postElement) {
+                    const postId = postElement.id.replace('post-', '');
+                    window.fetchAndReplacePost(postId);
+                }
+            } catch (error) {
+                window.showNotification("Erro ao editar comentário.", "error");
+            }
+        });
+        
+        document.getElementById("cancel-edit-comment-btn")?.addEventListener("click", () => {
+            document.getElementById("edit-comment-modal").style.display = "none";
+        });
+    }
+});
 
 // =================================================================
 // INICIALIZAÇÃO GLOBAL
@@ -840,9 +1513,141 @@ if (menuToggle && sidebar && overlay) {
 document.addEventListener("DOMContentLoaded", initGlobal);
 
 // =================================================================
+// LÓGICA DE INTERAÇÃO COM POSTS (GLOBAL - FEED E PERFIL)
+// =================================================================
+// Estas funções precisam estar disponíveis em qualquer página que exiba posts
+
+// Funções de Ação (Janelas e Menus)
+window.openPostMenu = (postId) => {
+    closeAllMenus();
+    const menu = document.getElementById(`post-menu-${postId}`);
+    if (menu) menu.style.display = "block";
+};
+
+window.openCommentMenu = (commentId) => {
+    closeAllMenus();
+    const menu = document.getElementById(`comment-menu-${commentId}`);
+    if (menu) menu.style.display = "block";
+};
+
+window.toggleComments = (postId) => {
+    const cs = document.getElementById(`comments-section-${postId}`);
+    if (cs) cs.style.display = cs.style.display === "block" ? "none" : "block";
+};
+
+window.toggleReplyForm = (commentId) => {
+    const form = document.getElementById(`reply-form-${commentId}`);
+    if (form) form.style.display = form.style.display === "flex" ? "none" : "flex";
+};
+
+window.sendComment = (postId, parentId = null) => {
+    const inputId = parentId ?
+        `reply-input-${parentId}` :
+        `comment-input-${postId}`;
+    const input = document.getElementById(inputId);
+    
+    if (!input) return;
+
+    const content = input.value.trim();
+    if (window.stompClient?.connected && content) {
+        window.stompClient.send(
+            `/app/postagem/${postId}/comentar`, {},
+            JSON.stringify({
+                conteudo: content,
+                parentId: parentId
+            })
+        );
+        input.value = "";
+        if (parentId) {
+            const replyForm = document.getElementById(`reply-form-${parentId}`);
+            if (replyForm) replyForm.style.display = "none";
+        }
+    } else {
+        window.showNotification("Erro: Conexão perdida ou comentário vazio.", "error");
+    }
+};
+
+window.toggleLike = async (event, postagemId, comentarioId = null) => {
+    const btn = event.currentTarget;
+    const isPost = comentarioId === null;
+    const countId = isPost ?
+        `like-count-post-${postagemId}` :
+        `like-count-comment-${comentarioId}`;
+    const countSpan = document.getElementById(countId);
+    
+    // Fallback se o elemento não existir
+    if (!countSpan) return;
+
+    let count = parseInt(
+        countSpan.innerText.trim().replace(/<[^>]*>/g, ""),
+        10
+    );
+    if (isNaN(count)) count = 0;
+
+    // Atualização Otimista (UI primeiro)
+    btn.classList.toggle("liked");
+    const isLiked = btn.classList.contains("liked");
+    const newCount = isLiked ? count + 1 : count - 1;
+
+    if (isPost) countSpan.textContent = newCount;
+    else countSpan.innerHTML = `<i class="fas fa-heart"></i> ${newCount}`;
+
+    try {
+        await axios.post(`${window.backendUrl}/curtidas/toggle`, {
+            postagemId,
+            comentarioId,
+        });
+    } catch (error) {
+        window.showNotification("Erro ao processar curtida.", "error");
+        // Reverte em caso de erro
+        btn.classList.toggle("liked");
+        if (isPost) countSpan.textContent = count;
+        else countSpan.innerHTML = `<i class="fas fa-heart"></i> ${count}`;
+    }
+};
+
+window.deletePost = async (postId) => {
+    if (confirm("Tem certeza que deseja excluir esta postagem?")) {
+        try {
+            await axios.delete(`${window.backendUrl}/postagem/${postId}`);
+            window.showNotification("Postagem excluída.", "success");
+            
+            // Remove da tela imediatamente
+            const postElement = document.getElementById(`post-${postId}`);
+            if(postElement) postElement.remove();
+            
+        } catch (error) {
+            window.showNotification("Erro ao excluir postagem.", "error");
+        }
+    }
+};
+
+window.deleteComment = async (commentId) => {
+    if (confirm("Tem certeza que deseja excluir este comentário?")) {
+        try {
+            await axios.delete(`${window.backendUrl}/comentarios/${commentId}`);
+            window.showNotification("Comentário excluído.", "success");
+            // A atualização visual virá via WebSocket geralmente, mas podemos forçar recarregamento se necessário
+        } catch (error) {
+            window.showNotification("Erro ao excluir comentário.", "error");
+        }
+    }
+};
+
+window.highlightComment = async (commentId) => {
+    try {
+        await axios.put(`${window.backendUrl}/comentarios/${commentId}/destacar`);
+    } catch (error) {
+        window.showNotification("Erro ao destacar.", "error");
+    }
+};
+
+// =================================================================
 // LÓGICA ESPECIALIZADA (Só executa se estiver na página principal)
 // =================================================================
 document.addEventListener("DOMContentLoaded", () => {
+
+  
   // 1. Verifica se estamos na página principal para carregar o feed
   const postsContainer = document.querySelector(".posts-container");
   if (!postsContainer) {
@@ -874,12 +1679,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   let selectedFilesForPost = [];
-  let selectedFilesForEdit = [];
-  let urlsParaRemover = [];
   const searchInput = document.getElementById("search-input");
 
   // --- FUNÇÕES DE CARROSSEL ---
-
+  
   // Função para abrir o visualizador de mídias
   window.openMediaViewer = (mediaUrls, startIndex = 0) => {
       const modal = document.getElementById('media-viewer-modal');
@@ -1037,6 +1840,8 @@ window.scrollFeedCarousel = (postId, direction) => {
     }
 };
 
+
+
 // Função que gera o HTML do carrossel para o Feed
 function renderFeedCarousel(mediaUrls, postId) {
     let slidesHtml = '';
@@ -1146,7 +1951,8 @@ function setupCarouselEventListeners(postElement, postId) {
     }
   }
 
- function createPostElement(post) {
+// Localize e substitua a função createPostElement no arquivo principal.js
+function createPostElement(post) {
     const postElement = document.createElement("div");
     postElement.className = "post";
     postElement.id = `post-${post.id}`;
@@ -1161,15 +1967,15 @@ function setupCarouselEventListeners(postElement, postId) {
     const dataFormatada = new Date(post.dataCriacao).toLocaleString("pt-BR");
     const isAuthor = currentUser && autorIdDoPost === currentUser.id;
     
+    // Link para o perfil do autor
+    const profileLink = `perfil.html?id=${autorIdDoPost}`;
+    
     let mediaHtml = "";
 
-    // --- LÓGICA MODIFICADA DE MÍDIA ---
     if (post.urlsMidia && post.urlsMidia.length > 0) {
         if (post.urlsMidia.length > 2) {
-            // SE MAIS DE 2 MÍDIAS: Usa o Carrossel Horizontal
             mediaHtml = renderFeedCarousel(post.urlsMidia, post.id);
         } else if (post.urlsMidia.length === 1) {
-            // Apenas uma mídia (comportamento original)
             const url = post.urlsMidia[0];
             const fullMediaUrl = url.startsWith("http") ? url : `${window.backendUrl}${url}`;
             const safeMediaArray = JSON.stringify(post.urlsMidia).replace(/"/g, '&quot;');
@@ -1184,7 +1990,6 @@ function setupCarouselEventListeners(postElement, postId) {
                              </div>`;
             }
         } else {
-            // Exatamente 2 mídias: Mantém o Grid (renderMediaGrid existente no seu código)
             mediaHtml = renderMediaGrid(post.urlsMidia);
         }
     }
@@ -1193,9 +1998,10 @@ function setupCarouselEventListeners(postElement, postId) {
     let commentsHtml = rootComments
       .sort((a, b) => new Date(a.dataCriacao) - new Date(b.dataCriacao))
       .map((comment) =>
-        renderCommentWithReplies(comment, post.comentarios, post)
+        window.renderCommentWithReplies(comment, post.comentarios, post)
       )
       .join("");
+      
     let optionsMenu = "";
     if (isAuthor) {
       optionsMenu = `
@@ -1208,12 +2014,18 @@ function setupCarouselEventListeners(postElement, postId) {
                 </div>`;
     }
 
+    // AQUI ESTÁ A ALTERAÇÃO PRINCIPAL (Adição do <a>)
     postElement.innerHTML = `
             <div class="post-header">
-                <a href="perfil.html?id=${autorIdDoPost}" class="post-author-details-link">
+                <a href="${profileLink}" class="post-author-details-link">
                     <div class="post-author-details">
-                        <div class="post-author-avatar"><img src="${autorAvatar}" alt="${autorNome}" onerror="this.src='${defaultAvatarUrl}';"></div>
-                        <div class="post-author-info"><strong>${autorNome}</strong><span>${dataFormatada}</span></div>
+                        <div class="post-author-avatar">
+                            <img src="${autorAvatar}" alt="${autorNome}" onerror="this.src='${defaultAvatarUrl}';">
+                        </div>
+                        <div class="post-author-info">
+                            <strong>${autorNome}</strong>
+                            <span>${dataFormatada}</span>
+                        </div>
                     </div>
                 </a>
                 ${optionsMenu}
@@ -1221,29 +2033,13 @@ function setupCarouselEventListeners(postElement, postId) {
             <div class="post-content"><p>${post.conteudo}</p></div>
             ${mediaHtml}
             <div class="post-actions">
-                <button class="action-btn ${
-                  post.curtidoPeloUsuario ? "liked" : ""
-                }" onclick="window.toggleLike(event, ${
-      post.id
-    }, null)"><i class="fas fa-heart"></i> <span id="like-count-post-${
-      post.id
-    }">${post.totalCurtidas || 0}</span></button>
-                <button class="action-btn" onclick="window.toggleComments(${
-                  post.id
-                })"><i class="fas fa-comment"></i> <span>${
-      post.comentarios?.length || 0
-    }</span></button>
+                <button class="action-btn ${post.curtidoPeloUsuario ? "liked" : ""}" onclick="window.toggleLike(event, ${post.id}, null)"><i class="fas fa-heart"></i> <span id="like-count-post-${post.id}">${post.totalCurtidas || 0}</span></button>
+                <button class="action-btn" onclick="window.toggleComments(${post.id})"><i class="fas fa-comment"></i> <span>${post.comentarios?.length || 0}</span></button>
             </div>
-            <div class="comments-section" id="comments-section-${
-              post.id
-            }" style="display: none;">
+            <div class="comments-section" id="comments-section-${post.id}" style="display: none;">
                 <div class="comments-list">${commentsHtml}</div>
                 <div class="comment-form">
-                    <input type="text" id="comment-input-${
-                      post.id
-                    }" placeholder="Adicione um comentário..."><button onclick="window.sendComment(${
-      post.id
-    }, null)"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" id="comment-input-${post.id}" placeholder="Adicione um comentário..."><button onclick="window.sendComment(${post.id}, null)"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>`;
 
@@ -1251,117 +2047,6 @@ function setupCarouselEventListeners(postElement, postId) {
         setupCarouselEventListeners(postElement, post.id);
     }
     return postElement;
-  }
-
-  function createCommentElement(comment, post, allComments) {
-        //
-        const commentAuthorName = comment.autor?.nome || comment.nomeAutor || "Usuário";
-        const commentAuthorAvatar = comment.urlFotoAutor ? (comment.urlFotoAutor.startsWith("http") ? comment.urlFotoAutor : `${backendUrl}${comment.urlFotoAutor}`) : defaultAvatarUrl;
-        const autorIdDoComentario = comment.autor?.id || comment.autorId;
-        const autorIdDoPost = post.autor?.id || post.autorId;
-        const isAuthor = currentUser && autorIdDoComentario == currentUser.id;
-        const isPostOwner = currentUser && autorIdDoPost == currentUser.id;
-        let optionsMenu = "";
-        
-        if (isAuthor || isPostOwner) {
-          optionsMenu = `
-                    <button class="comment-options-btn" onclick="event.stopPropagation(); window.openCommentMenu(${comment.id})">
-                        <i class="fas fa-ellipsis-h"></i>
-                    </button>
-                    <div class="options-menu" id="comment-menu-${comment.id}" onclick="event.stopPropagation();">
-                        ${isAuthor ? `<button onclick="window.openEditCommentModal(${comment.id}, '${comment.conteudo.replace(/'/g, "\\'")}')"><i class="fas fa-pen"></i> Editar</button>` : ""}
-                        ${isAuthor || isPostOwner ? `<button class="danger" onclick="window.deleteComment(${comment.id})"><i class="fas fa-trash"></i> Excluir</button>` : ""}
-                        ${isPostOwner ? `<button onclick="window.highlightComment(${comment.id})"><i class="fas fa-star"></i> ${comment.destacado ? "Remover Destaque" : "Destacar"}</button>` : ""}
-                    </div>`;
-        }
-
-        // --- ▼▼▼ LÓGICA DA TAG @USERNAME ATUALIZADA ▼▼▼ ---
-        let tagHtml = '';
-        // 1. Verificamos se é uma resposta (tem parentId) e se temos a lista de comentários
-        if (comment.parentId && allComments) {
-            // 2. Encontramos o comentário "pai"
-            const parentComment = allComments.find(c => c.id === comment.parentId);
-
-            // 3. Verificamos se o "pai" TAMBÉM é uma resposta (Nível 2+)
-            //    Se parentComment.parentId existir, significa que não é uma resposta ao comentário principal.
-            if (parentComment && parentComment.parentId) {
-                
-                // 4. Pegamos o ID DO AUTOR do comentário pai (do DTO do comentário pai)
-                const parentAuthorId = parentComment.autorId; 
-                
-                // 5. Criamos o link para o PERFIL desse autor
-                tagHtml = `<a href="perfil.html?id=${parentAuthorId}" class="reply-tag">@${comment.replyingToName}</a>`;
-            }
-        }
-        // --- ▲▲▲ FIM DA LÓGICA ATUALIZADA ▲▲▲ ---
-
-        return `
-                <div class="comment-container">
-                    <div class="comment ${comment.destacado ? "destacado" : ""}" id="comment-${comment.id}">
-                        <div class="comment-avatar"><img src="${commentAuthorAvatar}" alt="Avatar de ${commentAuthorName}"></div>
-                        <div class="comment-body">
-                            <span class="comment-author">${commentAuthorName}</span>
-                            <p class="comment-content">${tagHtml} ${comment.conteudo}</p>
-                        </div>
-                        ${optionsMenu}
-                    </div>
-                    <div class="comment-actions-footer">
-                        <button class="action-btn-like ${comment.curtidoPeloUsuario ? "liked" : ""}" onclick="window.toggleLike(event, ${post.id}, ${comment.id})">Curtir</button>
-                        <button class="action-btn-reply" onclick="window.toggleReplyForm(${comment.id})">Responder</button>
-                        <span class="like-count" id="like-count-comment-${comment.id}"><i class="fas fa-heart"></i> ${comment.totalCurtidas || 0}</span>
-                    </div>
-                    <div class="reply-form" id="reply-form-${comment.id}">
-                        <input type="text" id="reply-input-${comment.id}" placeholder="Escreva sua resposta..."><button onclick="window.sendComment(${post.id}, ${comment.id})"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                </div>`;
-    }
-
-// SUBSTITUA a função 'renderCommentWithReplies' inteira por esta:
-function renderCommentWithReplies(comment, allComments, post, isAlreadyInReplyThread = false) {
-    // 1. Cria o HTML para o comentário atual
-    let commentHtml = createCommentElement(comment, post, allComments); 
-
-    // 2. Encontra todas as respostas diretas a este comentário
-    const replies = allComments
-        .filter((reply) => reply.parentId === comment.id)
-        .sort((a, b) => new Date(a.dataCriacao) - new Date(b.dataCriacao));
-
-    // 3. Se este comentário tem respostas E é um comentário "principal" (não uma resposta de nível 2+)
-    if (replies.length > 0 && !isAlreadyInReplyThread) {
-        
-        // A. Adicionar o botão "Ver Respostas"
-        const plural = replies.length > 1 ? 'respostas' : 'resposta';
-        commentHtml += `
-            <div class="view-replies-container">
-                <button class="btn-view-replies" onclick="window.toggleReplies(this, ${comment.id})">
-                    <i class="fas fa-comment-dots"></i>
-                    Ver ${replies.length} ${plural}
-                </button>
-            </div>
-        `;
-
-        // B. Ocultar o contêiner de respostas por padrão
-        //    O 'display: flex' será adicionado pelo JS ao clicar
-        commentHtml += `<div class="comment-replies" id="replies-for-${comment.id}" style="display: none;">`;
-        
-        // C. Renderizar as respostas (lógica existente que achata a árvore)
-        replies.forEach((reply) => {
-            // Passa 'true' para que as sub-respostas sejam aninhadas
-            commentHtml += renderCommentWithReplies(reply, allComments, post, true); 
-        });
-        
-        commentHtml += `</div>`; // Fecha o container
-    
-    } else if (replies.length > 0 && isAlreadyInReplyThread) {
-        // 4. Se for uma resposta (Nível 2+) que TAMBÉM tem respostas (Nível 3+),
-        //    apenas continue a recursão. A lógica original já achatava isso.
-        replies.forEach((reply) => {
-            commentHtml += renderCommentWithReplies(reply, allComments, post, true);
-        });
-    }
-
-    // 5. Se não houver respostas (replies.length === 0), só retorna o commentHtml
-    return commentHtml;
 }
 
   function showPublicPost(post, prepend = false) {
@@ -1372,9 +2057,6 @@ function renderCommentWithReplies(comment, allComments, post, isAlreadyInReplyTh
       : feedElements.postsContainer.appendChild(postElement);
   }
 
- /* SUBSTITUA a função 'fetchAndReplacePost' inteira por esta 
-   em CADA arquivo JS que a possua (principal.js, perfil.js)
-*/
 async function fetchAndReplacePost(postId) {
     const oldPostElement = document.getElementById(`post-${postId}`);
     
@@ -1453,11 +2135,7 @@ async function fetchAndReplacePost(postId) {
 }
 
   function handlePublicFeedUpdate(payload) {
-    // NÃO vamos mais ignorar. Precisamos da atualização para atualizar os contadores.
-    /*
-    if (payload.autorAcaoId && currentUser && payload.autorAcaoId == currentUser.id)
-      return; 
-    */
+    
     const postId = payload.postagem?.id || payload.id || payload.postagemId;
     if (payload.tipo === "remocao" && payload.postagemId) {
       const postElement = document.getElementById(`post-${payload.postagemId}`);
@@ -1467,155 +2145,6 @@ async function fetchAndReplacePost(postId) {
     }
   }
 
-  // Funções de Ação (Janelas)
-  window.openPostMenu = (postId) => {
-    closeAllMenus();
-    document.getElementById(`post-menu-${postId}`).style.display = "block";
-  };
-  window.openCommentMenu = (commentId) => {
-    closeAllMenus();
-    document.getElementById(`comment-menu-${commentId}`).style.display =
-      "block";
-  };
-  window.toggleComments = (postId) => {
-    const cs = document.getElementById(`comments-section-${postId}`);
-    cs.style.display = cs.style.display === "block" ? "none" : "block";
-  };
-  window.toggleReplyForm = (commentId) => {
-    const form = document.getElementById(`reply-form-${commentId}`);
-    form.style.display = form.style.display === "flex" ? "none" : "flex";
-  };
-  window.sendComment = (postId, parentId = null) => {
-    const inputId = parentId
-      ? `reply-input-${parentId}`
-      : `comment-input-${postId}`;
-    const input = document.getElementById(inputId);
-    const content = input.value.trim();
-    if (stompClient?.connected && content) {
-      stompClient.send(
-        `/app/postagem/${postId}/comentar`,
-        {},
-        JSON.stringify({ conteudo: content, parentId: parentId })
-      );
-      input.value = "";
-      if (parentId)
-        document.getElementById(`reply-form-${parentId}`).style.display =
-          "none";
-    }
-  };
-  window.toggleLike = async (event, postagemId, comentarioId = null) => {
-    const btn = event.currentTarget;
-    const isPost = comentarioId === null;
-    const countId = isPost
-      ? `like-count-post-${postagemId}`
-      : `like-count-comment-${comentarioId}`;
-    const countSpan = document.getElementById(countId);
-    let count = parseInt(
-      countSpan.innerText.trim().replace(/<[^>]*>/g, ""),
-      10
-    );
-    if (isNaN(count)) count = 0;
-
-    btn.classList.toggle("liked");
-    const isLiked = btn.classList.contains("liked");
-    const newCount = isLiked ? count + 1 : count - 1;
-
-    if (isPost) countSpan.textContent = newCount;
-    else countSpan.innerHTML = `<i class="fas fa-heart"></i> ${newCount}`;
-
-    try {
-      await axios.post(`${backendUrl}/curtidas/toggle`, {
-        postagemId,
-        comentarioId,
-      });
-    } catch (error) {
-      showNotification("Erro ao processar curtida.", "error");
-      btn.classList.toggle("liked");
-      if (isPost) countSpan.textContent = count;
-      else countSpan.innerHTML = `<i class="fas fa-heart"></i> ${count}`;
-    }
-  };
-  window.deletePost = async (postId) => {
-    if (confirm("Tem certeza?")) {
-      try {
-        await axios.delete(`${backendUrl}/postagem/${postId}`);
-        showNotification("Postagem excluída.", "success");
-      } catch (error) {
-        showNotification("Erro ao excluir postagem.", "error");
-      }
-    }
-  };
-  window.deleteComment = async (commentId) => {
-    if (confirm("Tem certeza?")) {
-      try {
-        await axios.delete(`${backendUrl}/comentarios/${commentId}`);
-        showNotification("Comentário excluído.", "success");
-      } catch (error) {
-        showNotification("Erro ao excluir comentário.", "error");
-      }
-    }
-  };
-  window.highlightComment = async (commentId) => {
-    try {
-      await axios.put(`${backendUrl}/comentarios/${commentId}/destacar`);
-    } catch (error) {
-      showNotification("Erro ao destacar.", "error");
-    }
-  };
-
-  // Funções de Modal (Edição)
-  window.openEditPostModal = async (postId) => {
-    //
-    const existingMediaContainer = document.getElementById(
-      "edit-existing-media-container"
-    );
-    if (!feedElements.editPostModal || !existingMediaContainer) return;
-    selectedFilesForEdit = [];
-    urlsParaRemover = [];
-    updateEditFilePreview();
-    existingMediaContainer.innerHTML = "";
-    try {
-      const response = await axios.get(`${backendUrl}/postagem/${postId}`);
-      const post = response.data;
-      feedElements.editPostIdInput.value = post.id;
-      feedElements.editPostTextarea.value = post.conteudo;
-      post.urlsMidia.forEach((url) => {
-        const item = document.createElement("div");
-        item.className = "existing-media-item";
-        const preview = document.createElement("img");
-        preview.src = url;
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.onchange = (e) => {
-          if (e.target.checked) {
-            urlsParaRemover.push(url);
-            item.style.opacity = "0.5";
-          } else {
-            urlsParaRemover = urlsParaRemover.filter((u) => u !== url);
-            item.style.opacity = "1";
-          }
-        };
-        item.appendChild(preview);
-        item.appendChild(checkbox);
-        existingMediaContainer.appendChild(item);
-      });
-      feedElements.editPostModal.style.display = "flex";
-    } catch (error) {
-      showNotification("Erro ao carregar postagem.", "error");
-    }
-  };
-  window.openEditCommentModal = (commentId, content) => {
-    //
-    feedElements.editCommentIdInput.value = commentId;
-    feedElements.editCommentTextarea.value = content;
-    feedElements.editCommentModal.style.display = "flex";
-  };
-  function closeAndResetEditCommentModal() {
-    //
-    feedElements.editCommentModal.style.display = "none";
-    feedElements.editCommentIdInput.value = "";
-    feedElements.editCommentTextarea.value = "";
-  }
   function updateFilePreview() {
     //
     feedElements.filePreviewContainer.innerHTML = "";
@@ -1639,27 +2168,7 @@ async function fetchAndReplacePost(postId) {
       feedElements.filePreviewContainer.appendChild(item);
     });
   }
-  function updateEditFilePreview() {
-    //
-    feedElements.editFilePreviewContainer.innerHTML = "";
-    selectedFilesForEdit.forEach((file, index) => {
-      const item = document.createElement("div");
-      item.className = "file-preview-item";
-      const previewElement = document.createElement("img");
-      previewElement.src = URL.createObjectURL(file);
-      item.appendChild(previewElement);
-      const removeBtn = document.createElement("button");
-      removeBtn.type = "button";
-      removeBtn.className = "remove-file-btn";
-      removeBtn.innerHTML = "&times;";
-      removeBtn.onclick = () => {
-        selectedFilesForEdit.splice(index, 1);
-        updateEditFilePreview();
-      };
-      item.appendChild(removeBtn);
-      feedElements.editFilePreviewContainer.appendChild(item);
-    });
-  }
+  
   function filterPosts() {
     //
     const searchTerm = searchInput.value.toLowerCase();
@@ -1679,6 +2188,8 @@ async function fetchAndReplacePost(postId) {
 
   // --- SETUP DE EVENT LISTENERS (Específicos do Feed) ---
   function setupFeedEventListeners() {
+
+    
     if (searchInput) searchInput.addEventListener("input", filterPosts);
 
     // Event listeners para o carrossel de mídias
@@ -1722,77 +2233,6 @@ async function fetchAndReplacePost(postId) {
         }
     });
 
-    //
-    if (feedElements.editPostFileInput)
-      feedElements.editPostFileInput.addEventListener("change", (event) => {
-        Array.from(event.target.files).forEach((file) =>
-          selectedFilesForEdit.push(file)
-        );
-        updateEditFilePreview();
-      });
-    if (feedElements.editPostForm)
-      feedElements.editPostForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const btn = e.submitter;
-        btn.disabled = true;
-        btn.textContent = "Salvando...";
-        try {
-          const postId = feedElements.editPostIdInput.value;
-          const postagemDTO = {
-            conteudo: feedElements.editPostTextarea.value,
-            urlsParaRemover: urlsParaRemover,
-          };
-          const formData = new FormData();
-          formData.append(
-            "postagem",
-            new Blob([JSON.stringify(postagemDTO)], {
-              type: "application/json",
-            })
-          );
-          selectedFilesForEdit.forEach((file) =>
-            formData.append("arquivos", file)
-          );
-          await axios.put(`${backendUrl}/postagem/${postId}`, formData);
-          feedElements.editPostModal.style.display = "none";
-          showNotification("Postagem editada.", "success");
-        } catch (error) {
-         let errorMessage = "Erro ao editar.";
-                if (error.response && error.response.data && error.response.data.message) {
-                    errorMessage = error.response.data.message;
-                }
-                showNotification(errorMessage, "error");
-        } finally {
-          btn.disabled = false;
-          btn.textContent = "Salvar";
-        }
-      });
-    if (feedElements.cancelEditPostBtn)
-      feedElements.cancelEditPostBtn.addEventListener(
-        "click",
-        () => (feedElements.editPostModal.style.display = "none")
-      );
-    if (feedElements.editCommentForm)
-      feedElements.editCommentForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const commentId = feedElements.editCommentIdInput.value;
-        const content = feedElements.editCommentTextarea.value;
-        try {
-          await axios.put(
-            `${backendUrl}/comentarios/${commentId}`,
-            { conteudo: content },
-            { headers: { "Content-Type": "application/json" } }
-          );
-          showNotification("Comentário editado.", "success");
-          closeAndResetEditCommentModal();
-        } catch (error) {
-          showNotification("Não foi possível salvar.", "error");
-        }
-      });
-    if (feedElements.cancelEditCommentBtn)
-      feedElements.cancelEditCommentBtn.addEventListener(
-        "click",
-        closeAndResetEditCommentModal
-      );
     if (feedElements.postFileInput)
       feedElements.postFileInput.addEventListener("change", (event) => {
         selectedFilesForPost = Array.from(event.target.files);
