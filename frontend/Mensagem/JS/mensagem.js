@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-   function renderBlockedUsers(users) {
+    function renderBlockedUsers(users) {
       const blockedList = document.getElementById("blocked-users-list");
       if (!blockedList) return;
 
