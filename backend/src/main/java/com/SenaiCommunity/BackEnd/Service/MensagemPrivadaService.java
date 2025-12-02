@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,10 +118,19 @@ public class MensagemPrivadaService {
         Usuario usuarioLogado = usuarioRepository.findByEmail(usuarioLogadoUsername)
                 .orElseThrow(() -> new NoSuchElementException("Usuário logado não encontrado"));
 
+        // 1. Carrega os IDs dos bloqueados ANTES de entrar no loop/stream.
+        // Isso evita erros de LazyLoading e recursão infinita no equals/hashCode.
+        Set<Long> idsBloqueadosPeloUsuario = usuarioLogado.getBloqueados().stream()
+                .map(Usuario::getId)
+                .collect(Collectors.toSet());
+
+        // Opcional: IDs de quem bloqueou o usuário (se a relação for bidirecional mapeada)
+        // Se não tiver mapeado na entidade, precisaria buscar no repositório, mas vamos focar na sua lógica atual.
+
         List<MensagemPrivada> ultimasMensagens = mensagemPrivadaRepository.findUltimasMensagensPorConversa(usuarioLogado.getId());
 
         return ultimasMensagens.stream()
-                // --- FILTRAGEM DE BLOQUEIO (NOVO) ---
+                // --- FILTRAGEM DE BLOQUEIO SEGURA ---
                 .filter(mensagem -> {
                     Usuario outroUsuario;
                     if (mensagem.getRemetente().getId().equals(usuarioLogado.getId())) {
@@ -129,11 +139,15 @@ public class MensagemPrivadaService {
                         outroUsuario = mensagem.getRemetente();
                     }
 
-                    // Verifica se EU bloqueei ele
-                    boolean euBloqueei = usuarioLogado.getBloqueados().contains(outroUsuario);
+                    // Verifica se o ID do outro usuário está na lista de IDs bloqueados
+                    boolean euBloqueei = idsBloqueadosPeloUsuario.contains(outroUsuario.getId());
 
-                    // Verifica se ELE me bloqueou (Opcional: se quiser esconder conversas de quem te bloqueou)
-                    boolean eleMeBloqueou = outroUsuario.getBloqueados().contains(usuarioLogado);
+                    // Verifica se ELE me bloqueou.
+                    // Nota: 'outroUsuario' vem da mensagem e pode ser um Proxy.
+                    // Acessar getBloqueados() nele pode disparar select extra.
+                    // Se estiver lento, recomendo criar um método no Repository: existsByBloqueadorAndBloqueado(...)
+                    boolean eleMeBloqueou = outroUsuario.getBloqueados().stream()
+                            .anyMatch(u -> u.getId().equals(usuarioLogado.getId()));
 
                     // Só mostra se NINGUÉM bloqueou NINGUÉM
                     return !euBloqueei && !eleMeBloqueou;
@@ -280,11 +294,14 @@ public class MensagemPrivadaService {
         mensagemPrivadaRepository.deletarConversaEntreUsuarios(usuario.getId(), idOutroUsuario);
     }
 
+    // Certifique-se também que este método está seguro
     @Transactional(readOnly = true)
     public List<com.SenaiCommunity.BackEnd.DTO.UsuarioSaidaDTO> listarBloqueados(String emailUsuario) {
         Usuario usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado"));
 
+        // Se UsuarioSaidaDTO tentar acessar propriedades complexas do usuário, pode dar erro.
+        // Garanta que o construtor do DTO seja simples.
         return usuario.getBloqueados().stream()
                 .map(bloqueado -> new com.SenaiCommunity.BackEnd.DTO.UsuarioSaidaDTO(bloqueado))
                 .collect(Collectors.toList());

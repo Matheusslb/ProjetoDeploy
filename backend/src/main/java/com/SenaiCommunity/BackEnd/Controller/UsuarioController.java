@@ -115,6 +115,7 @@ public class UsuarioController {
     // Listar Bloqueados (Para o Modal)
     @GetMapping("/bloqueados")
     public ResponseEntity<List<UsuarioSaidaDTO>> listarBloqueados(Principal principal) {
+        // Usa o email do usuário logado (Principal)
         List<UsuarioSaidaDTO> bloqueados = mensagemPrivadaService.listarBloqueados(principal.getName());
         return ResponseEntity.ok(bloqueados);
     }
