@@ -338,7 +338,7 @@ public class ProjetoService {
             }
         } else {
             if (isNovoGrupo) {
-                projeto.setImagemUrl("/images/default-project.jpg");
+                projeto.setImagemUrl("/images/projetos-default.png");
             }
         }
 
@@ -645,7 +645,7 @@ public class ProjetoService {
         if (nomeFoto != null && !nomeFoto.isBlank()) {
             dto.setImagemUrl(nomeFoto);
         } else {
-            dto.setImagemUrl("/images/default-project.jpg");
+            dto.setImagemUrl("/images/projetos-default.png");
         }
 
         dto.setDataCriacao(projeto.getDataCriacao());

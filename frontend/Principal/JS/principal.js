@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const backendUrl = "https://senaicommunityapp.up.railway.app";
 const jwtToken = localStorage.getItem("token");
 const defaultAvatarUrl = `${backendUrl}/images/default-avatar.jpg`;
-const defaultProjectUrl = `${backendUrl}/images/default-project.jpg`;
+const defaultProjectUrl = `${backendUrl}/images/projetos-default.png`;
 
 // Variáveis globais para que outros scripts (como mensagem.js) possam acessá-las
 let stompClient = null;
