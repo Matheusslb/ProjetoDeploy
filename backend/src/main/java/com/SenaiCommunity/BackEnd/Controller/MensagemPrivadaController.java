@@ -2,7 +2,6 @@ package com.SenaiCommunity.BackEnd.Controller;
 
 import com.SenaiCommunity.BackEnd.DTO.MensagemPrivadaEntradaDTO;
 import com.SenaiCommunity.BackEnd.DTO.MensagemPrivadaSaidaDTO;
-import com.SenaiCommunity.BackEnd.DTO.UsuarioSaidaDTO;
 import com.SenaiCommunity.BackEnd.Exception.ConteudoImproprioException;
 import com.SenaiCommunity.BackEnd.Service.ArquivoMidiaService;
 import com.SenaiCommunity.BackEnd.Service.MensagemPrivadaService;
@@ -14,14 +13,12 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -116,31 +113,6 @@ public class MensagemPrivadaController {
             } catch (NoSuchElementException e) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
             }
-        }
-        // No arquivo: com.SenaiCommunity.BackEnd.Controller.MensagemPrivadaController
-
-        @GetMapping("/bloqueados")
-        public ResponseEntity<List<UsuarioSaidaDTO>> listarBloqueados() {
-            // Pega o usuário logado (assumindo que você usa Spring Security)
-            String emailUsuarioLogado = SecurityContextHolder.getContext().getAuthentication().getName();
-
-            // Chama o serviço que você já tem
-            List<UsuarioSaidaDTO> bloqueados = mensagemPrivadaService.listarBloqueados(emailUsuarioLogado);
-            return ResponseEntity.ok(bloqueados);
-        }
-
-        @PostMapping("/bloquear/{id}")
-        public ResponseEntity<Void> bloquearUsuario(@PathVariable Long id) {
-            String emailUsuarioLogado = SecurityContextHolder.getContext().getAuthentication().getName();
-            mensagemPrivadaService.bloquearUsuario(emailUsuarioLogado, id);
-            return ResponseEntity.ok().build();
-        }
-
-        @DeleteMapping("/bloquear/{id}")
-        public ResponseEntity<Void> desbloquearUsuario(@PathVariable Long id) {
-            String emailUsuarioLogado = SecurityContextHolder.getContext().getAuthentication().getName();
-            mensagemPrivadaService.desbloquearUsuario(emailUsuarioLogado, id);
-            return ResponseEntity.ok().build();
         }
 
         @DeleteMapping("/{id}")

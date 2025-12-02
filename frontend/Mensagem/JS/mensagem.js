@@ -231,9 +231,9 @@ document.addEventListener("DOMContentLoaded", () => {
     async function fetchBlockedUsers() {
       blockedList.innerHTML = '<div class="loading-spinner"></div>';
       try {
-        // CORREÇÃO: Alterado de /usuarios/bloqueados para /api/chat/privado/bloqueados
+        // Ajuste a URL conforme seu BackEnd
         const response = await axios.get(
-          `${window.backendUrl}/api/chat/privado/bloqueados`
+          `${window.backendUrl}/usuarios/bloqueados`
         );
         renderBlockedUsers(response.data);
       } catch (error) {
@@ -298,17 +298,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.handleUnblockUser = async function (userId) {
       try {
-        // CORREÇÃO: Alterado para /api/chat/privado/bloquear/{userId}
-        // Nota: O método deve ser DELETE para desbloquear, conforme sua lógica de toggleBlockUser
-        await axios.delete(
-          `${window.backendUrl}/api/chat/privado/bloquear/${userId}`
-        );
-
+        // Ajuste a URL conforme seu BackEnd
+        await axios.delete(`${window.backendUrl}/usuarios/bloquear/${userId}`); // Ou POST /desbloquear
         showNotification("Usuário desbloqueado.", "success");
         fetchBlockedUsers(); // Recarrega a lista do modal
         fetchConversations(); // Recarrega a lista de conversas (caso ele reapareça)
       } catch (error) {
-        console.error(error); // Log para ajudar no debug
         showNotification("Erro ao desbloquear.", "error");
       }
     };
