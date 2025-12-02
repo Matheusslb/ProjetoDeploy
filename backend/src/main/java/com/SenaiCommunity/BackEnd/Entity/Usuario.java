@@ -1,16 +1,23 @@
 package com.SenaiCommunity.BackEnd.Entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor; // Adicionado para garantir construtor vazio
+import lombok.AllArgsConstructor; // Opcional, mas útil
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects; // Importante para o equals/hashCode
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Usuario {
@@ -51,6 +58,7 @@ public abstract class Usuario {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Curtida> curtidas;
 
+    // A correção principal garante que o Hibernate consiga gerenciar este Set corretamente
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "usuario_bloqueios",
@@ -59,4 +67,19 @@ public abstract class Usuario {
     )
     private Set<Usuario> bloqueados = new HashSet<>();
 
+    // --- IMPLEMENTAÇÃO CORRETA DE EQUALS E HASHCODE ---
+    // Usa apenas o ID para garantir que o objeto seja encontrado no Set
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return Objects.equals(id, usuario.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
