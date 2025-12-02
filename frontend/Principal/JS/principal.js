@@ -288,7 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
 const backendUrl = "https://senaicommunityapp.up.railway.app";
 const jwtToken = localStorage.getItem("token");
 const defaultAvatarUrl = `${backendUrl}/images/default-avatar.jpg`;
-const messageBadgeElement = document.getElementById("message-badge");
 const defaultProjectUrl = `${backendUrl}/images/default-project.jpg`;
 
 // Variáveis globais para que outros scripts (como mensagem.js) possam acessá-las
@@ -569,8 +568,14 @@ function connectWebSocket() {
 }
 
 async function fetchAndUpdateUnreadCount() {
-  if (!messageBadgeElement) return; // Só executa se o badge existir na página
+  // CORREÇÃO: Removemos a verificação da variável 'messageBadgeElement' que não existia
+  const badge = document.getElementById("message-badge-sidebar");
+
+  // Se não achar o badge na página, não faz nada
+  if (!badge) return;
+
   try {
+    // Certifique-se que este endpoint retorna um número inteiro (ex: 5)
     const response = await axios.get(
       `${backendUrl}/api/chat/privado/nao-lidas/contagem`
     );
@@ -582,9 +587,23 @@ async function fetchAndUpdateUnreadCount() {
 }
 
 function updateMessageBadge(count) {
-  if (messageBadgeElement) {
-    messageBadgeElement.textContent = count;
-    messageBadgeElement.style.display = count > 0 ? "flex" : "none";
+  // Tenta pegar o badge da sidebar (ID correto: message-badge-sidebar)
+  const badgeSidebar = document.getElementById("message-badge-sidebar");
+
+  // Tenta pegar o badge antigo se ainda existir em algum lugar
+  const badgeTop = document.getElementById("message-badge");
+
+  // Atualiza o badge da Sidebar
+  if (badgeSidebar) {
+    badgeSidebar.textContent = count;
+    // Mostra apenas se tiver mensagens (> 0)
+    badgeSidebar.style.display = count > 0 ? "flex" : "none";
+  }
+
+  // Atualiza badge legado (se houver)
+  if (badgeTop) {
+    badgeTop.textContent = count;
+    badgeTop.style.display = count > 0 ? "flex" : "none";
   }
 }
 
