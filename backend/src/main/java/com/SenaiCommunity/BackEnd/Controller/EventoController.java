@@ -22,7 +22,9 @@ public class EventoController {
     @Autowired
     private EventoService eventoService;
 
+
     @GetMapping("/meus-eventos")
+    @PreAuthorize("hasRole('ALUNO') or hasRole('PROFESSOR') or hasRole('ADMIN')")
     public ResponseEntity<List<EventoSaidaDTO>> listarMeusEventos(Authentication authentication) {
         try {
             List<EventoSaidaDTO> eventos = eventoService.listarEventosPorInteresse(authentication);
@@ -35,7 +37,7 @@ public class EventoController {
     // Apenas ADMIN pode criar
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFESSOR')")
     public EventoSaidaDTO criarEvento(
             @RequestPart("evento") EventoEntradaDTO eventoDTO,
             @RequestPart(name = "imagem", required = false) MultipartFile imagem) {
@@ -45,7 +47,7 @@ public class EventoController {
 
     // Apenas ADMIN pode editar (NOVO ENDPOINT)
     @PutMapping(value = "/{id}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFESSOR')")
     public ResponseEntity<EventoSaidaDTO> atualizarEvento(
             @PathVariable Long id,
             @RequestPart("evento") EventoEntradaDTO eventoDTO,
@@ -59,13 +61,15 @@ public class EventoController {
         }
     }
 
-    // Todos (Aluno, Professor, Admin) podem visualizar
+
     @GetMapping
+    @PreAuthorize("hasRole('ALUNO') or hasRole('PROFESSOR') or hasRole('ADMIN')")
     public List<EventoSaidaDTO> listarTodos() {
         return eventoService.listarTodos();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ALUNO') or hasRole('PROFESSOR') or hasRole('ADMIN')")
     public ResponseEntity<EventoSaidaDTO> buscarPorId(@PathVariable Long id) {
         try {
             EventoSaidaDTO dto = eventoService.buscarPorId(id);
@@ -77,7 +81,7 @@ public class EventoController {
 
     // Apenas ADMIN pode deletar
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFESSOR')")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         try {
             eventoService.deletar(id);
@@ -87,8 +91,10 @@ public class EventoController {
         }
     }
 
+
     // NOVO: Endpoint para marcar interesse/lembrete (Qualquer usuário autenticado)
     @PostMapping("/{id}/interesse")
+    @PreAuthorize("hasRole('ALUNO') or hasRole('PROFESSOR') or hasRole('ADMIN')")
     public ResponseEntity<String> alternarInteresse(@PathVariable Long id, Authentication authentication) {
         try {
             boolean interessado = eventoService.alternarInteresse(id, authentication);

@@ -16,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/vagas")
+@PreAuthorize("hasAnyRole('ADMIN', 'PROFESSOR')")
 public class VagaController {
 
     @Autowired
@@ -23,6 +24,7 @@ public class VagaController {
 
     // Endpoint PÚBLICO para listar todas as vagas
     @GetMapping
+    @PreAuthorize("hasRole('ALUNO') or hasRole('PROFESSOR') or hasRole('ADMIN')")
     public ResponseEntity<List<VagaSaidaDTO>> listarVagas() {
         return ResponseEntity.ok(vagaService.listarTodas());
     }
