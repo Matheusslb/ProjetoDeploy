@@ -354,6 +354,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function populateProfileData(user) {
         if (!user) return;
+
+        // Dados Básicos
         const userImage = user.urlFotoPerfil || user.fotoPerfil || defaultAvatarUrl;
         const finalUserImage = userImage.startsWith('http') ? userImage : `${backendUrl}${userImage.startsWith('/') ? '' : '/'}${userImage}`;
 
@@ -362,6 +364,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (elements.profileBio) elements.profileBio.textContent = user.bio || "Nenhuma bio informada.";
         if (elements.profileEmail) elements.profileEmail.textContent = user.email;
 
+        // Fundo
         const bannerEl = document.getElementById('profile-banner');
         if (bannerEl) {
             let bgUrl = user.urlFotoFundo;
@@ -373,50 +376,55 @@ document.addEventListener("DOMContentLoaded", () => {
             bannerEl.style.backgroundImage = `url('${bgUrl}')`;
         }
 
+        // Data Nascimento
         if (elements.profileDob) {
             if (user.dataNascimento) {
                 const dob = new Date(user.dataNascimento);
-                const userTimezoneOffset = dob.getTimezoneOffset() * 60000;
-                const adjustedDate = new Date(dob.getTime() + userTimezoneOffset);
+                const adjustedDate = new Date(dob.getTime() + dob.getTimezoneOffset() * 60000);
                 elements.profileDob.textContent = new Intl.DateTimeFormat('pt-BR').format(adjustedDate);
             } else {
                 elements.profileDob.textContent = "Data não informada";
             }
         }
 
+        // Título / Role
+        const roleRaw = user.tipoUsuario || user.role || "Membro";
+        const role = roleRaw.replace('ROLE_', '').toUpperCase();
         if (elements.profileTitle) {
-            const role = user.tipoUsuario || user.role || "Membro";
-            elements.profileTitle.textContent = role.replace('ROLE_', '');
+            elements.profileTitle.textContent = role;
         }
-        const role = (currentUser.tipoUsuario || "").toUpperCase().replace("ROLE_", "");
 
-        // Resetar displays
-        document.getElementById('meta-aluno-curso').style.display = 'none';
-        document.getElementById('meta-aluno-periodo').style.display = 'none';
-        document.getElementById('meta-prof-formacao').style.display = 'none';
-        document.getElementById('meta-prof-sn').style.display = 'none';
+        // --- LÓGICA DE EXIBIÇÃO ESPECÍFICA ---
 
+        // 1. Esconde tudo primeiro
+        const fieldsAluno = ['meta-aluno-curso', 'meta-aluno-periodo'];
+        const fieldsProf = ['meta-prof-formacao', 'meta-prof-sn'];
+
+        [...fieldsAluno, ...fieldsProf].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+
+        // 2. Mostra baseado no tipo
         if (role === 'ALUNO') {
-            // Mostra campos de Aluno
             const elCurso = document.getElementById('profile-curso');
             const elPeriodo = document.getElementById('profile-periodo');
 
-            if (elCurso) {
-                elCurso.textContent = user.curso || "Curso não informado";
+            if (elCurso && user.curso) {
+                elCurso.textContent = user.curso;
                 document.getElementById('meta-aluno-curso').style.display = 'flex';
             }
-            if (elPeriodo) {
-                elPeriodo.textContent = user.periodo || "Período não informado";
+            if (elPeriodo && user.periodo) {
+                elPeriodo.textContent = user.periodo;
                 document.getElementById('meta-aluno-periodo').style.display = 'flex';
             }
         }
         else if (role === 'PROFESSOR') {
-            // Mostra campos de Professor
             const elFormacao = document.getElementById('profile-formacao');
             const elSn = document.getElementById('profile-sn');
 
-            if (elFormacao) {
-                elFormacao.textContent = user.formacao || "Formação não informada";
+            if (elFormacao && user.formacao) {
+                elFormacao.textContent = user.formacao;
                 document.getElementById('meta-prof-formacao').style.display = 'flex';
             }
             if (elSn && user.codigoSn) {
@@ -424,7 +432,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById('meta-prof-sn').style.display = 'flex';
             }
         }
-
     }
 
     function setupTabNavigation() {
@@ -514,14 +521,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 };
 
                 const role = (currentUser.tipoUsuario || "").toUpperCase().replace("ROLE_", "");
-
                 if (role === 'ALUNO') {
                     usuarioDTO.curso = document.getElementById('edit-aluno-curso').value;
                     usuarioDTO.periodo = document.getElementById('edit-aluno-periodo').value;
                 } else if (role === 'PROFESSOR') {
                     usuarioDTO.formacao = document.getElementById('edit-prof-formacao').value;
                 }
-
                 const password = document.getElementById('edit-profile-password').value;
                 if (password) {
                     usuarioDTO.senha = password;
@@ -589,50 +594,18 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Substitua a função window.openEditProfileModal existente por esta:
     window.openEditProfileModal = function () {
         if (!currentUser) return;
 
+        // Preenche dados comuns
         document.getElementById('edit-profile-name').value = currentUser.nome;
         document.getElementById('edit-profile-bio').value = currentUser.bio || '';
         if (currentUser.dataNascimento) {
             document.getElementById('edit-profile-dob').value = currentUser.dataNascimento.split('T')[0];
         }
 
-        const profilePicPreview = document.getElementById('edit-profile-pic-preview');
-        if (profilePicPreview) {
-            let photoUrl = window.getAvatarUrl(currentUser.urlFotoPerfil);
-
-            // Força a imagem default explicitamente se não houver URL
-            if (!currentUser.urlFotoPerfil || currentUser.urlFotoPerfil.trim() === '') {
-                photoUrl = window.defaultAvatarUrl;
-            }
-
-            profilePicPreview.src = photoUrl;
-
-            // Handler de segurança
-            profilePicPreview.onerror = function () {
-                this.src = window.defaultAvatarUrl;
-            };
-        }
-
-        const bgPreviewImg = document.getElementById('bg-preview-img');
-        const bgOverlayText = document.getElementById('cover-upload-text');
-
-        if (currentUser.urlFotoFundo && !currentUser.urlFotoFundo.includes('default-background.jpg')) {
-            bgPreviewImg.src = window.getAvatarUrl(currentUser.urlFotoFundo);
-            bgPreviewImg.style.display = 'block';
-            if (bgOverlayText) bgOverlayText.textContent = "Alterar Capa";
-        } else {
-            bgPreviewImg.src = "";
-            bgPreviewImg.style.display = 'none';
-            if (bgOverlayText) bgOverlayText.textContent = "Adicionar Capa";
-        }
-
-        document.getElementById('edit-profile-pic-input').value = '';
-        document.getElementById('edit-profile-bg-input').value = '';
-        document.getElementById('edit-profile-password').value = '';
-        document.getElementById('edit-profile-password-confirm').value = '';
-
+        // --- LÓGICA DE INPUTS ESPECÍFICOS ---
         const role = (currentUser.tipoUsuario || "").toUpperCase().replace("ROLE_", "");
 
         const divAluno = document.getElementById('edit-fields-aluno');
@@ -653,6 +626,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById('edit-prof-formacao').value = currentUser.formacao || '';
             }
         }
+
+        // Lógica da foto e modal (mantida igual)
+        const profilePicPreview = document.getElementById('edit-profile-pic-preview');
+        if (profilePicPreview) {
+            let photoUrl = window.getAvatarUrl(currentUser.urlFotoPerfil);
+            if (!currentUser.urlFotoPerfil) photoUrl = window.defaultAvatarUrl;
+            profilePicPreview.src = photoUrl;
+        }
+
+        // Reset inputs
+        document.getElementById('edit-profile-pic-input').value = '';
+        document.getElementById('edit-profile-bg-input').value = '';
+        document.getElementById('edit-profile-password').value = '';
+        document.getElementById('edit-profile-password-confirm').value = '';
 
         document.getElementById('edit-profile-modal').style.display = 'flex';
     };
@@ -895,13 +882,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     function setupCarouselModalEvents() { if (elements.mediaViewerModal) { elements.mediaViewerModal.addEventListener('click', (e) => { if (e.target === elements.mediaViewerModal) closeMediaViewer(); }); } }
     if (document.readyState === "complete" || document.readyState === "interactive") { init(); } else { window.addEventListener("load", init); }
-    
-window.openModernProjectModal = (project) => {
+
+    window.openModernProjectModal = (project) => {
         // 1. Tratamento da Imagem
         const imageUrl = project.imagemUrl
             ? (project.imagemUrl.startsWith('http') ? project.imagemUrl : `${window.backendUrl}/api/arquivos/${project.imagemUrl}`)
             : (window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`);
-        
+
         // 2. Tratamento do Status
         const statusText = project.status || 'Em Planejamento';
 
@@ -910,7 +897,7 @@ window.openModernProjectModal = (project) => {
         // Verifica se existe URL de vídeo no objeto 'project'
         if (project.videoDescricaoUrl) {
             let videoUrl = project.videoDescricaoUrl;
-            
+
             // Ajusta a URL se não for absoluta (http...)
             if (!videoUrl.startsWith('http')) {
                 videoUrl = `${window.backendUrl}/api/arquivos/${videoUrl}`;
@@ -1017,4 +1004,5 @@ window.openModernProjectModal = (project) => {
                 });
             }
         }, 100);
-    }});
+    }
+});
