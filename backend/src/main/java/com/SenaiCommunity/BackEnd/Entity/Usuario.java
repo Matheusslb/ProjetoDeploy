@@ -20,6 +20,10 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "usuario", indexes = {
+        @Index(name = "idx_usuario_email", columnList = "email"),
+        @Index(name = "idx_usuario_nome", columnList = "nome")
+})
 public abstract class Usuario {
 
     @Id

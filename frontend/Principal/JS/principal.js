@@ -310,6 +310,18 @@ window.getAvatarUrl = function (fotoPerfil) {
   if (!fotoPerfil) {
     return window.defaultAvatarUrl || "https://via.placeholder.com/150";
   }
+  
+  // SE FOR CLOUDINARY, APLICA OTIMIZAÇÃO
+  if (fotoPerfil.includes("cloudinary.com")) {
+    // Insere transformações após "/upload/"
+    // w_200: largura 200px
+    // h_200: altura 200px
+    // c_fill: corta para preencher (não distorce)
+    // q_auto: qualidade automática
+    // f_auto: formato automático (usa WebP se o navegador suportar)
+    return fotoPerfil.replace("/upload/", "/upload/w_200,h_200,c_fill,q_auto,f_auto/");
+  }
+
   if (fotoPerfil.startsWith("http")) {
     return fotoPerfil;
   }

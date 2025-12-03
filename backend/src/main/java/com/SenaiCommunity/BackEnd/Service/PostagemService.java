@@ -9,8 +9,10 @@ import com.SenaiCommunity.BackEnd.Entity.Usuario;
 import com.SenaiCommunity.BackEnd.Exception.ConteudoImproprioException;
 import com.SenaiCommunity.BackEnd.Repository.PostagemRepository;
 import com.SenaiCommunity.BackEnd.Repository.UsuarioRepository;
+import org.springframework.cache.annotation.Cacheable;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +39,9 @@ public class PostagemService {
 
     @Autowired
     private FiltroProfanidadeService filtroProfanidade;
+
     @Transactional
+    @CacheEvict(value = "feed-postagens", allEntries = true)
     public PostagemSaidaDTO criarPostagem(String autorUsername, PostagemEntradaDTO dto, List<MultipartFile> arquivos) {
         Usuario autor = usuarioRepository.findByEmail(autorUsername)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
@@ -73,6 +77,7 @@ public class PostagemService {
     }
 
     @Transactional
+    @CacheEvict(value = "feed-postagens", allEntries = true)
     public PostagemSaidaDTO editarPostagem(Long id, String username, PostagemEntradaDTO dto, List<MultipartFile> novosArquivos) {
         Postagem postagem = buscarPorId(id);
 
@@ -131,6 +136,7 @@ public class PostagemService {
     }
 
     @Transactional
+    @CacheEvict(value = "feed-postagens", allEntries = true)
     public void excluirPostagem(Long id, String username) {
         Postagem postagem = buscarPorId(id);
 
@@ -155,6 +161,7 @@ public class PostagemService {
         postagemRepository.deleteById(id);
     }
 
+    @Cacheable(value = "feed-postagens")
     public List<PostagemSaidaDTO> buscarPostagensPublicas() {
         List<Postagem> posts = postagemRepository.findTop10ByOrderByDataPostagemDesc();
 

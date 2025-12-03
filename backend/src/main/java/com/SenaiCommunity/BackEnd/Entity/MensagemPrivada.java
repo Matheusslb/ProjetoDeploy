@@ -14,6 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 
+@Table(name = "mensagem_privada", indexes = {
+        @Index(name = "idx_msg_remetente", columnList = "remetente_id"),
+        @Index(name = "idx_msg_destinatario", columnList = "destinatario_id")
+})
 public class MensagemPrivada {
 
     @Id

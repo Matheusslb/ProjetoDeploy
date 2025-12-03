@@ -5,8 +5,10 @@ import com.SenaiCommunity.BackEnd.DTO.SolicitacaoEntradaDTO;
 import com.SenaiCommunity.BackEnd.Entity.*;
 import com.SenaiCommunity.BackEnd.Exception.ConteudoImproprioException;
 import com.SenaiCommunity.BackEnd.Repository.*;
+import org.springframework.cache.annotation.Cacheable;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -249,6 +251,7 @@ public class ProjetoService {
         return converterParaDTO(projeto);
     }
 
+    @Cacheable(value = "projetos-publicos")
     public List<ProjetoDTO> listarProjetosPublicos() {
         List<Projeto> projetos = projetoRepository.findByGrupoPrivadoFalse();
         return projetos.stream().map(this::converterParaDTO).collect(Collectors.toList());
@@ -297,6 +300,7 @@ public class ProjetoService {
     }
 
     @Transactional
+    @CacheEvict(value = "projetos-publicos", allEntries = true)
     public ProjetoDTO salvar(ProjetoDTO dto, MultipartFile foto, MultipartFile videoDescricao) {
         if (filtroProfanidade.contemProfanidade(dto.getTitulo()) ||
                 filtroProfanidade.contemProfanidade(dto.getDescricao())) {
@@ -633,6 +637,7 @@ public class ProjetoService {
     }
 
     @Transactional
+    @CacheEvict(value = "projetos-publicos", allEntries = true)
     public void deletar(Long id, Long adminId) {
         Projeto projeto = projetoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado com id: " + id));

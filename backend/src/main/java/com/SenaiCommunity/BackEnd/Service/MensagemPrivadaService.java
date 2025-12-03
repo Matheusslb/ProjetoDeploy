@@ -9,6 +9,8 @@ import com.SenaiCommunity.BackEnd.Exception.ConteudoImproprioException;
 import com.SenaiCommunity.BackEnd.Repository.MensagemPrivadaRepository;
 import com.SenaiCommunity.BackEnd.Repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -220,7 +222,13 @@ public class MensagemPrivadaService {
     }
 
     public List<MensagemPrivadaSaidaDTO> buscarMensagensPrivadas(Long user1, Long user2) {
-        List<MensagemPrivada> mensagens = mensagemPrivadaRepository.findMensagensEntreUsuarios(user1, user2);
+
+        var pageable = PageRequest.of(0, 50, Sort.by("dataEnvio").descending()); // Pega as 50 mais recentes
+
+        List<MensagemPrivada> mensagens = mensagemPrivadaRepository.findMensagensEntreUsuarios(user1, user2, pageable);
+
+        mensagens.sort((m1, m2) -> m1.getDataEnvio().compareTo(m2.getDataEnvio()));
+
         return mensagens.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());

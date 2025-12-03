@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +50,7 @@ public class NotificacaoService {
         criarNotificacao(destinatario, mensagem, tipo, idReferencia, null);
     }
 
+    @Async
     @Transactional
     public void criarNotificacao(Usuario destinatario, String mensagem, String tipo, Long idReferencia, Long idReferenciaSecundaria) {
 
