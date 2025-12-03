@@ -895,34 +895,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     function setupCarouselModalEvents() { if (elements.mediaViewerModal) { elements.mediaViewerModal.addEventListener('click', (e) => { if (e.target === elements.mediaViewerModal) closeMediaViewer(); }); } }
     if (document.readyState === "complete" || document.readyState === "interactive") { init(); } else { window.addEventListener("load", init); }
-    window.openModernProjectModal = (project) => {
+    
+window.openModernProjectModal = (project) => {
         // 1. Tratamento da Imagem
         const imageUrl = project.imagemUrl
             ? (project.imagemUrl.startsWith('http') ? project.imagemUrl : `${window.backendUrl}/api/arquivos/${project.imagemUrl}`)
             : (window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`);
-
-            let videoHtml = '';
-                if (projeto.videoDescricaoUrl) {
-                    let videoUrl = projeto.videoDescricaoUrl;
-                    
-                    // Ajusta URL se não for absoluta (http...)
-                    if (!videoUrl.startsWith('http')) {
-                        videoUrl = `${window.backendUrl}/api/arquivos/${videoUrl}`;
-                    }
-
-                    videoHtml = `
-                        <div class="pm-video-section" style="margin-bottom: 2rem;">
-                            <div class="pm-section-title">Vídeo de Apresentação</div>
-                            <video controls style="width: 100%; border-radius: 8px; background: #09090b; max-height: 320px; border: 1px solid var(--border-color);">
-                                <source src="${videoUrl}" type="video/mp4">
-                                <source src="${videoUrl}" type="video/webm">
-                                Seu navegador não suporta a visualização de vídeos.
-                            </video>
-                        </div>
-                    `;
-                }
+        
         // 2. Tratamento do Status
         const statusText = project.status || 'Em Planejamento';
+
+        // --- NOVO: Lógica do Vídeo ---
+        let videoHtml = '';
+        // Verifica se existe URL de vídeo no objeto 'project'
+        if (project.videoDescricaoUrl) {
+            let videoUrl = project.videoDescricaoUrl;
+            
+            // Ajusta a URL se não for absoluta (http...)
+            if (!videoUrl.startsWith('http')) {
+                videoUrl = `${window.backendUrl}/api/arquivos/${videoUrl}`;
+            }
+
+            videoHtml = `
+                <div class="pm-video-section" style="margin-bottom: 2rem;">
+                    <div class="pm-section-title">Vídeo de Apresentação</div>
+                    <video controls style="width: 100%; border-radius: 8px; background: #000; max-height: 320px; border: 1px solid var(--border-color); display: block;">
+                        <source src="${videoUrl}">
+                        Seu navegador não suporta a tag de vídeo.
+                    </video>
+                </div>
+            `;
+        }
+        // -----------------------------
 
         // 3. Tecnologias
         const techsHtml = (project.tecnologias || [])
@@ -962,6 +966,8 @@ document.addEventListener("DOMContentLoaded", () => {
                   <div class="pm-description">
                     ${project.descricao || "Este projeto não possui uma descrição detalhada."}
                   </div>
+
+                  ${videoHtml}
                   
                   <div class="pm-grid">
                       <div class="pm-info-item">
@@ -1011,5 +1017,4 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
         }, 100);
-    };
-});
+    }});

@@ -1682,17 +1682,10 @@
 
 /* 1. Container Principal do Modal */
 .new-project-content {
-    padding: 0;
-    width: 100%;
-    max-width: 650px;
-    height: 90vh;        /* Altura fixa de 90% da tela */
-    max-height: 90vh;
-    background: var(--bg-secondary);
-    border-radius: 12px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;    /* Impede que o modal cresça além dos 90vh */
-    position: relative;
+    overflow: hidden; /* Impede que o container principal role */
+    max-height: 90vh; /* Limite no desktop */
 }
 
 /* 2. Cabeçalho (Fixo no topo) */
@@ -1708,19 +1701,14 @@
 #novo-projeto-form {
     display: flex;
     flex-direction: column;
-    flex: 1;             /* Ocupa todo o espaço restante abaixo do header */
-    overflow: hidden;    /* Mantém o scroll preso aqui dentro */
-    min-height: 0;       /* Essencial para o Flexbox funcionar no Firefox/Chrome */
+    flex: 1;            /* Ocupa todo o espaço abaixo do header */
+    min-height: 0;      /* Crítico para o scroll funcionar dentro do Flexbox */
+    overflow: hidden;   /* Impede scroll no form geral */
 }
 
 /* 4. Capa do Projeto (Fixa no topo do form) */
 .project-cover-wrapper {
-    flex-shrink: 0;
-    width: 100%;
-    height: 160px;
-    background-color: var(--bg-tertiary);
-    border-bottom: 1px solid var(--border-color);
-    position: relative;
+    flex-shrink: 0; 
 }
 
 .project-cover-label {
@@ -1738,9 +1726,13 @@
 
 /* 5. Corpo com Inputs (ONDE O SCROLL ACONTECE) */
 .new-project-content .modal-body {
-    flex: 1;             /* Cresce para ocupar o espaço */
-    overflow-y: auto;    /* A barra de rolagem aparece AQUI */
+    flex: 1;                /* Ocupa o espaço livre no meio */
+    overflow-y: auto;       /* Habilita o scroll AQUI */
+    overflow-x: hidden;
     padding: 1.5rem;
+    
+    /* Scroll suave para iOS */
+    -webkit-overflow-scrolling: touch; 
 }
 
 /* Estilo dos inputs */
@@ -1759,84 +1751,74 @@
 
 /* 6. Rodapé (Fixo no fundo do form) */
 .new-project-content .modal-footer {
-    flex-shrink: 0;      /* Não deixa encolher ou sumir */
-    padding: 1.25rem 1.5rem;
+    flex-shrink: 0;         /* Não encolhe */
     background: var(--bg-secondary);
     border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
     z-index: 10;
 }
 
 /* === AJUSTE MOBILE === */
 @media (max-width: 768px) {
-  .new-project-content {
-        position: fixed; /* Força posição fixa para não sair da tela */
+    
+    /* 1. Força o modal a preencher a tela inteira */
+    .new-project-content {
+        position: fixed;
         top: 0;
         left: 0;
         width: 100% !important;
         height: 100% !important;
-        max-height: 100% !important;
+        max-width: none !important;
+        max-height: 100dvh !important; /* dvh lida melhor com a barra do navegador */
         border-radius: 0;
         margin: 0;
-        display: flex;
-        flex-direction: column;
     }
-    .form-row { flex-direction: column; gap: 0; }
-    .project-cover-wrapper {
-        height: 100px; /* Reduzi para sobrar mais espaço para os campos */
+
+    /* 2. Ajuste do Cabeçalho */
+    .new-project-content .modal-header {
         flex-shrink: 0;
-    }
-    
-    /* No mobile, botões um em cima do outro */
-   .new-project-content .modal-header {
-        flex-shrink: 0; /* Não encolhe */
-        z-index: 20;
-    }
-    #novo-projeto-form {
-        display: flex;
-        flex-direction: column;
-        flex: 1;       /* Ocupa o espaço restante */
-        min-height: 0; /* CRUCIAL: Permite que o flex container encolha para ativar o scroll */
-        overflow: hidden;
-    }
-    .new-project-content .modal-footer button {
-        width: 100%;
-        padding: 0.8rem;
-    }
-    .new-project-content .modal-footer {
-        flex-shrink: 0; /* Não encolhe */
-        background: var(--bg-secondary);
-        z-index: 20;
-        border-top: 1px solid var(--border-color);
-        padding: 0.8rem;
-    }
-    #video-preview-container {
-        margin-top: 10px;
-        margin-bottom: 10px;
+        padding: 1rem;
     }
 
-    #proj-video-preview {
-        max-height: 150px !important; /* Força altura máxima pequena no mobile */
-        width: 100%;
-        object-fit: contain;
-        background-color: #000;
+    /* 3. Ajuste da Capa (Menor no mobile para sobrar espaço) */
+    .project-cover-wrapper {
+        height: 120px;
     }
 
-    /* Ajuste para o nome do arquivo não quebrar layout */
-    #proj-video-name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-    }
+    /* 4. Ajuste do Corpo (Área de Scroll) */
     .new-project-content .modal-body {
-        flex: 1; /* Ocupa todo o espaço disponível entre a capa e o rodapé */
-        overflow-y: auto !important; /* Força a barra de rolagem */
-        -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
         padding: 1rem;
         padding-bottom: 2rem; /* Espaço extra no final */
     }
-}
 
+    /* 5. Ajuste dos Inputs para Mobile */
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    /* 6. Ajuste do Rodapé (Botões empilhados e fixos) */
+    .new-project-content .modal-footer {
+        padding: 0.75rem 1rem;
+        flex-direction: column-reverse; /* Cancelar embaixo, Publicar em cima */
+        gap: 0.75rem;
+    }
+
+    .new-project-content .modal-footer button {
+        width: 100%;
+        margin: 0;
+        height: 48px; /* Altura boa para o dedo */
+        font-size: 1rem;
+    }
+
+    /* 7. Correção do Preview de Vídeo (Para não quebrar a largura) */
+    #video-preview-container video {
+        max-height: 180px;
+        width: 100%;
+        object-fit: contain;
+        background: black;
+    }
+}
