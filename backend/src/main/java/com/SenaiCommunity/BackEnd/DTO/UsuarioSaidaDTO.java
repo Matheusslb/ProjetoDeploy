@@ -21,6 +21,13 @@ public class UsuarioSaidaDTO {
     private LocalDate dataNascimento;
     private LocalDateTime dataCadastro;
     private Long totalProjetos;
+    private String curso;
+    private String periodo;
+    private String formacao;
+    private String codigoSn;
+
+
+
 
 
     public UsuarioSaidaDTO(Usuario usuario) {
@@ -31,6 +38,18 @@ public class UsuarioSaidaDTO {
         this.bio = usuario.getBio();
         this.dataNascimento = usuario.getDataNascimento();
         this.dataCadastro = usuario.getDataCadastro();
+
+
+
+        if (usuario instanceof com.SenaiCommunity.BackEnd.Entity.Aluno) {
+            com.SenaiCommunity.BackEnd.Entity.Aluno aluno = (com.SenaiCommunity.BackEnd.Entity.Aluno) usuario;
+            this.curso = aluno.getCurso();
+            this.periodo = aluno.getPeriodo();
+        } else if (usuario instanceof com.SenaiCommunity.BackEnd.Entity.Professor) {
+            com.SenaiCommunity.BackEnd.Entity.Professor prof = (com.SenaiCommunity.BackEnd.Entity.Professor) usuario;
+            this.formacao = prof.getFormacao();
+            this.codigoSn = prof.getCodigoSn();
+        }
 
         String nomeFoto = usuario.getFotoPerfil();
         if (nomeFoto != null && !nomeFoto.isBlank()) {

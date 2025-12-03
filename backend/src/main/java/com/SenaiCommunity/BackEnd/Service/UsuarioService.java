@@ -3,7 +3,9 @@ package com.SenaiCommunity.BackEnd.Service;
 import com.SenaiCommunity.BackEnd.DTO.UsuarioAtualizacaoDTO;
 import com.SenaiCommunity.BackEnd.DTO.UsuarioBuscaDTO;
 import com.SenaiCommunity.BackEnd.DTO.UsuarioSaidaDTO;
+import com.SenaiCommunity.BackEnd.Entity.Aluno;
 import com.SenaiCommunity.BackEnd.Entity.Amizade;
+import com.SenaiCommunity.BackEnd.Entity.Professor;
 import com.SenaiCommunity.BackEnd.Entity.Usuario;
 import com.SenaiCommunity.BackEnd.Exception.ConteudoImproprioException;
 import com.SenaiCommunity.BackEnd.Repository.AmizadeRepository;
@@ -96,12 +98,15 @@ public class UsuarioService {
      */
     public UsuarioSaidaDTO atualizarUsuarioLogado(Authentication authentication, UsuarioAtualizacaoDTO dto) {
         if (filtroProfanidade.contemProfanidade(dto.getNome()) ||
-                filtroProfanidade.contemProfanidade(dto.getBio())) {
+                filtroProfanidade.contemProfanidade(dto.getBio()) ||
+                filtroProfanidade.contemProfanidade(dto.getCurso()) || // Validação extra
+                filtroProfanidade.contemProfanidade(dto.getFormacao())) {
             throw new ConteudoImproprioException("Seus dados de perfil contêm texto não permitido.");
         }
 
         Usuario usuario = getUsuarioFromAuthentication(authentication);
 
+        // Atualizações Comuns
         if (StringUtils.hasText(dto.getNome())) {
             usuario.setNome(dto.getNome());
         }
@@ -113,6 +118,19 @@ public class UsuarioService {
         }
         if (StringUtils.hasText(dto.getSenha())) {
             usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
+        }
+        
+        // Se for ALUNO
+        if (usuario instanceof Aluno) {
+            Aluno aluno = (Aluno) usuario;
+            if (dto.getCurso() != null) aluno.setCurso(dto.getCurso());
+            if (dto.getPeriodo() != null) aluno.setPeriodo(dto.getPeriodo());
+        }
+        // Se for PROFESSOR
+        else if (usuario instanceof Professor) {
+            Professor professor = (Professor) usuario;
+            if (dto.getFormacao() != null) professor.setFormacao(dto.getFormacao());
+            // codigoSn geralmente não se altera pelo perfil, mas pode adicionar se quiser
         }
 
         Usuario usuarioAtualizado = usuarioRepository.save(usuario);

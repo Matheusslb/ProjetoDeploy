@@ -49,11 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // =================================================================
     // ATUALIZAÇÃO EM TEMPO REAL (COMENTÁRIOS E LIKES NO PERFIL)
     // =================================================================
-    
+
     // Sobrescreve a função global fetchAndReplacePost APENAS no contexto do perfil.
     window.fetchAndReplacePost = async (postId) => {
         const oldPostElement = document.getElementById(`post-${postId}`);
-        
+
         let wasCommentsVisible = false;
         const openReplyContainerIds = new Set();
 
@@ -62,10 +62,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (oldCommentsSection && oldCommentsSection.style.display === 'block') {
                 wasCommentsVisible = true;
             }
-            
+
             const oldReplyContainers = oldPostElement.querySelectorAll('.comment-replies');
             oldReplyContainers.forEach(container => {
-                if (container.style.display === 'flex') { 
+                if (container.style.display === 'flex') {
                     openReplyContainerIds.add(container.id);
                 }
             });
@@ -73,15 +73,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const response = await axios.get(`${backendUrl}/postagem/${postId}`);
-            
+
             // ESSENCIAL: Usa a função de criação de post DO PERFIL
-            const newPostElement = createProfilePostElement(response.data); 
+            const newPostElement = createProfilePostElement(response.data);
 
             if (wasCommentsVisible) {
                 const newCommentsSection = newPostElement.querySelector(".comments-section");
                 if (newCommentsSection) newCommentsSection.style.display = 'block';
             }
-            
+
             if (openReplyContainerIds.size > 0) {
                 openReplyContainerIds.forEach(containerId => {
                     const newReplyContainer = newPostElement.querySelector(`#${containerId}`);
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 });
             }
-            
+
             if (oldPostElement) {
                 oldPostElement.replaceWith(newPostElement);
             }
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const updatedUserDTO = JSON.parse(message.body);
                     updateProfilePageUI(updatedUserDTO);
                     if (currentUser && String(updatedUserDTO.id) === String(currentUser.id)) {
-                        if(typeof window.updateUIWithUserData === 'function') {
+                        if (typeof window.updateUIWithUserData === 'function') {
                             window.updateUIWithUserData(updatedUserDTO);
                         }
                     }
@@ -172,8 +172,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (elements.profileBio) elements.profileBio.textContent = user.bio || "Nenhuma bio informada.";
         if (elements.profileEmail) elements.profileEmail.textContent = user.email;
         if (elements.tabProjectsCount) {
-             const novoTotal = user.totalProjetos !== undefined ? user.totalProjetos : elements.tabProjectsCount.textContent;
-             elements.tabProjectsCount.textContent = novoTotal;
+            const novoTotal = user.totalProjetos !== undefined ? user.totalProjetos : elements.tabProjectsCount.textContent;
+            elements.tabProjectsCount.textContent = novoTotal;
         }
     }
 
@@ -293,7 +293,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return mediaHtml;
     }
 
-   
+
     function setupProfileMobileMenu() {
         if (elements.profileMobileMenuToggle) {
             elements.profileMobileMenuToggle.addEventListener('click', (e) => {
@@ -309,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function init() {
         if (!window.jwtToken) return;
         setProfileLoading(true);
-      
+
         setupProfileMobileMenu();
         setupEditProfileForm();
         setupProfileWebSocketListener();
@@ -388,6 +388,43 @@ document.addEventListener("DOMContentLoaded", () => {
             const role = user.tipoUsuario || user.role || "Membro";
             elements.profileTitle.textContent = role.replace('ROLE_', '');
         }
+        const role = (currentUser.tipoUsuario || "").toUpperCase().replace("ROLE_", "");
+
+        // Resetar displays
+        document.getElementById('meta-aluno-curso').style.display = 'none';
+        document.getElementById('meta-aluno-periodo').style.display = 'none';
+        document.getElementById('meta-prof-formacao').style.display = 'none';
+        document.getElementById('meta-prof-sn').style.display = 'none';
+
+        if (role === 'ALUNO') {
+            // Mostra campos de Aluno
+            const elCurso = document.getElementById('profile-curso');
+            const elPeriodo = document.getElementById('profile-periodo');
+
+            if (elCurso) {
+                elCurso.textContent = user.curso || "Curso não informado";
+                document.getElementById('meta-aluno-curso').style.display = 'flex';
+            }
+            if (elPeriodo) {
+                elPeriodo.textContent = user.periodo || "Período não informado";
+                document.getElementById('meta-aluno-periodo').style.display = 'flex';
+            }
+        }
+        else if (role === 'PROFESSOR') {
+            // Mostra campos de Professor
+            const elFormacao = document.getElementById('profile-formacao');
+            const elSn = document.getElementById('profile-sn');
+
+            if (elFormacao) {
+                elFormacao.textContent = user.formacao || "Formação não informada";
+                document.getElementById('meta-prof-formacao').style.display = 'flex';
+            }
+            if (elSn && user.codigoSn) {
+                elSn.textContent = user.codigoSn;
+                document.getElementById('meta-prof-sn').style.display = 'flex';
+            }
+        }
+
     }
 
     function setupTabNavigation() {
@@ -420,7 +457,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const profilePicInput = document.getElementById('edit-profile-pic-input');
         const profilePicPreview = document.getElementById('edit-profile-pic-preview');
         if (profilePicInput && profilePicPreview) {
-            profilePicInput.addEventListener('change', function() {
+            profilePicInput.addEventListener('change', function () {
                 const file = this.files[0];
                 if (file) profilePicPreview.src = URL.createObjectURL(file);
             });
@@ -430,7 +467,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const bgPreviewImg = document.getElementById('bg-preview-img');
         const bgOverlayText = document.getElementById('cover-upload-text');
         if (bgInput && bgPreviewImg) {
-            bgInput.addEventListener('change', function() {
+            bgInput.addEventListener('change', function () {
                 const file = this.files[0];
                 if (file) {
                     bgPreviewImg.src = URL.createObjectURL(file);
@@ -476,6 +513,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     dataNascimento: document.getElementById('edit-profile-dob').value
                 };
 
+                const role = (currentUser.tipoUsuario || "").toUpperCase().replace("ROLE_", "");
+
+                if (role === 'ALUNO') {
+                    usuarioDTO.curso = document.getElementById('edit-aluno-curso').value;
+                    usuarioDTO.periodo = document.getElementById('edit-aluno-periodo').value;
+                } else if (role === 'PROFESSOR') {
+                    usuarioDTO.formacao = document.getElementById('edit-prof-formacao').value;
+                }
+
                 const password = document.getElementById('edit-profile-password').value;
                 if (password) {
                     usuarioDTO.senha = password;
@@ -500,7 +546,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 // --- CORREÇÃO PRINCIPAL (ATUALIZAÇÃO DE FOTO APÓS SALVAR) ---
-                
+
                 // 1. Determina a URL. Se vier vazia do back, usa default.
                 let novaFoto = window.getAvatarUrl(usuarioAtualizado.urlFotoPerfil);
                 if (!usuarioAtualizado.urlFotoPerfil || usuarioAtualizado.urlFotoPerfil.trim() === '') {
@@ -512,7 +558,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (imgElement) {
                         imgElement.src = novaFoto;
                         // Força a imagem default se a URL gerada estiver quebrada
-                        imgElement.onerror = function() {
+                        imgElement.onerror = function () {
                             this.src = window.defaultAvatarUrl;
                         };
                     }
@@ -543,7 +589,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    window.openEditProfileModal = function() {
+    window.openEditProfileModal = function () {
         if (!currentUser) return;
 
         document.getElementById('edit-profile-name').value = currentUser.nome;
@@ -555,16 +601,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const profilePicPreview = document.getElementById('edit-profile-pic-preview');
         if (profilePicPreview) {
             let photoUrl = window.getAvatarUrl(currentUser.urlFotoPerfil);
-            
+
             // Força a imagem default explicitamente se não houver URL
             if (!currentUser.urlFotoPerfil || currentUser.urlFotoPerfil.trim() === '') {
                 photoUrl = window.defaultAvatarUrl;
             }
 
             profilePicPreview.src = photoUrl;
-            
+
             // Handler de segurança
-            profilePicPreview.onerror = function() {
+            profilePicPreview.onerror = function () {
                 this.src = window.defaultAvatarUrl;
             };
         }
@@ -587,6 +633,27 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('edit-profile-password').value = '';
         document.getElementById('edit-profile-password-confirm').value = '';
 
+        const role = (currentUser.tipoUsuario || "").toUpperCase().replace("ROLE_", "");
+
+        const divAluno = document.getElementById('edit-fields-aluno');
+        const divProf = document.getElementById('edit-fields-professor');
+
+        if (divAluno) divAluno.style.display = 'none';
+        if (divProf) divProf.style.display = 'none';
+
+        if (role === 'ALUNO') {
+            if (divAluno) {
+                divAluno.style.display = 'block';
+                document.getElementById('edit-aluno-curso').value = currentUser.curso || '';
+                document.getElementById('edit-aluno-periodo').value = currentUser.periodo || '';
+            }
+        } else if (role === 'PROFESSOR') {
+            if (divProf) {
+                divProf.style.display = 'block';
+                document.getElementById('edit-prof-formacao').value = currentUser.formacao || '';
+            }
+        }
+
         document.getElementById('edit-profile-modal').style.display = 'flex';
     };
 
@@ -599,42 +666,42 @@ document.addEventListener("DOMContentLoaded", () => {
             if (elements.profileFriendsList) elements.profileFriendsList.innerHTML = '<p class="empty-state">Não foi possível carregar amigos.</p>';
         }
     }
- // 2. Procure a função 'renderProfileFriends' e SUBSTITUA por esta nova versão:
-function renderProfileFriends(friends) {
-    if (!elements.profileFriendsList) return;
-    
-    // Atualiza contador
-    if (elements.tabFriendsCount) elements.tabFriendsCount.textContent = friends.length;
-    
-    // Limpa e aplica a classe de GRID
-    elements.profileFriendsList.innerHTML = '';
-    elements.profileFriendsList.className = 'friends-grid'; // Usa a nova classe CSS
-    elements.profileFriendsList.style.display = 'grid'; // Força o display grid
-    elements.profileFriendsList.style.gap = '1.5rem';
+    // 2. Procure a função 'renderProfileFriends' e SUBSTITUA por esta nova versão:
+    function renderProfileFriends(friends) {
+        if (!elements.profileFriendsList) return;
 
-    if (friends.length === 0) { 
-        elements.profileFriendsList.style.display = 'flex'; // Volta para flex para centralizar msg
-        elements.profileFriendsList.innerHTML = '<p class="empty-state">Nenhum amigo encontrado.</p>'; 
-        return; 
-    }
+        // Atualiza contador
+        if (elements.tabFriendsCount) elements.tabFriendsCount.textContent = friends.length;
 
-    friends.forEach(friend => {
-        // Normalização dos dados
-        const friendObj = friend.amigo || friend;
-        const friendId = friendObj.id || friendObj.idUsuario;
-        const friendName = friendObj.nome || friendObj.nomeUsuario;
-        
-        // Tratamento da imagem
-        let friendAvatar = friendObj.fotoPerfil || friendObj.urlFotoPerfil;
-        const avatarUrl = window.getAvatarUrl ? window.getAvatarUrl(friendAvatar) : 
-            (friendAvatar && friendAvatar.startsWith('http') ? friendAvatar : `${window.backendUrl}/api/arquivos/${friendAvatar}`);
+        // Limpa e aplica a classe de GRID
+        elements.profileFriendsList.innerHTML = '';
+        elements.profileFriendsList.className = 'friends-grid'; // Usa a nova classe CSS
+        elements.profileFriendsList.style.display = 'grid'; // Força o display grid
+        elements.profileFriendsList.style.gap = '1.5rem';
 
-        // Criação do CARD (Estrutura nova)
-        const item = document.createElement('a');
-        item.href = `perfil.html?id=${friendId}`;
-        item.className = 'profile-friend-card';
-        
-        item.innerHTML = `
+        if (friends.length === 0) {
+            elements.profileFriendsList.style.display = 'flex'; // Volta para flex para centralizar msg
+            elements.profileFriendsList.innerHTML = '<p class="empty-state">Nenhum amigo encontrado.</p>';
+            return;
+        }
+
+        friends.forEach(friend => {
+            // Normalização dos dados
+            const friendObj = friend.amigo || friend;
+            const friendId = friendObj.id || friendObj.idUsuario;
+            const friendName = friendObj.nome || friendObj.nomeUsuario;
+
+            // Tratamento da imagem
+            let friendAvatar = friendObj.fotoPerfil || friendObj.urlFotoPerfil;
+            const avatarUrl = window.getAvatarUrl ? window.getAvatarUrl(friendAvatar) :
+                (friendAvatar && friendAvatar.startsWith('http') ? friendAvatar : `${window.backendUrl}/api/arquivos/${friendAvatar}`);
+
+            // Criação do CARD (Estrutura nova)
+            const item = document.createElement('a');
+            item.href = `perfil.html?id=${friendId}`;
+            item.className = 'profile-friend-card';
+
+            item.innerHTML = `
             <img src="${avatarUrl}" alt="${friendName}" class="friend-card-avatar" onerror="this.src='${window.defaultAvatarUrl}'">
             <div class="friend-card-info">
                 <span class="friend-card-name">${friendName}</span>
@@ -643,10 +710,10 @@ function renderProfileFriends(friends) {
                 </span>
             </div>
         `;
-        
-        elements.profileFriendsList.appendChild(item);
-    });
-}
+
+            elements.profileFriendsList.appendChild(item);
+        });
+    }
     async function fetchProfileProjects(userId) {
         try {
             const response = await axios.get(`${backendUrl}/projetos/usuario/${userId}`);
@@ -712,44 +779,44 @@ function renderProfileFriends(friends) {
     }
 
     // Localize e substitua a função createProfilePostElement no arquivo perfil.js
-function createProfilePostElement(post) {
-    const postElement = document.createElement("div");
-    postElement.className = "post";
-    postElement.id = `post-${post.id}`;
-    
-    const autorNome = post.nomeAutor || "Usuário";
-    const autorAvatar = post.urlFotoAutor ? (post.urlFotoAutor.startsWith('http') ? post.urlFotoAutor : `${backendUrl}${post.urlFotoAutor}`) : defaultAvatarUrl;
-    const dataFormatada = new Date(post.dataCriacao).toLocaleDateString('pt-BR');
-    const isAuthor = currentUser && (String(post.autorId) === String(currentUser.id));
+    function createProfilePostElement(post) {
+        const postElement = document.createElement("div");
+        postElement.className = "post";
+        postElement.id = `post-${post.id}`;
 
-    // Link para o perfil do autor
-    const profileLink = `perfil.html?id=${post.autorId}`;
+        const autorNome = post.nomeAutor || "Usuário";
+        const autorAvatar = post.urlFotoAutor ? (post.urlFotoAutor.startsWith('http') ? post.urlFotoAutor : `${backendUrl}${post.urlFotoAutor}`) : defaultAvatarUrl;
+        const dataFormatada = new Date(post.dataCriacao).toLocaleDateString('pt-BR');
+        const isAuthor = currentUser && (String(post.autorId) === String(currentUser.id));
 
-    let mediaHtml = "";
-    if (post.urlsMidia && post.urlsMidia.length > 0) {
-        if (post.urlsMidia.length > 2) { mediaHtml = renderFeedCarousel(post.urlsMidia, post.id); }
-        else if (post.urlsMidia.length === 1) {
-            const url = post.urlsMidia[0];
-            const fullMediaUrl = url.startsWith("http") ? url : `${backendUrl}${url}`;
-            const safeMediaArray = JSON.stringify(post.urlsMidia).replace(/"/g, '&quot;');
-            if (url.match(/\.(mp4|webm)$/i)) { mediaHtml = `<div class="post-media" onclick="window.openMediaViewer(${safeMediaArray}, 0)"><video controls src="${fullMediaUrl}" style="max-width: 100%; border-radius: 8px;"></video></div>`; }
-            else { mediaHtml = `<div class="post-media" onclick="window.openMediaViewer(${safeMediaArray}, 0)"><img src="${fullMediaUrl}" style="max-width: 100%; border-radius: 8px; cursor: pointer;"></div>`; }
-        } else { mediaHtml = renderMediaGrid(post.urlsMidia); }
-    }
-    
-    const rootComments = (post.comentarios || []).filter((c) => !c.parentId);
-    let commentsHtml = "";
-    if (typeof window.renderCommentWithReplies === 'function') {
-        commentsHtml = rootComments.sort((a, b) => new Date(a.dataCriacao) - new Date(b.dataCriacao)).map((comment) => window.renderCommentWithReplies(comment, post.comentarios, post)).join("");
-    }
-    
-    let optionsMenu = "";
-    if (isAuthor) {
-        optionsMenu = `<div class="post-options"><button class="post-options-btn" onclick="event.stopPropagation(); window.openPostMenu(${post.id})"><i class="fas fa-ellipsis-h"></i></button><div class="options-menu" id="post-menu-${post.id}" onclick="event.stopPropagation();"><button onclick="window.openEditPostModal(${post.id})"><i class="fas fa-pen"></i> Editar</button><button class="danger" onclick="window.deletePost(${post.id})"><i class="fas fa-trash"></i> Excluir</button></div></div>`;
-    }
+        // Link para o perfil do autor
+        const profileLink = `perfil.html?id=${post.autorId}`;
 
-    // AQUI ESTÁ A ALTERAÇÃO PRINCIPAL NA ESTRUTURA HTML (Adição do <a>)
-    postElement.innerHTML = `
+        let mediaHtml = "";
+        if (post.urlsMidia && post.urlsMidia.length > 0) {
+            if (post.urlsMidia.length > 2) { mediaHtml = renderFeedCarousel(post.urlsMidia, post.id); }
+            else if (post.urlsMidia.length === 1) {
+                const url = post.urlsMidia[0];
+                const fullMediaUrl = url.startsWith("http") ? url : `${backendUrl}${url}`;
+                const safeMediaArray = JSON.stringify(post.urlsMidia).replace(/"/g, '&quot;');
+                if (url.match(/\.(mp4|webm)$/i)) { mediaHtml = `<div class="post-media" onclick="window.openMediaViewer(${safeMediaArray}, 0)"><video controls src="${fullMediaUrl}" style="max-width: 100%; border-radius: 8px;"></video></div>`; }
+                else { mediaHtml = `<div class="post-media" onclick="window.openMediaViewer(${safeMediaArray}, 0)"><img src="${fullMediaUrl}" style="max-width: 100%; border-radius: 8px; cursor: pointer;"></div>`; }
+            } else { mediaHtml = renderMediaGrid(post.urlsMidia); }
+        }
+
+        const rootComments = (post.comentarios || []).filter((c) => !c.parentId);
+        let commentsHtml = "";
+        if (typeof window.renderCommentWithReplies === 'function') {
+            commentsHtml = rootComments.sort((a, b) => new Date(a.dataCriacao) - new Date(b.dataCriacao)).map((comment) => window.renderCommentWithReplies(comment, post.comentarios, post)).join("");
+        }
+
+        let optionsMenu = "";
+        if (isAuthor) {
+            optionsMenu = `<div class="post-options"><button class="post-options-btn" onclick="event.stopPropagation(); window.openPostMenu(${post.id})"><i class="fas fa-ellipsis-h"></i></button><div class="options-menu" id="post-menu-${post.id}" onclick="event.stopPropagation();"><button onclick="window.openEditPostModal(${post.id})"><i class="fas fa-pen"></i> Editar</button><button class="danger" onclick="window.deletePost(${post.id})"><i class="fas fa-trash"></i> Excluir</button></div></div>`;
+        }
+
+        // AQUI ESTÁ A ALTERAÇÃO PRINCIPAL NA ESTRUTURA HTML (Adição do <a>)
+        postElement.innerHTML = `
         <div class="post-header">
             <a href="${profileLink}" class="post-author-details-link">
                 <div class="post-author-details">
@@ -777,10 +844,10 @@ function createProfilePostElement(post) {
                 <button onclick="window.sendComment(${post.id}, null)"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>`;
-    
-    if (post.urlsMidia && post.urlsMidia.length > 2) { setTimeout(() => setupCarouselEventListeners(postElement, post.id), 0); }
-    return postElement;
-}
+
+        if (post.urlsMidia && post.urlsMidia.length > 2) { setTimeout(() => setupCarouselEventListeners(postElement, post.id), 0); }
+        return postElement;
+    }
 
     function configureProfileActions(isMyProfile) {
         if (elements.editProfileBtnPage) { elements.editProfileBtnPage.style.display = isMyProfile ? "inline-block" : "none"; }
@@ -828,37 +895,37 @@ function createProfilePostElement(post) {
     }
     function setupCarouselModalEvents() { if (elements.mediaViewerModal) { elements.mediaViewerModal.addEventListener('click', (e) => { if (e.target === elements.mediaViewerModal) closeMediaViewer(); }); } }
     if (document.readyState === "complete" || document.readyState === "interactive") { init(); } else { window.addEventListener("load", init); }
-window.openModernProjectModal = (project) => {
-    // 1. Tratamento da Imagem
-    const imageUrl = project.imagemUrl
-        ? (project.imagemUrl.startsWith('http') ? project.imagemUrl : `${window.backendUrl}/api/arquivos/${project.imagemUrl}`)
-        : (window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`);
+    window.openModernProjectModal = (project) => {
+        // 1. Tratamento da Imagem
+        const imageUrl = project.imagemUrl
+            ? (project.imagemUrl.startsWith('http') ? project.imagemUrl : `${window.backendUrl}/api/arquivos/${project.imagemUrl}`)
+            : (window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`);
 
-    // 2. Tratamento do Status
-    const statusText = project.status || 'Em Planejamento';
-    
-    // 3. Tecnologias
-    const techsHtml = (project.tecnologias || [])
-        .map(tech => `<span class="pm-tag">${tech}</span>`)
-        .join('') || '<span class="pm-tag" style="opacity:0.7">N/A</span>';
+        // 2. Tratamento do Status
+        const statusText = project.status || 'Em Planejamento';
 
-    // 4. Membros
-    const membersHtml = (project.membros || [])
-        .map(membro => {
-            const rawAvatar = membro.usuarioFotoPerfil || membro.fotoPerfil;
-            const avatarUrl = window.getAvatarUrl ? window.getAvatarUrl(rawAvatar) : 
-                (rawAvatar && rawAvatar.startsWith('http') ? rawAvatar : `${window.backendUrl}/api/arquivos/${rawAvatar}`);
-            
-            return `
+        // 3. Tecnologias
+        const techsHtml = (project.tecnologias || [])
+            .map(tech => `<span class="pm-tag">${tech}</span>`)
+            .join('') || '<span class="pm-tag" style="opacity:0.7">N/A</span>';
+
+        // 4. Membros
+        const membersHtml = (project.membros || [])
+            .map(membro => {
+                const rawAvatar = membro.usuarioFotoPerfil || membro.fotoPerfil;
+                const avatarUrl = window.getAvatarUrl ? window.getAvatarUrl(rawAvatar) :
+                    (rawAvatar && rawAvatar.startsWith('http') ? rawAvatar : `${window.backendUrl}/api/arquivos/${rawAvatar}`);
+
+                return `
               <div class="pm-member">
                   <img src="${avatarUrl}" onerror="this.src='${window.defaultAvatarUrl}'">
                   <span>${membro.usuarioNome || membro.nome || 'Membro'}</span>
               </div>
           `;
-        }).join('') || '<span style="color:var(--text-secondary)">Sem membros visíveis</span>';
+            }).join('') || '<span style="color:var(--text-secondary)">Sem membros visíveis</span>';
 
-    // 5. Estrutura HTML do Modal
-    const modalHtml = `
+        // 5. Estrutura HTML do Modal
+        const modalHtml = `
       <div class="project-modal-overlay" id="dynamic-project-modal">
           <div class="project-modal-card">
               <div class="pm-hero" style="background-image: url('${imageUrl}');">
@@ -907,22 +974,22 @@ window.openModernProjectModal = (project) => {
       </div>
   `;
 
-    // 6. Inserção no DOM e Eventos
-    const existingModal = document.getElementById('dynamic-project-modal');
-    if (existingModal) existingModal.remove();
-    
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    // Fechar ao clicar fora
-    setTimeout(() => {
-        const modalOverlay = document.getElementById('dynamic-project-modal');
-        if (modalOverlay) {
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) {
-                    modalOverlay.remove();
-                }
-            });
-        }
-    }, 100);
-};
+        // 6. Inserção no DOM e Eventos
+        const existingModal = document.getElementById('dynamic-project-modal');
+        if (existingModal) existingModal.remove();
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        // Fechar ao clicar fora
+        setTimeout(() => {
+            const modalOverlay = document.getElementById('dynamic-project-modal');
+            if (modalOverlay) {
+                modalOverlay.addEventListener('click', (e) => {
+                    if (e.target === modalOverlay) {
+                        modalOverlay.remove();
+                    }
+                });
+            }
+        }, 100);
+    };
 });
