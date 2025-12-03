@@ -502,6 +502,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+                const projVideoInput = document.getElementById('proj-video');
+                const videoLabel = document.getElementById('video-file-name');
+
+                if (projVideoInput && videoLabel) {
+                    projVideoInput.addEventListener('change', function (e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            videoLabel.textContent = file.name;
+                            videoLabel.style.color = "var(--accent-primary)";
+                        } else {
+                            videoLabel.textContent = "Selecionar Vídeo";
+                            videoLabel.style.color = "inherit";
+                        }
+                    });
+                }
+
                 // Inicializar menu mobile
                 setupMobileMenu();
                 updateSidebarUserInfo();
@@ -914,7 +930,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             },
 
-   showProjectPreview(projeto) {
+            showProjectPreview(projeto) {
                 // Remove modal anterior se existir
                 const existingModal = document.getElementById('dynamic-project-modal');
                 if (existingModal) existingModal.remove();
@@ -1168,21 +1184,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
             handlers: {
                 openModal() {
+                    // 1. Resetar Form e Imagens
+                    const form = document.getElementById('novo-projeto-form');
+                    if (form) form.reset();
+
+                    // 2. Controlar visibilidade da imagem vs placeholder
                     const preview = document.getElementById('proj-image-preview');
-                    // Define a imagem padrão (usa a variável global do window ou um fallback)
-                    const defaultImg = window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`;
+                    const defaultCover = window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`;
 
                     if (preview) {
-                        // Se não tiver src, ou se for placeholder, ou se estiver vazio
-                        if (!preview.src || preview.src.includes('placehold.co') || preview.src === window.location.href) {
-                            preview.src = defaultImg;
-                        }
-
-                        // Garante que, se der erro ao carregar, volte para o padrão
-                        preview.onerror = function () {
-                            this.src = defaultImg;
-                        };
+                        // Se a imagem default estiver quebrada ou não definida, esconde a tag img para mostrar o placeholder
+                        preview.src = "";
+                        preview.style.display = 'none';
                     }
+
+                    // 3. Resetar texto do vídeo
+                    const videoLabel = document.getElementById('video-file-name');
+                    if (videoLabel) videoLabel.textContent = "Selecionar Vídeo";
+
                     toggleModal('novo-projeto-modal', true);
                 },
 

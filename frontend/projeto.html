@@ -228,20 +228,31 @@
   </div>
 
   <!-- Modal de Novo Projeto -->
-  <div id="novo-projeto-modal" class="modal-overlay" style="display: none">
-    <div class="modal-content new-project-content">
-      <div class="modal-header">
-        <h3>Criar Novo Projeto</h3>
-        <button class="close-modal-btn">&times;</button>
-      </div>
+ <div id="novo-projeto-modal" class="modal-overlay" style="display: none">
+  <div class="modal-content new-project-content">
+    
+    <div class="modal-header">
+      <h3>Criar Novo Projeto</h3>
+      <button class="close-modal-btn" type="button"><i class="fas fa-times"></i></button>
+    </div>
 
-      <form id="novo-projeto-form">
+    <form id="novo-projeto-form">
+      <div class="modal-scroll-area">
+        
         <div class="project-cover-wrapper">
           <input type="file" id="proj-imagem" accept="image/*" hidden />
           <label for="proj-imagem" class="project-cover-label">
-            <img id="proj-image-preview" src="http://localhost:8080/images/default-project.jpg"
-              onerror="this.src='http://localhost:8080/images/default-project.jpg'" alt="Capa do Projeto" />
-
+            <img
+              id="proj-image-preview"
+              src="" 
+              onerror="this.style.display='none'"
+              alt=""
+            />
+            <div class="cover-placeholder" id="cover-placeholder-ui">
+                <i class="fas fa-image"></i>
+                <span>Adicionar Capa</span>
+            </div>
+            
             <div class="cover-overlay">
               <i class="fas fa-camera"></i>
               <span>Alterar Capa</span>
@@ -249,76 +260,87 @@
           </label>
         </div>
 
-        <div class="form-group">
-          <label for="proj-video">Vídeo de Apresentação <small>(Opcional)</small></label>
-
-          <div class="file-input-wrapper" style="flex-direction: column; align-items: start; gap: 10px;">
-            <label for="proj-video" class="file-input-label"
-              style="width: 100%; text-align: center; justify-content: center;">
-              <i class="fas fa-video"></i> Selecionar Vídeo
-            </label>
-            <input type="file" id="proj-video" class="file-input" accept="video/mp4,video/webm,video/ogg">
-
-            <div id="video-preview-container" style="width: 100%; display: none;">
-              <video id="proj-video-preview" controls
-                style="width: 100%; border-radius: 8px; max-height: 200px; background: #000;">
-                Seu navegador não suporta preview de vídeo.
-              </video>
-              <div class="file-name" id="proj-video-name" style="margin-top: 5px; font-size: 0.8rem;"></div>
+        <div class="form-inputs-container">
+            
+            <div class="form-group">
+                <label>Vídeo de Apresentação (Opcional)</label>
+                <div class="video-upload-box">
+                    <input type="file" id="proj-video" accept="video/*" hidden>
+                    <label for="proj-video" class="video-upload-label">
+                        <i class="fas fa-video"></i>
+                        <span id="video-file-name">Selecionar Vídeo</span>
+                    </label>
+                </div>
             </div>
-          </div>
-        </div>
 
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="proj-titulo">Título do Projeto</label>
-            <input type="text" id="proj-titulo" required maxlength="100" placeholder="Ex: Sistema de Gestão Escolar" />
-          </div>
-
-          <div class="form-row">
-            <div class="form-group half">
-              <label for="proj-categoria">Categoria</label>
-              <select id="proj-categoria" required>
-                <option value="">Selecione...</option>
-                <option value="web">Desenvolvimento Web</option>
-                <option value="mobile">Mobile</option>
-                <option value="iot">IoT & Robótica</option>
-                <option value="ia">Inteligência Artificial</option>
-                <option value="dados">Ciência de Dados</option>
-              </select>
+            <div class="form-group">
+              <label for="proj-titulo">Título do Projeto</label>
+              <input
+                type="text"
+                id="proj-titulo"
+                required
+                maxlength="100"
+                placeholder="Ex: Sistema de Gestão Escolar"
+              />
             </div>
-            <div class="form-group half">
-              <label for="proj-privacidade">Visibilidade</label>
-              <select id="proj-privacidade">
-                <option value="false">🌎 Público</option>
-                <option value="true">🔒 Privado</option>
-              </select>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="proj-categoria">Categoria</label>
+                <select id="proj-categoria" required>
+                  <option value="">Selecione...</option>
+                  <option value="web">Desenvolvimento Web</option>
+                  <option value="mobile">Mobile</option>
+                  <option value="iot">IoT & Robótica</option>
+                  <option value="ia">Inteligência Artificial</option>
+                  <option value="dados">Ciência de Dados</option>
+                </select>
+              </div>
+              <div class="form-group half">
+                <label for="proj-privacidade">Visibilidade</label>
+                <select id="proj-privacidade">
+                  <option value="false">🌎 Público</option>
+                  <option value="true">🔒 Privado</option>
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <label for="proj-tecnologias">Tecnologias <small>(separadas por vírgula)</small></label>
-            <input type="text" id="proj-tecnologias" placeholder="Ex: React, Node.js, Arduino" />
-          </div>
+            <div class="form-group">
+              <label for="proj-tecnologias">Tecnologias <small>(separadas por vírgula)</small></label>
+              <div class="input-with-icon">
+                  <i class="fas fa-code"></i>
+                  <input
+                    type="text"
+                    id="proj-tecnologias"
+                    placeholder="Ex: React, Java, AWS"
+                  />
+              </div>
+            </div>
 
-          <div class="form-group">
-            <label for="proj-descricao">Descrição Detalhada</label>
-            <textarea id="proj-descricao" rows="4" required maxlength="500"
-              placeholder="Descreva o objetivo, funcionalidades e o que você precisa..."></textarea>
-          </div>
+            <div class="form-group">
+              <label for="proj-descricao">Descrição Detalhada</label>
+              <textarea
+                id="proj-descricao"
+                rows="5"
+                required
+                maxlength="1000"
+                placeholder="Descreva o objetivo, funcionalidades e o que você precisa..."
+              ></textarea>
+            </div>
         </div>
+      </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary close-modal-btn-action">
-            Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary btn-publish">
-            <i class="fas fa-rocket"></i> Publicar Projeto
-          </button>
-        </div>
-      </form>
-    </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-ghost close-modal-btn-action">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary btn-publish">
+          <i class="fas fa-rocket"></i> Publicar Projeto
+        </button>
+      </div>
+    </form>
   </div>
+</div>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>

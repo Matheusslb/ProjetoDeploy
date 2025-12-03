@@ -1822,3 +1822,259 @@
         background: black;
     }
 }
+
+/* 1. Container Principal */
+.new-project-content {
+    width: 100%;
+    max-width: 600px;
+    height: 85vh; /* Altura fixa confortável */
+    max-height: 800px;
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* 2. Header Fixo */
+.new-project-content .modal-header {
+    flex-shrink: 0;
+    padding: 1rem 1.5rem;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.new-project-content .modal-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* 3. Área de Scroll (Contém Capa, Vídeo e Inputs) */
+.modal-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    background: var(--bg-primary); /* Fundo um pouco mais escuro para destaque */
+}
+
+/* Scrollbar estilizada */
+.modal-scroll-area::-webkit-scrollbar { width: 6px; }
+.modal-scroll-area::-webkit-scrollbar-track { background: transparent; }
+.modal-scroll-area::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+/* 4. Capa do Projeto (Agora rola junto) */
+.project-cover-wrapper {
+    width: 100%;
+    height: 180px;
+    background-color: var(--bg-tertiary);
+    position: relative;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.project-cover-label {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-cover-label img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 1;
+}
+
+/* Placeholder quando não tem imagem */
+.cover-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    z-index: 0;
+}
+
+.cover-placeholder i { font-size: 2rem; opacity: 0.5; }
+
+/* Overlay de Edição */
+.cover-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 2;
+    backdrop-filter: blur(2px);
+}
+
+.project-cover-label:hover .cover-overlay { opacity: 1; }
+
+/* 5. Container dos Inputs */
+.form-inputs-container {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+/* Upload de Vídeo Customizado */
+.video-upload-box {
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-tertiary);
+    transition: 0.2s;
+}
+
+.video-upload-box:hover {
+    border-color: var(--accent-primary);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.video-upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 1rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-weight: 500;
+    width: 100%;
+}
+
+.video-upload-label i { color: var(--accent-primary); }
+
+/* Estilo Inputs Modernos */
+.new-project-content label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.new-project-content input[type="text"],
+.new-project-content select,
+.new-project-content textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.new-project-content input:focus,
+.new-project-content select:focus,
+.new-project-content textarea:focus {
+    border-color: var(--accent-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Input com ícone */
+.input-with-icon { position: relative; }
+.input-with-icon i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+}
+.input-with-icon input { padding-left: 2.5rem !important; }
+
+/* 6. Footer Fixo */
+.new-project-content .modal-footer {
+    flex-shrink: 0;
+    padding: 1rem 1.5rem;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* Botões Modernos */
+.btn-primary {
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-primary:hover { background: var(--accent-secondary); transform: translateY(-1px); }
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-ghost:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+
+/* =================================================================
+   RESPONSIVIDADE (MOBILE)
+================================================================= */
+@media (max-width: 768px) {
+    .new-project-content {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0;
+        border: none;
+    }
+
+    .project-cover-wrapper { height: 160px; }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .form-inputs-container { padding: 1.25rem; }
+
+    .new-project-content .modal-footer {
+        flex-direction: column-reverse; /* Botão Publicar em cima do Cancelar */
+        gap: 0.75rem;
+    }
+    
+    .new-project-content .modal-footer button {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem;
+    }
+}
