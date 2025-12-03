@@ -1877,6 +1877,16 @@ body {
     overflow: hidden !important;
   }
 
+     /* Adicione isso dentro do @media (max-width: 1024px) se quiser garantir o destaque */
+.sidebar .user-info {
+    /* Garante que o fundo do card apareça sobre o fundo da sidebar */
+    background: var(--bg-secondary) !important; 
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    margin: 1rem !important; /* Dá um respiro das bordas da tela */
+    width: auto !important; /* Deixa o card ocupar o espaço com margem */
+}
+
   /* 2. Container: LIBERA o posicionamento para não prender o menu */
   .container {
     position: static !important; /* Importante: não usar fixed aqui */
