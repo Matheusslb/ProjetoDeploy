@@ -1771,22 +1771,72 @@
 
 /* === AJUSTE MOBILE === */
 @media (max-width: 768px) {
-    .new-project-content {
+  .new-project-content {
+        position: fixed; /* Força posição fixa para não sair da tela */
+        top: 0;
+        left: 0;
         width: 100% !important;
-        height: 100vh !important; /* Tela cheia no celular */
-        max-height: 100vh !important;
+        height: 100% !important;
+        max-height: 100% !important;
         border-radius: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
     }
     .form-row { flex-direction: column; gap: 0; }
-    .project-cover-wrapper { height: 120px; }
+    .project-cover-wrapper {
+        height: 100px; /* Reduzi para sobrar mais espaço para os campos */
+        flex-shrink: 0;
+    }
     
     /* No mobile, botões um em cima do outro */
-    .new-project-content .modal-footer {
-        flex-direction: column-reverse; 
+   .new-project-content .modal-header {
+        flex-shrink: 0; /* Não encolhe */
+        z-index: 20;
+    }
+    #novo-projeto-form {
+        display: flex;
+        flex-direction: column;
+        flex: 1;       /* Ocupa o espaço restante */
+        min-height: 0; /* CRUCIAL: Permite que o flex container encolha para ativar o scroll */
+        overflow: hidden;
     }
     .new-project-content .modal-footer button {
         width: 100%;
         padding: 0.8rem;
+    }
+    .new-project-content .modal-footer {
+        flex-shrink: 0; /* Não encolhe */
+        background: var(--bg-secondary);
+        z-index: 20;
+        border-top: 1px solid var(--border-color);
+        padding: 0.8rem;
+    }
+    #video-preview-container {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    #proj-video-preview {
+        max-height: 150px !important; /* Força altura máxima pequena no mobile */
+        width: 100%;
+        object-fit: contain;
+        background-color: #000;
+    }
+
+    /* Ajuste para o nome do arquivo não quebrar layout */
+    #proj-video-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+    .new-project-content .modal-body {
+        flex: 1; /* Ocupa todo o espaço disponível entre a capa e o rodapé */
+        overflow-y: auto !important; /* Força a barra de rolagem */
+        -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
+        padding: 1rem;
+        padding-bottom: 2rem; /* Espaço extra no final */
     }
 }
 

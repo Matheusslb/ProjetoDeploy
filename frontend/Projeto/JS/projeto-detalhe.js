@@ -137,7 +137,7 @@ function checkUserRole() {
     const leaveProjectBtn = document.getElementById('leave-project-btn');
     const deleteProjectBtn = document.getElementById('delete-project-btn');
     const deleteProjectModalBtn = document.getElementById('delete-project-modal-btn');
-    
+
 
     const isAdminOrModerator = (userRole === 'ADMIN' || userRole === 'MODERADOR');
     const isAdmin = (userRole === 'ADMIN');
@@ -163,7 +163,7 @@ function checkUserRole() {
     }
 
     // NOVO: Atualizar botão mobile de solicitações
-  if (mobileSolicitacoesBtn) {
+    if (mobileSolicitacoesBtn) {
         // No CSS mobile-header usa flex, então inline-flex ou flex funciona bem
         mobileSolicitacoesBtn.style.display = isAdminOrModerator ? 'inline-flex' : 'none';
     }
@@ -561,7 +561,7 @@ function updateProjectInfo() {
             if (!videoUrl.startsWith('http')) {
                 videoUrl = `${backendUrl}/api/arquivos/${videoUrl}`;
             }
-            
+
             videoPlayer.src = videoUrl;
             videoContainer.style.display = 'block';
         } else {
@@ -789,7 +789,7 @@ function processMessageContent(content) {
 
     // Limite de caracteres para truncar
     const maxLength = 350; // Aumentei um pouco para não cortar mensagens médias
-    
+
     if (content.length > maxLength) {
         // Criar versão curta
         const truncatedText = content.substring(0, maxLength);
@@ -831,7 +831,7 @@ function expandMessage(button) {
             truncatedContent.style.display = 'none';
             fullContent.style.display = 'inline'; // ou block
             fullContent.style.animation = 'fadeIn 0.3s ease';
-            
+
             // Atualizar botão
             btnText.textContent = 'Ver menos';
             button.classList.add('expanded'); // Para girar o ícone via CSS
@@ -839,7 +839,7 @@ function expandMessage(button) {
             // AÇÃO: RECOLHER
             truncatedContent.style.display = 'inline'; // ou block
             fullContent.style.display = 'none';
-            
+
             // Atualizar botão
             btnText.textContent = 'Ver mais';
             button.classList.remove('expanded');
@@ -1432,7 +1432,7 @@ async function sendMessage() {
             messageInput.value = '';
             clearSelectedFiles();
 
-        
+
         } else {
             // Fallback: enviar via API REST
             showNotification("Enviando via API...", "info");
@@ -1710,13 +1710,13 @@ async function changeMemberRole(memberId) {
 function setupEventListeners() {
     // Listener para o botão de solicitações MOBILE
     const mobileSolicitacoesBtn = document.getElementById('mobile-solicitacoes-btn');
-        if (mobileSolicitacoesBtn) {
-            mobileSolicitacoesBtn.addEventListener('click', function(e) {
-                e.preventDefault(); // Previne comportamentos padrão
-                console.log("Abrindo solicitações mobile...");
-                openSolicitacoesModal();
-            });
-        }
+    if (mobileSolicitacoesBtn) {
+        mobileSolicitacoesBtn.addEventListener('click', function (e) {
+            e.preventDefault(); // Previne comportamentos padrão
+            console.log("Abrindo solicitações mobile...");
+            openSolicitacoesModal();
+        });
+    }
 
     // Envio de mensagem
     const messageInput = document.getElementById('message-input');
@@ -1738,8 +1738,8 @@ function setupEventListeners() {
         // Remove listeners antigos para evitar duplicidade (opcional, mas boa prática)
         const newBtn = addMemberBtn.cloneNode(true);
         addMemberBtn.parentNode.replaceChild(newBtn, addMemberBtn);
-        
-        newBtn.addEventListener('click', function(e) {
+
+        newBtn.addEventListener('click', function (e) {
             e.preventDefault();
             openAddMemberModal(); // Chama a função que já existe no seu código
         });
@@ -2077,31 +2077,31 @@ async function searchUsers(searchTerm) {
             return;
         }
 
-       /* No arquivo projeto-detalhe.js, dentro da função searchUsers */
+        /* No arquivo projeto-detalhe.js, dentro da função searchUsers */
 
-availableUsers.forEach(user => {
-    const userElement = document.createElement('div');
-    userElement.className = 'user-search-result';
+        availableUsers.forEach(user => {
+            const userElement = document.createElement('div');
+            userElement.className = 'user-search-result';
 
-    // --- CORREÇÃO AQUI: Lógica robusta para imagem do usuário ---
-    let userAvatar = defaultAvatarUrl;
-    
-    // Verifica se existe alguma propriedade de foto
-    const rawPhoto = user.urlFotoPerfil || user.fotoPerfil || user.foto;
-    
-    if (rawPhoto) {
-        if (rawPhoto.startsWith('http')) {
-            userAvatar = rawPhoto;
-        } else if (rawPhoto.startsWith('/')) {
-            userAvatar = `${backendUrl}${rawPhoto}`;
-        } else {
-            // Se for apenas o nome do arquivo, adiciona o caminho da API
-            userAvatar = `${backendUrl}/api/arquivos/${rawPhoto}`;
-        }
-    }
-    // -----------------------------------------------------------
+            // --- CORREÇÃO AQUI: Lógica robusta para imagem do usuário ---
+            let userAvatar = defaultAvatarUrl;
 
-    userElement.innerHTML = `
+            // Verifica se existe alguma propriedade de foto
+            const rawPhoto = user.urlFotoPerfil || user.fotoPerfil || user.foto;
+
+            if (rawPhoto) {
+                if (rawPhoto.startsWith('http')) {
+                    userAvatar = rawPhoto;
+                } else if (rawPhoto.startsWith('/')) {
+                    userAvatar = `${backendUrl}${rawPhoto}`;
+                } else {
+                    // Se for apenas o nome do arquivo, adiciona o caminho da API
+                    userAvatar = `${backendUrl}/api/arquivos/${rawPhoto}`;
+                }
+            }
+            // -----------------------------------------------------------
+
+            userElement.innerHTML = `
         <div class="user-avatar">
             <img src="${userAvatar}" alt="${user.nome}" onerror="this.src='${defaultAvatarUrl}'">
         </div>
@@ -2114,8 +2114,8 @@ availableUsers.forEach(user => {
         </button>
     `;
 
-    resultsContainer.appendChild(userElement);
-});
+            resultsContainer.appendChild(userElement);
+        });
 
     } catch (error) {
         console.error("Erro ao buscar usuários:", error);
@@ -2193,7 +2193,7 @@ function openProjectSettingsModal() {
     // CORREÇÃO: Configurar input de foto
     setupPhotoInput();
 
-   // LÓGICA DE VÍDEO
+    // LÓGICA DE VÍDEO
     const videoInput = document.getElementById('edit-project-video');
     const videoPreview = document.getElementById('edit-video-preview');
     const videoContainer = document.getElementById('edit-video-preview-container');
@@ -2212,11 +2212,11 @@ function openProjectSettingsModal() {
             }
             videoPreview.src = videoUrl;
             videoContainer.style.display = 'block';
-            if(videoNameDisplay) videoNameDisplay.textContent = "Vídeo atual carregado";
+            if (videoNameDisplay) videoNameDisplay.textContent = "Vídeo atual carregado";
         } else {
             videoPreview.src = "";
             videoContainer.style.display = 'none';
-            if(videoNameDisplay) videoNameDisplay.textContent = "Nenhum vídeo configurado";
+            if (videoNameDisplay) videoNameDisplay.textContent = "Nenhum vídeo configurado";
         }
     }
 
@@ -2226,30 +2226,30 @@ function openProjectSettingsModal() {
         const newVideoInput = videoInput.cloneNode(true);
         videoInput.parentNode.replaceChild(newVideoInput, videoInput);
 
-        newVideoInput.addEventListener('change', function(e) {
+        newVideoInput.addEventListener('change', function (e) {
             const file = e.target.files[0];
-            
+
             if (file) {
                 // Usuário selecionou um novo vídeo -> Mostra o preview dele
                 const fileUrl = URL.createObjectURL(file);
                 videoPreview.src = fileUrl;
                 videoContainer.style.display = 'block';
                 videoPreview.load(); // Força carregamento da capa
-                
-                if(videoNameDisplay) videoNameDisplay.textContent = `Novo: ${file.name}`;
+
+                if (videoNameDisplay) videoNameDisplay.textContent = `Novo: ${file.name}`;
             } else {
                 // Usuário cancelou a seleção -> Volta para o vídeo original (se houver) ou limpa
                 if (currentProject.videoDescricaoUrl) {
                     let videoUrl = currentProject.videoDescricaoUrl;
                     if (!videoUrl.startsWith('http')) videoUrl = `${backendUrl}/api/arquivos/${videoUrl}`;
-                    
+
                     videoPreview.src = videoUrl;
                     videoContainer.style.display = 'block';
-                    if(videoNameDisplay) videoNameDisplay.textContent = "Vídeo atual mantido";
+                    if (videoNameDisplay) videoNameDisplay.textContent = "Vídeo atual mantido";
                 } else {
                     videoPreview.src = "";
                     videoContainer.style.display = 'none';
-                    if(videoNameDisplay) videoNameDisplay.textContent = "Nenhum arquivo selecionado";
+                    if (videoNameDisplay) videoNameDisplay.textContent = "Nenhum arquivo selecionado";
                 }
             }
         });
@@ -2283,9 +2283,18 @@ async function updateProjectSettings() {
         if (photoInput && photoInput.files[0]) {
             formData.append('foto', photoInput.files[0]);
         }
-        
+
         const videoInput = document.getElementById('edit-project-video');
+        const MAX_SIZE = 100 * 1024 * 1024; // 100MB
+
         if (videoInput && videoInput.files[0]) {
+            // VALIDAÇÃO
+            if (videoInput.files[0].size > MAX_SIZE) {
+                window.showNotification("O vídeo selecionado excede o limite de 100MB.", "error");
+                hideLoading(); // Importante esconder o loading que foi ativado no início
+                return; // Cancela o envio
+            }
+
             formData.append('videoDescricao', videoInput.files[0]);
         }
 

@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const DEFAULT_COVER_IMAGE = window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`;
-    
+
     // Função utilitária para mostrar/ocultar modais
     function toggleModal(modalId, show) {
         const modal = document.getElementById(modalId);
@@ -1172,7 +1172,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const form = document.getElementById('novo-projeto-form');
                     const preview = document.getElementById('proj-image-preview');
-                   const defaultImg = window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`;
+                    const defaultImg = window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`;
 
                     if (form) form.reset();
 
@@ -1180,12 +1180,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (preview) {
                         preview.src = defaultImg;
                     }
-                    
+
                     // Limpar o preview do vídeo
                     const vidPreview = document.getElementById('proj-video-preview');
                     const vidContainer = document.getElementById('video-preview-container');
                     const vidName = document.getElementById('proj-video-name');
-                    
+
                     if (vidPreview) vidPreview.src = "";
                     if (vidContainer) vidContainer.style.display = 'none';
                     if (vidName) vidName.textContent = "";
@@ -1209,8 +1209,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     formData.append("descricao", this.elements.projDescricaoInput.value);
                     formData.append("autorId", currentUser.id);
                     formData.append("maxMembros", 50);
+                    const MAX_SIZE = 100 * 1024 * 1024; // 100MB em bytes
+
                     const videoInput = document.getElementById("proj-video");
+
+                    // VALIDAÇÃO DE TAMANHO
                     if (videoInput && videoInput.files[0]) {
+                        if (videoInput.files[0].size > MAX_SIZE) {
+                            window.showNotification("O vídeo é muito grande. O limite é 100MB.", "error");
+                            setButtonLoading(btn, false);
+                            btn.dataset.processing = "false";
+                            return; // PARA A EXECUÇÃO AQUI
+                        }
                         formData.append("videoDescricao", videoInput.files[0]);
                     }
 
@@ -1264,10 +1274,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         console.error("Erro ao criar projeto:", error);
                         let errorMessage = "Falha ao criar o projeto.";
 
-                        if (error.response && error.response.data) {
+                        // Tratamento específico para erro 413
+                        if (error.response && error.response.status === 413) {
+                            errorMessage = "O arquivo é muito grande para ser enviado. Tente um vídeo menor.";
+                        }
+                        else if (error.response && error.response.data) {
                             errorMessage = error.response.data.message || error.response.data;
-                        } else if (typeof error.response?.data === 'string') {
-                            errorMessage = error.response.data;
                         }
 
                         window.showNotification(errorMessage, "error");
@@ -1328,20 +1340,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 const projVideoName = document.getElementById('proj-video-name');
 
                 if (projVideoInput && projVideoPreview) {
-                    projVideoInput.addEventListener('change', function(e) {
+                    projVideoInput.addEventListener('change', function (e) {
                         const file = e.target.files[0];
-                        
+
                         if (file) {
                             // Cria uma URL temporária para o arquivo selecionado
                             const fileUrl = URL.createObjectURL(file);
-                            
+
                             // Define no player e mostra
                             projVideoPreview.src = fileUrl;
                             videoPreviewContainer.style.display = 'block';
                             projVideoName.textContent = file.name;
-                            
+
                             // Carrega o vídeo para mostrar a "capa" (primeiro frame)
-                            projVideoPreview.load(); 
+                            projVideoPreview.load();
                         } else {
                             // Se cancelar, limpa tudo
                             projVideoPreview.src = "";
