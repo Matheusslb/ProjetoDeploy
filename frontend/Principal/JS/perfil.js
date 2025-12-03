@@ -901,6 +901,26 @@ document.addEventListener("DOMContentLoaded", () => {
             ? (project.imagemUrl.startsWith('http') ? project.imagemUrl : `${window.backendUrl}/api/arquivos/${project.imagemUrl}`)
             : (window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`);
 
+            let videoHtml = '';
+                if (projeto.videoDescricaoUrl) {
+                    let videoUrl = projeto.videoDescricaoUrl;
+                    
+                    // Ajusta URL se não for absoluta (http...)
+                    if (!videoUrl.startsWith('http')) {
+                        videoUrl = `${window.backendUrl}/api/arquivos/${videoUrl}`;
+                    }
+
+                    videoHtml = `
+                        <div class="pm-video-section" style="margin-bottom: 2rem;">
+                            <div class="pm-section-title">Vídeo de Apresentação</div>
+                            <video controls style="width: 100%; border-radius: 8px; background: #09090b; max-height: 320px; border: 1px solid var(--border-color);">
+                                <source src="${videoUrl}" type="video/mp4">
+                                <source src="${videoUrl}" type="video/webm">
+                                Seu navegador não suporta a visualização de vídeos.
+                            </video>
+                        </div>
+                    `;
+                }
         // 2. Tratamento do Status
         const statusText = project.status || 'Em Planejamento';
 

@@ -914,7 +914,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             },
 
-            showProjectPreview(projeto) {
+   showProjectPreview(projeto) {
                 // Remove modal anterior se existir
                 const existingModal = document.getElementById('dynamic-project-modal');
                 if (existingModal) existingModal.remove();
@@ -922,6 +922,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 // 1. Preparar Dados
                 const imageUrl = this.getProjectImageUrl(projeto.imagemUrl);
                 const statusClass = (projeto.status || '').toLowerCase().replace(/\s+/g, '');
+
+                // --- NOVO: Lógica do Vídeo ---
+                let videoHtml = '';
+                if (projeto.videoDescricaoUrl) {
+                    let videoUrl = projeto.videoDescricaoUrl;
+                    if (!videoUrl.startsWith('http')) {
+                        videoUrl = `${window.backendUrl}/api/arquivos/${videoUrl}`;
+                    }
+                    videoHtml = `
+                        <div class="pm-video-section" style="margin-bottom: 2rem;">
+                            <div class="pm-section-title">Vídeo de Apresentação</div>
+                            <video controls style="width: 100%; border-radius: 8px; background: #000; max-height: 320px; border: 1px solid var(--border-color); display: block;">
+                                <source src="${videoUrl}">
+                                Seu navegador não suporta a tag de vídeo.
+                            </video>
+                        </div>
+                    `;
+                }
+                // -----------------------------
 
                 // Mapear Tecnologias
                 const techsHtml = (projeto.tecnologias || [])
@@ -940,7 +959,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         `;
                     }).join('') || '<span style="color:var(--text-secondary)">Sem membros visíveis</span>';
 
-                // Lógica dos Botões de Ação (Entrar, Já é membro, etc)
+                // Lógica dos Botões de Ação
                 const isMember = projeto.membros && projeto.membros.some(m => m.usuarioId === window.currentUser.id);
                 const isAuthor = projeto.autorId === window.currentUser.id;
 
@@ -977,7 +996,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     ${projeto.descricao || "Este projeto não possui uma descrição detalhada."}
                                 </div>
 
-                                <div class="pm-grid">
+                                ${videoHtml} <div class="pm-grid">
                                     <div class="pm-info-item">
                                         <h4>Categoria</h4>
                                         <span>${projeto.categoria || 'Geral'}</span>
