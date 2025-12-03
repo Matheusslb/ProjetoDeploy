@@ -297,7 +297,7 @@ public class ProjetoService {
     }
 
     @Transactional
-    public ProjetoDTO salvar(ProjetoDTO dto, MultipartFile foto) {
+    public ProjetoDTO salvar(ProjetoDTO dto, MultipartFile foto, MultipartFile videoDescricao) {
         if (filtroProfanidade.contemProfanidade(dto.getTitulo()) ||
                 filtroProfanidade.contemProfanidade(dto.getDescricao())) {
             throw new ConteudoImproprioException("Os dados do projeto contêm texto não permitido.");
@@ -339,6 +339,16 @@ public class ProjetoService {
         } else {
             if (isNovoGrupo) {
                 projeto.setImagemUrl("/images/projetos-default.png");
+            }
+        }
+
+        if (videoDescricao != null && !videoDescricao.isEmpty()) {
+            try {
+                String urlVideo = midiaService.upload(videoDescricao);
+                projeto.setVideoDescricaoUrl(urlVideo);
+            } catch (IOException e) {
+                e.printStackTrace(); // Trate melhor em produção
+                throw new RuntimeException("Erro ao salvar o vídeo do projeto", e);
             }
         }
 
@@ -541,7 +551,7 @@ public class ProjetoService {
     }
 
     @Transactional
-    public void atualizarInfoGrupo(Long projetoId, String novoTitulo, String novaDescricao, String novaImagemUrl,
+    public void atualizarInfoGrupo(Long projetoId, String novoTitulo, String novaDescricao, String novaImagemUrl, MultipartFile novoVideoDescricao,
                                    String novoStatus, Integer novoMaxMembros, Boolean novoGrupoPrivado,
                                    String novaCategoria, List<String> novasTecnologias, Long adminId) {
         if (!isAdmin(projetoId, adminId)) {
@@ -562,9 +572,6 @@ public class ProjetoService {
                     novoStatus.equalsIgnoreCase("Concluido") ||
                     novoStatus.equalsIgnoreCase("Concluído")) {
 
-                // Se for "Concluído" (com acento), salva como "Concluido" ou mantém,
-                // dependendo de como você quer no banco. Vou manter o original "Concluido" (sem acento)
-                // se vier com acento, para padronizar.
                 if (novoStatus.equalsIgnoreCase("Concluído")) {
                     projeto.setStatus("Concluido");
                 } else {
@@ -572,6 +579,14 @@ public class ProjetoService {
                 }
             } else {
                 throw new IllegalArgumentException("Status deve ser: Em planejamento, Em progresso ou Concluído");
+            }
+        }
+        if (novoVideoDescricao != null && !novoVideoDescricao.isEmpty()) {
+            try {
+                String urlVideo = midiaService.upload(novoVideoDescricao);
+                projeto.setVideoDescricaoUrl(urlVideo);
+            } catch (IOException e) {
+                throw new RuntimeException("Erro ao atualizar o vídeo do projeto", e);
             }
         }
 
@@ -640,6 +655,7 @@ public class ProjetoService {
         dto.setStatus(projeto.getStatus());
         dto.setCategoria(projeto.getCategoria());
         dto.setTecnologias(projeto.getTecnologias());
+        dto.setVideoDescricaoUrl(projeto.getVideoDescricaoUrl());
 
         String nomeFoto = projeto.getImagemUrl();
         if (nomeFoto != null && !nomeFoto.isBlank()) {

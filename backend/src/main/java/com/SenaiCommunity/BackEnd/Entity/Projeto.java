@@ -31,6 +31,7 @@ public class Projeto {
     private Integer maxMembros = 50; // Limite de membros no grupo
     private Boolean grupoPrivado = false; // Se true, apenas por convite
     private String categoria;
+    private String videoDescricaoUrl;
 
     @ElementCollection
     private List<String> tecnologias;

@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const DEFAULT_COVER_IMAGE = window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`;
+    
     // Função utilitária para mostrar/ocultar modais
     function toggleModal(modalId, show) {
         const modal = document.getElementById(modalId);
@@ -36,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             cancelEditBtn: document.getElementById('cancel-edit-profile-btn'),
             cancelDeleteBtn: document.getElementById('cancel-delete-account-btn')
-
         },
 
         init() {
@@ -137,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (this.elements.categoryFilter) {
                 this.elements.categoryFilter.addEventListener("change", runFilters);
             }
-
 
             // Fechar ao clicar fora
             window.addEventListener('click', (e) => {
@@ -1028,7 +1027,6 @@ document.addEventListener("DOMContentLoaded", () => {
             },
 
             // No arquivo projeto.js, atualize a função renderOnlineFriends para:
-
             renderOnlineFriends() {
                 if (!this.elements.onlineFriendsList) return;
 
@@ -1174,7 +1172,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const form = document.getElementById('novo-projeto-form');
                     const preview = document.getElementById('proj-image-preview');
-                    const defaultImg = window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`;
+                   const defaultImg = window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`;
 
                     if (form) form.reset();
 
@@ -1182,6 +1180,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (preview) {
                         preview.src = defaultImg;
                     }
+                    
+                    // Limpar o preview do vídeo
+                    const vidPreview = document.getElementById('proj-video-preview');
+                    const vidContainer = document.getElementById('video-preview-container');
+                    const vidName = document.getElementById('proj-video-name');
+                    
+                    if (vidPreview) vidPreview.src = "";
+                    if (vidContainer) vidContainer.style.display = 'none';
+                    if (vidName) vidName.textContent = "";
                 },
 
                 async handleFormSubmit(e) {
@@ -1202,6 +1209,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     formData.append("descricao", this.elements.projDescricaoInput.value);
                     formData.append("autorId", currentUser.id);
                     formData.append("maxMembros", 50);
+                    const videoInput = document.getElementById("proj-video");
+                    if (videoInput && videoInput.files[0]) {
+                        formData.append("videoDescricao", videoInput.files[0]);
+                    }
 
                     // Tratamento booleano
                     const isPrivate = this.elements.projPrivacidadeInput.value === 'true';
@@ -1291,9 +1302,7 @@ document.addEventListener("DOMContentLoaded", () => {
             },
 
             setupEventListeners() {
-
-
-
+                // 1. Preview da Imagem do Projeto
                 const projImageInput = document.getElementById('proj-imagem');
                 const projImagePreview = document.getElementById('proj-image-preview');
                 const defaultCover = window.defaultProjectUrl || `${window.backendUrl}/images/default-project.jpg`;
@@ -1312,7 +1321,37 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 }
 
-                // 2. Adicionar lógica de Cancelar botão secundário
+                // 2. Preview do Vídeo do Projeto
+                const projVideoInput = document.getElementById('proj-video');
+                const projVideoPreview = document.getElementById('proj-video-preview');
+                const videoPreviewContainer = document.getElementById('video-preview-container');
+                const projVideoName = document.getElementById('proj-video-name');
+
+                if (projVideoInput && projVideoPreview) {
+                    projVideoInput.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        
+                        if (file) {
+                            // Cria uma URL temporária para o arquivo selecionado
+                            const fileUrl = URL.createObjectURL(file);
+                            
+                            // Define no player e mostra
+                            projVideoPreview.src = fileUrl;
+                            videoPreviewContainer.style.display = 'block';
+                            projVideoName.textContent = file.name;
+                            
+                            // Carrega o vídeo para mostrar a "capa" (primeiro frame)
+                            projVideoPreview.load(); 
+                        } else {
+                            // Se cancelar, limpa tudo
+                            projVideoPreview.src = "";
+                            videoPreviewContainer.style.display = 'none';
+                            projVideoName.textContent = "";
+                        }
+                    });
+                }
+
+                // 3. Adicionar lógica de Cancelar botão secundário
                 const closeBtnAction = document.querySelector('.close-modal-btn-action');
                 if (closeBtnAction) {
                     closeBtnAction.addEventListener('click', () => this.handlers.closeModal.call(this));

@@ -551,6 +551,26 @@ function updateProjectInfo() {
         });
     }
 
+    const videoContainer = document.getElementById('project-video-container');
+    const videoPlayer = document.getElementById('project-video-player');
+
+    if (videoContainer && videoPlayer) {
+        if (currentProject.videoDescricaoUrl) {
+            // Verifica se é URL completa ou relativa
+            let videoUrl = currentProject.videoDescricaoUrl;
+            if (!videoUrl.startsWith('http')) {
+                videoUrl = `${backendUrl}/api/arquivos/${videoUrl}`;
+            }
+            
+            videoPlayer.src = videoUrl;
+            videoContainer.style.display = 'block';
+        } else {
+            videoPlayer.pause();
+            videoPlayer.src = "";
+            videoContainer.style.display = 'none';
+        }
+    }
+
     // Atualizar modal
     document.getElementById('modal-project-name').textContent = currentProject.titulo;
     document.getElementById('modal-project-description').textContent = currentProject.descricao || "Sem descrição";
@@ -2173,6 +2193,68 @@ function openProjectSettingsModal() {
     // CORREÇÃO: Configurar input de foto
     setupPhotoInput();
 
+   // LÓGICA DE VÍDEO
+    const videoInput = document.getElementById('edit-project-video');
+    const videoPreview = document.getElementById('edit-video-preview');
+    const videoContainer = document.getElementById('edit-video-preview-container');
+    const videoNameDisplay = document.getElementById('edit-video-name');
+
+    // 1. Resetar input de arquivo
+    if (videoInput) videoInput.value = '';
+
+    // 2. Verificar se já existe vídeo no Backend para mostrar
+    if (videoPreview && videoContainer) {
+        if (currentProject.videoDescricaoUrl) {
+            let videoUrl = currentProject.videoDescricaoUrl;
+            // Ajustar URL se for relativa
+            if (!videoUrl.startsWith('http')) {
+                videoUrl = `${backendUrl}/api/arquivos/${videoUrl}`;
+            }
+            videoPreview.src = videoUrl;
+            videoContainer.style.display = 'block';
+            if(videoNameDisplay) videoNameDisplay.textContent = "Vídeo atual carregado";
+        } else {
+            videoPreview.src = "";
+            videoContainer.style.display = 'none';
+            if(videoNameDisplay) videoNameDisplay.textContent = "Nenhum vídeo configurado";
+        }
+    }
+
+    // 3. Configurar o Listener de TROCA de arquivo (Preview instantâneo)
+    if (videoInput) {
+        // Clonar para remover listeners antigos e evitar duplicação
+        const newVideoInput = videoInput.cloneNode(true);
+        videoInput.parentNode.replaceChild(newVideoInput, videoInput);
+
+        newVideoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            
+            if (file) {
+                // Usuário selecionou um novo vídeo -> Mostra o preview dele
+                const fileUrl = URL.createObjectURL(file);
+                videoPreview.src = fileUrl;
+                videoContainer.style.display = 'block';
+                videoPreview.load(); // Força carregamento da capa
+                
+                if(videoNameDisplay) videoNameDisplay.textContent = `Novo: ${file.name}`;
+            } else {
+                // Usuário cancelou a seleção -> Volta para o vídeo original (se houver) ou limpa
+                if (currentProject.videoDescricaoUrl) {
+                    let videoUrl = currentProject.videoDescricaoUrl;
+                    if (!videoUrl.startsWith('http')) videoUrl = `${backendUrl}/api/arquivos/${videoUrl}`;
+                    
+                    videoPreview.src = videoUrl;
+                    videoContainer.style.display = 'block';
+                    if(videoNameDisplay) videoNameDisplay.textContent = "Vídeo atual mantido";
+                } else {
+                    videoPreview.src = "";
+                    videoContainer.style.display = 'none';
+                    if(videoNameDisplay) videoNameDisplay.textContent = "Nenhum arquivo selecionado";
+                }
+            }
+        });
+    }
+
     modal.style.display = 'flex';
 }
 
@@ -2200,6 +2282,11 @@ async function updateProjectSettings() {
         const photoInput = document.getElementById('edit-project-photo');
         if (photoInput && photoInput.files[0]) {
             formData.append('foto', photoInput.files[0]);
+        }
+        
+        const videoInput = document.getElementById('edit-project-video');
+        if (videoInput && videoInput.files[0]) {
+            formData.append('videoDescricao', videoInput.files[0]);
         }
 
         // Processar tecnologias

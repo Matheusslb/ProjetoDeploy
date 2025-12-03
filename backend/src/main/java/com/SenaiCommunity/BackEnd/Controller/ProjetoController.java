@@ -176,6 +176,7 @@ public class ProjetoController {
             @RequestParam(required = false) List<Long> professorIds,
             @RequestParam(required = false) List<Long> alunoIds,
             @RequestPart(required = false) MultipartFile foto,
+            @RequestPart(required = false) MultipartFile videoDescricao,
             @RequestParam(required = false) String categoria,
             @RequestParam(required = false) List<String> tecnologias) {
 
@@ -196,7 +197,7 @@ public class ProjetoController {
             dto.setCategoria(categoria);
             dto.setTecnologias(tecnologias);
 
-            ProjetoDTO salvo = projetoService.salvar(dto, foto);
+            ProjetoDTO salvo = projetoService.salvar(dto, foto, videoDescricao);
 
             return ResponseEntity.ok(Map.of(
                     "message", "Projeto criado com sucesso!",
@@ -212,9 +213,8 @@ public class ProjetoController {
     @PutMapping("/{id}")
     public ResponseEntity<ProjetoDTO> atualizar(@PathVariable Long id, @RequestBody ProjetoDTO dto) {
         dto.setId(id);
-        // Esta chamada passa 'null' para a foto, o que é correto para
-        // uma atualização que não altera a imagem.
-        ProjetoDTO atualizado = projetoService.salvar(dto, null);
+
+        ProjetoDTO atualizado = projetoService.salvar(dto, null, null);
         return ResponseEntity.ok(atualizado);
     }
 
@@ -321,12 +321,13 @@ public class ProjetoController {
             @PathVariable Long projetoId,
             @RequestParam(required = false) String titulo,
             @RequestParam(required = false) String descricao,
-            @RequestParam(required = false) MultipartFile foto, // CORREÇÃO: Aceitar arquivo
+            @RequestParam(required = false) MultipartFile foto,
+            @RequestParam(required = false) MultipartFile videoDescricao,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Integer maxMembros,
             @RequestParam(required = false) Boolean grupoPrivado,
             @RequestParam(required = false) String categoria,
-            @RequestParam(required = false) String tecnologias, // CORREÇÃO: Aceitar tecnologias como JSON string
+            @RequestParam(required = false) String tecnologias,
             @RequestParam Long adminId) {
 
         try {
@@ -354,7 +355,7 @@ public class ProjetoController {
                 }
             }
 
-            projetoService.atualizarInfoGrupo(projetoId, titulo, descricao, novaImagemUrl,
+            projetoService.atualizarInfoGrupo(projetoId, titulo, descricao, novaImagemUrl,videoDescricao,
                     status, maxMembros, grupoPrivado, categoria,
                     tecnologiasList, adminId);
             return ResponseEntity.ok(Map.of("message", "Informações do grupo atualizadas com sucesso!"));

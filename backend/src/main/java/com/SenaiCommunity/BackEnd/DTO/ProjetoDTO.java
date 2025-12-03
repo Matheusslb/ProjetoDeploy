@@ -26,6 +26,7 @@ public class ProjetoDTO {
 
     private Long autorId;
     private String autorNome;
+    private String videoDescricaoUrl;
 
     // Manter compatibilidade
     private List<Long> professorIds;

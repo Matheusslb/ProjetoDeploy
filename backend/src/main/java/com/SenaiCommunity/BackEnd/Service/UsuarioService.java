@@ -119,7 +119,7 @@ public class UsuarioService {
         if (StringUtils.hasText(dto.getSenha())) {
             usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
         }
-        
+
         // Se for ALUNO
         if (usuario instanceof Aluno) {
             Aluno aluno = (Aluno) usuario;
