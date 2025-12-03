@@ -680,8 +680,8 @@ body {
   position: absolute;
   top: 0.75rem;
   left: 0.75rem;
-  background-color: rgba(13, 17, 23, 0.9);
-  color: white;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   border-radius: 8px;
   text-align: center;
   padding: 0.6rem;
