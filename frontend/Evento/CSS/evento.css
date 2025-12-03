@@ -963,26 +963,35 @@ body {
   background: linear-gradient(to top, var(--bg-primary), transparent);
 }
 
+/* Em ProjetoDeploy/frontend/Evento/CSS/evento.css */
+
 .evento-details-date {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--text-primary);
-  border-radius: 12px;
-  text-align: center;
-  padding: 0.8rem;
-  line-height: 1.1;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+    /* CORREÇÃO 1: Usar var(--accent-primary) que é a variável real do seu tema */
+    background-color: var(--accent-primary); 
+    color: #ffffff;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    font-weight: bold;
+    padding: 5px;
+    
+    /* Adiciona uma sombra suave para destacar da imagem */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    z-index: 10; /* Garante que fique acima da imagem */
 }
 
 .evento-day {
   font-size: 1.8rem;
   font-weight: 800;
   display: block;
-  color: var(--accent-primary);
+  /* CORREÇÃO 2: Forçar branco (estava var(--accent-primary) sumindo no fundo) */
+  color: #ffffff !important; 
+  line-height: 1;
 }
 
 .evento-month {
@@ -990,7 +999,9 @@ body {
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 1px;
-  color: var(--text-secondary);
+  /* CORREÇÃO 3: Forçar branco (estava var(--text-secondary) cinza escuro) */
+  color: rgba(255, 255, 255, 0.9) !important; 
+  margin-top: 2px;
 }
 
 .evento-details-main-info {
