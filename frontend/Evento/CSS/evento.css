@@ -695,6 +695,7 @@ body {
   font-size: 1.3rem;
   font-weight: 700;
   display: block;
+  color: var(--accent-primary);
 }
 
 .evento-data span:last-child {
