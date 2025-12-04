@@ -27,7 +27,7 @@ public class NormalizacaoUtils {
         // 3. Remover acentos
         processado = Normalizer.normalize(processado, Normalizer.Form.NFD);
         processado = ACENTOS_PATTERN.matcher(processado).replaceAll("");
-        
+
         return processado.replaceAll("[^a-z\\s]", "");
     }
 }

@@ -565,7 +565,29 @@ document.addEventListener("DOMContentLoaded", () => {
     return [currentUser.id, otherUserId].sort((a, b) => a - b).join("-");
   }
 
-fetchMessages
+  async function fetchMessages(otherUserId) {
+    try {
+      // AJUSTE: A rota correta está no ChatRestController
+      // Rota: /api/chat/privado/historico/{amigoId}
+      const response = await axios.get(
+        `${backendUrl}/api/chat/privado/historico/${otherUserId}`
+      );
+
+      // O endpoint retorna uma List<MensagemPrivadaSaidaDTO>, então usamos .data diretamente
+      const novasMensagens = response.data;
+
+      // Renderiza as mensagens na tela
+      renderMessages(novasMensagens);
+      
+      return novasMensagens; 
+    } catch (error) {
+      console.error("Erro ao buscar mensagens:", error);
+      if (elements.chatMessagesContainer) {
+        elements.chatMessagesContainer.innerHTML = `<div class="error-state"><p>Erro ao carregar histórico.</p></div>`;
+      }
+      return [];
+    }
+  }
 
   function handleSendMessage(e) {
     e.preventDefault();
