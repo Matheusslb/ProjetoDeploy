@@ -34,13 +34,16 @@ public class Postagem{
     private String autorUsername;
 
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ToString.Exclude
     private List<ArquivoMidia> arquivos = new ArrayList<>();
 
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("dataCriacao ASC") //para os comentários virem em ordem
+    @ToString.Exclude
     private List<Comentario> comentarios = new ArrayList<>();
 
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private Set<Curtida> curtidas;
 
 }

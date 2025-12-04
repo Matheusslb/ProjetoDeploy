@@ -15,10 +15,10 @@ import java.util.List;
 @Repository
 public interface MensagemPrivadaRepository extends JpaRepository<MensagemPrivada, Long> {
 
-    // [CORREÇÃO DE PERFORMANCE]
-    // Adicionado o parâmetro 'Pageable' para limitar a quantidade de mensagens (ex: LIMIT 50).
-    // O 'ORDER BY' foi removido da Query para ser controlado pelo objeto Pageable no Service.
-    @Query("SELECT m FROM MensagemPrivada m WHERE " +
+    @Query("SELECT m FROM MensagemPrivada m " +
+            "JOIN FETCH m.remetente " +
+            "JOIN FETCH m.destinatario " +
+            "WHERE " +
             "(m.remetente.id = :id1 AND m.destinatario.id = :id2) OR " +
             "(m.remetente.id = :id2 AND m.destinatario.id = :id1)")
     List<MensagemPrivada> findMensagensEntreUsuarios(@Param("id1") Long id1, @Param("id2") Long id2, Pageable pageable);

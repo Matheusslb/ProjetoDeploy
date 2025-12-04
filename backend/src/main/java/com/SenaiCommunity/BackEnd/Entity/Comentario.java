@@ -32,21 +32,26 @@ public class Comentario {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "autor_id", nullable = false)
+    @ToString.Exclude
     private Usuario autor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "postagem_id", nullable = false)
+    @ToString.Exclude
     private Postagem postagem;
 
     //RELACIONAMENTO PARA RESPOSTAS (Self-referencing)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id") // Coluna que armazena o ID do comentário pai
+    @ToString.Exclude
     private Comentario parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<Comentario> replies = new ArrayList<>();
 
     @OneToMany(mappedBy = "comentario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private Set<Curtida> curtidas;
 
 }
