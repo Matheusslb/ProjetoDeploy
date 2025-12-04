@@ -79,6 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  let currentPage = 0;
+  let isLoadingHistory = false;
+
   // --- ESTADO ---
   let conversas = [];
   let userFriends = [];
@@ -242,6 +245,29 @@ document.addEventListener("DOMContentLoaded", () => {
           '<p class="error-text">Erro ao carregar bloqueados.</p>';
       }
     }
+
+    elements.chatMessagesContainer.addEventListener('scroll', () => {
+    if (elements.chatMessagesContainer.scrollTop === 0 && !isLoadingHistory) {
+        loadMoreMessages();
+    }
+});
+
+    async function loadMoreMessages() {
+    isLoadingHistory = true;
+    const currentHeight = elements.chatMessagesContainer.scrollHeight;
+    
+    currentPage++;
+    const newMessages = await fetchMessages(activeConversation.usuarioId, currentPage);
+    
+    if (newMessages.length > 0) {
+        // Prepend (adiciona no topo) as mensagens antigas
+        renderMessages(newMessages, true); // true indica que é histórico
+        
+        // Mantém a posição do scroll para o usuário não se perder
+        elements.chatMessagesContainer.scrollTop = elements.chatMessagesContainer.scrollHeight - currentHeight;
+    }
+    isLoadingHistory = false;
+}
 
     function renderBlockedUsers(users) {
       const blockedList = document.getElementById("blocked-users-list");
@@ -488,6 +514,9 @@ document.addEventListener("DOMContentLoaded", () => {
       renderConversationsList();
     }
 
+    currentPage = 0; 
+    isLoadingHistory = false;
+
     activeConversation = {
       usuarioId: otherUserId,
       nome: convoData.nomeOutroUsuario || convoData.nome,
@@ -536,25 +565,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return [currentUser.id, otherUserId].sort((a, b) => a - b).join("-");
   }
 
-  async function fetchMessages(otherUserId) {
-    const cacheKey = getCacheKey(otherUserId);
-    if (!cacheKey) return;
-    if (chatMessages.has(cacheKey)) {
-      renderMessages(chatMessages.get(cacheKey));
-      return;
-    }
-    try {
-      const response = await axios.get(
-        `${backendUrl}/api/chat/privado/historico/${otherUserId}`
-      );
-      chatMessages.set(cacheKey, response.data);
-      renderMessages(response.data);
-    } catch (error) {
-      console.error(error);
-      if (elements.chatMessagesContainer)
-        elements.chatMessagesContainer.innerHTML = `<div class="error-state"><p>Erro ao carregar mensagens</p></div>`;
-    }
-  }
+fetchMessages
 
   function handleSendMessage(e) {
     e.preventDefault();
@@ -773,14 +784,18 @@ document.addEventListener("DOMContentLoaded", () => {
     else elements.chatHeader.innerHTML = content;
   }
 
-  function renderMessages(messages) {
+ function renderMessages(messages, prepend = false) {
     if (!elements.chatMessagesContainer) return;
+    
     if (!messages || messages.length === 0) {
-      elements.chatMessagesContainer.innerHTML = `<div class="empty-chat"><i class="fas fa-comments"></i></div>`;
+      if (!prepend) { // Só mostra vazio se não estivermos adicionando histórico
+          elements.chatMessagesContainer.innerHTML = `<div class="empty-chat"><i class="fas fa-comments"></i></div>`;
+      }
       return;
     }
 
-    elements.chatMessagesContainer.innerHTML = messages
+    // Gera o HTML de todas as mensagens recebidas
+    const htmlContent = messages
       .map((msg) => {
         const isMe = msg.remetenteId === currentUser.id;
         const time = new Date(msg.dataEnvio).toLocaleTimeString("pt-BR", {
@@ -823,8 +838,17 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
       })
       .join("");
-    elements.chatMessagesContainer.scrollTop =
-      elements.chatMessagesContainer.scrollHeight;
+
+    // LÓGICA DE INSERÇÃO
+    if (prepend) {
+        // Adiciona antes do conteúdo atual (Histórico)
+        elements.chatMessagesContainer.insertAdjacentHTML('afterbegin', htmlContent);
+    } else {
+        // Substitui tudo (Carga inicial)
+        elements.chatMessagesContainer.innerHTML = htmlContent;
+        // Rola para o fim apenas na carga inicial
+        elements.chatMessagesContainer.scrollTop = elements.chatMessagesContainer.scrollHeight;
+    }
   }
 
   function showMessagesLoading() {

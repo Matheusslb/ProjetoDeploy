@@ -213,11 +213,60 @@ public class UsuarioService {
     public List<UsuarioBuscaDTO> buscarUsuariosPorNome(String nome, String emailUsuarioLogado) {
         Usuario usuarioLogado = buscarPorEmail(emailUsuarioLogado);
 
+        // 1. Busca todas as relações do usuário logado DE UMA VEZ (em memória)
+        List<Amizade> minhasRelacoes = amizadeRepository.findAllRelacoesDoUsuario(usuarioLogado.getId());
+
+        // 2. Busca os usuários pelo nome
         List<Usuario> usuariosEncontrados = usuarioRepository.findByNomeContainingIgnoreCaseAndIdNot(nome, usuarioLogado.getId());
 
+        // 3. Cruza os dados em memória (muito mais rápido que ir no banco N vezes)
         return usuariosEncontrados.stream()
-                .map(usuario -> toBuscaDTO(usuario, usuarioLogado))
+                .map(usuario -> {
+                    // Procura na lista em memória se existe relação
+                    Optional<Amizade> relacao = minhasRelacoes.stream()
+                            .filter(a -> a.getSolicitante().getId().equals(usuario.getId()) || a.getSolicitado().getId().equals(usuario.getId()))
+                            .findFirst();
+
+                    return toBuscaDTOOtimizado(usuario, usuarioLogado, relacao);
+                })
                 .collect(Collectors.toList());
+    }
+
+    private UsuarioBuscaDTO toBuscaDTOOtimizado(Usuario usuario, Usuario usuarioLogado, java.util.Optional<Amizade> relacaoOpt) {
+        // 1. Status padrão é NENHUMA
+        UsuarioBuscaDTO.StatusAmizadeRelacao status = UsuarioBuscaDTO.StatusAmizadeRelacao.NENHUMA;
+
+        // 2. Se existe uma relação encontrada na lista pré-carregada
+        if (relacaoOpt.isPresent()) {
+            Amizade amizade = relacaoOpt.get();
+
+            if (amizade.getStatus() == com.SenaiCommunity.BackEnd.Enum.StatusAmizade.ACEITO) {
+                status = UsuarioBuscaDTO.StatusAmizadeRelacao.AMIGOS;
+            }
+            else if (amizade.getStatus() == com.SenaiCommunity.BackEnd.Enum.StatusAmizade.PENDENTE) {
+                // Verifica quem enviou a solicitação comparando IDs
+                if (amizade.getSolicitante().getId().equals(usuarioLogado.getId())) {
+                    status = UsuarioBuscaDTO.StatusAmizadeRelacao.SOLICITACAO_ENVIADA;
+                } else {
+                    status = UsuarioBuscaDTO.StatusAmizadeRelacao.SOLICITACAO_RECEBIDA;
+                }
+            }
+        }
+
+        // 3. Tratamento da Foto (igual ao método original)
+        String urlFoto = usuario.getFotoPerfil() != null && !usuario.getFotoPerfil().isBlank()
+                ? usuario.getFotoPerfil()
+                : "/images/default-avatar.jpg";
+
+        // 4. Retorna o DTO preenchido
+        return new UsuarioBuscaDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                urlFoto,
+                status,
+                userStatusService.isOnline(usuario.getEmail())
+        );
     }
 
     /**

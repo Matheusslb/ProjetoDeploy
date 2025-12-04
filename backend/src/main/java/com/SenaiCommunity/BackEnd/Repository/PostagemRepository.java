@@ -8,8 +8,8 @@ import java.util.List;
 
 @Repository
 public interface PostagemRepository extends JpaRepository<Postagem, Long> {
-    @EntityGraph(attributePaths = {"autor"})
+    @EntityGraph(attributePaths = {"autor", "arquivos", "comentarios", "curtidas"})
     List<Postagem> findTop10ByOrderByDataPostagemDesc();
-    @EntityGraph(attributePaths = {"autor"})
+    @EntityGraph(attributePaths = {"autor", "arquivos", "comentarios", "curtidas"})
     List<Postagem> findByAutorIdOrderByDataPostagemDesc(Long usuarioId);
 }
