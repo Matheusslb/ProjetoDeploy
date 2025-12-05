@@ -135,7 +135,7 @@ public class PostagemService {
         return toDTO(atualizada);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @CacheEvict(value = "feed-postagens", allEntries = true)
     public void excluirPostagem(Long id, String username) {
         Postagem postagem = buscarPorId(id);
@@ -167,7 +167,7 @@ public class PostagemService {
 
         // Converte cada Postagem da lista para um PostagemSaidaDTO
         return posts.stream()
-                .map(this::toDTO) // Usa o método de conversão que você já tem!
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -193,11 +193,11 @@ public class PostagemService {
         return postagem;
     }
 
-    //  MÉTODO PARA BUSCAR UMA POSTAGEM ESPECÍFICA COM COMENTÁRIOS
+
     public PostagemSaidaDTO buscarPostagemPorIdComComentarios(Long id) {
         Postagem postagem = postagemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Postagem não encontrada com o ID: " + id));
-        return toDTO(postagem); // A mágica acontece no método de conversão toDTO
+        return toDTO(postagem);
     }
 
     @Transactional(readOnly = true)
@@ -205,7 +205,7 @@ public class PostagemService {
         // Busca as postagens do autor específico, ordenadas da mais recente para a mais antiga
         List<Postagem> posts = postagemRepository.findByAutorIdOrderByDataPostagemDesc(usuarioId);
 
-        // Converte a lista de entidades para DTOs usando seu método toDTO existente
+      
         return posts.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
