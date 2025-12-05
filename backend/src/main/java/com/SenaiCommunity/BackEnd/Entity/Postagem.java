@@ -1,5 +1,7 @@
 package com.SenaiCommunity.BackEnd.Entity;
 
+
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +15,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Postagem{
+public class Postagem {
 
     @Id
     @GeneratedValue
@@ -32,15 +34,18 @@ public class Postagem{
 
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude // CORREÇÃO: Evita loop infinito no Lombok
     private List<ArquivoMidia> arquivos = new ArrayList<>();
 
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("dataCriacao ASC") //para os comentários virem em ordem
+    @OrderBy("dataCriacao ASC")
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude // CORREÇÃO: Evita loop infinito no Lombok
     private List<Comentario> comentarios = new ArrayList<>();
 
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude // CORREÇÃO: Evita loop infinito no Lombok
     private Set<Curtida> curtidas;
 
 }
