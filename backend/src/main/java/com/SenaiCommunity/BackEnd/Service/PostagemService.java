@@ -135,7 +135,7 @@ public class PostagemService {
         return toDTO(atualizada);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     @CacheEvict(value = "feed-postagens", allEntries = true)
     public void excluirPostagem(Long id, String username) {
         Postagem postagem = buscarPorId(id);
@@ -160,7 +160,7 @@ public class PostagemService {
         // Deleta a postagem do banco de dados
         postagemRepository.deleteById(id);
     }
-
+    @Transactional(readOnly = true)
     @Cacheable(value = "feed-postagens")
     public List<PostagemSaidaDTO> buscarPostagensPublicas() {
         List<Postagem> posts = postagemRepository.findTop10ByOrderByDataPostagemDesc();
@@ -205,7 +205,7 @@ public class PostagemService {
         // Busca as postagens do autor específico, ordenadas da mais recente para a mais antiga
         List<Postagem> posts = postagemRepository.findByAutorIdOrderByDataPostagemDesc(usuarioId);
 
-      
+
         return posts.stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
