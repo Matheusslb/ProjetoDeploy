@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
@@ -30,19 +30,23 @@ public class Postagem {
     @Transient
     private String autorUsername;
 
+    // ALTERAÇÃO: De List para Set (HashSet)
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude // FIX: Evita loop infinito
-    private List<ArquivoMidia> arquivos = new ArrayList<>();
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    private Set<ArquivoMidia> arquivos = new HashSet<>();
 
+    // ALTERAÇÃO: De List para Set (LinkedHashSet para manter a ordem do @OrderBy)
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("dataCriacao ASC")
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude // FIX: Evita loop infinito
-    private List<Comentario> comentarios = new ArrayList<>();
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    private Set<Comentario> comentarios = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude // FIX: Evita loop infinito
+    @EqualsAndHashCode.Exclude
     private Set<Curtida> curtidas;
 }

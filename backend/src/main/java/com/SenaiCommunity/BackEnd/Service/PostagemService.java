@@ -19,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*; // Import genérico para List, Set, HashSet, etc.
 import java.util.stream.Collectors;
 
 @Service
@@ -53,7 +50,8 @@ public class PostagemService {
         Postagem novaPostagem = toEntity(dto, autor);
 
         if (arquivos != null && !arquivos.isEmpty()) {
-            List<ArquivoMidia> midias = new ArrayList<>();
+            // ALTERAÇÃO: Usando Set para compatibilidade com a Entidade
+            Set<ArquivoMidia> midias = new HashSet<>();
             for (MultipartFile file : arquivos) {
                 try {
                     String url = midiaService.upload(file);
@@ -85,6 +83,7 @@ public class PostagemService {
             throw new ConteudoImproprioException("Sua edição contém texto não permitido.");
         }
         postagem.setConteudo(dto.getConteudo());
+
         if (dto.getUrlsParaRemover() != null && !dto.getUrlsParaRemover().isEmpty()) {
             Set<String> urlsParaRemover = Set.copyOf(dto.getUrlsParaRemover());
             postagem.getArquivos().removeIf(arquivo -> {
@@ -97,6 +96,7 @@ public class PostagemService {
                 return false;
             });
         }
+
         if (novosArquivos != null && !novosArquivos.isEmpty()) {
             for (MultipartFile file : novosArquivos) {
                 try {
@@ -127,7 +127,7 @@ public class PostagemService {
         postagemRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true) // IMPORTANTE: Transactional evita LazyInitializationException
+    @Transactional(readOnly = true)
     public List<PostagemSaidaDTO> buscarPostagensPublicas() {
         List<Postagem> posts = postagemRepository.findTop10ByOrderByDataPostagemDesc();
         return posts.stream().map(this::toDTO).collect(Collectors.toList());
@@ -160,11 +160,11 @@ public class PostagemService {
     }
 
     private PostagemSaidaDTO toDTO(Postagem postagem) {
+        // Converte o Set de arquivos para List<String> para o DTO
         List<String> urls = postagem.getArquivos() != null
                 ? postagem.getArquivos().stream().map(ArquivoMidia::getUrl).collect(Collectors.toList())
                 : Collections.emptyList();
 
-        // FIX: Evita erro 500 se o usuário não estiver logado corretamente
         Long usuarioLogadoId = null;
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -177,6 +177,7 @@ public class PostagemService {
 
         final Long userId = usuarioLogadoId;
 
+        // Converte o Set de comentários para List<DTO>
         List<ComentarioSaidaDTO> comentariosDTO = postagem.getComentarios() != null
                 ? postagem.getComentarios().stream().map(c -> {
             boolean curtido = false;
