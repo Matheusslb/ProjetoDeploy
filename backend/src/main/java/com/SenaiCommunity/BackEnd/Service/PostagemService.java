@@ -9,11 +9,10 @@ import com.SenaiCommunity.BackEnd.Entity.Usuario;
 import com.SenaiCommunity.BackEnd.Exception.ConteudoImproprioException;
 import com.SenaiCommunity.BackEnd.Repository.PostagemRepository;
 import com.SenaiCommunity.BackEnd.Repository.UsuarioRepository;
-import org.springframework.cache.annotation.Cacheable; // Import mantido mas anotação removida do método
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.security.core.Authentication; // Import Adicionado
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,10 +50,8 @@ public class PostagemService {
             throw new ConteudoImproprioException("Sua postagem contém texto não permitido.");
         }
 
-        // Lógica de conversão DTO -> Entidade
         Postagem novaPostagem = toEntity(dto, autor);
 
-        // Processa os arquivos de mídia, se existirem
         if (arquivos != null && !arquivos.isEmpty()) {
             List<ArquivoMidia> midias = new ArrayList<>();
             for (MultipartFile file : arquivos) {
@@ -63,7 +60,7 @@ public class PostagemService {
                     ArquivoMidia midia = ArquivoMidia.builder()
                             .url(url)
                             .tipo(midiaService.detectarTipoPelaUrl(url))
-                            .postagem(novaPostagem) // Associa a mídia à postagem
+                            .postagem(novaPostagem)
                             .build();
                     midias.add(midia);
                 } catch (IOException e) {
@@ -81,182 +78,130 @@ public class PostagemService {
     @CacheEvict(value = "feed-postagens", allEntries = true)
     public PostagemSaidaDTO editarPostagem(Long id, String username, PostagemEntradaDTO dto, List<MultipartFile> novosArquivos) {
         Postagem postagem = buscarPorId(id);
-
         if (!postagem.getAutor().getEmail().equals(username)) {
             throw new SecurityException("Você não pode editar esta postagem.");
         }
-
         if (filtroProfanidade.contemProfanidade(dto.getConteudo())) {
             throw new ConteudoImproprioException("Sua edição contém texto não permitido.");
         }
-
-        // 1. Atualiza o conteúdo do texto
         postagem.setConteudo(dto.getConteudo());
-
-        // 2. Remove arquivos antigos, se solicitado
         if (dto.getUrlsParaRemover() != null && !dto.getUrlsParaRemover().isEmpty()) {
             Set<String> urlsParaRemover = Set.copyOf(dto.getUrlsParaRemover());
-
             postagem.getArquivos().removeIf(arquivo -> {
                 if (urlsParaRemover.contains(arquivo.getUrl())) {
                     try {
                         midiaService.deletar(arquivo.getUrl());
                         return true;
-                    } catch (IOException e) {
-                        System.err.println("Erro ao deletar arquivo do Cloudinary: " + arquivo.getUrl());
-                        return false;
-                    }
+                    } catch (IOException e) { return false; }
                 }
                 return false;
             });
         }
-
-        // 3. Adiciona novos arquivos, se enviados
         if (novosArquivos != null && !novosArquivos.isEmpty()) {
             for (MultipartFile file : novosArquivos) {
                 try {
                     String url = midiaService.upload(file);
                     ArquivoMidia midia = ArquivoMidia.builder()
-                            .url(url)
-                            .tipo(midiaService.detectarTipoPelaUrl(url))
-                            .postagem(postagem)
-                            .build();
+                            .url(url).tipo(midiaService.detectarTipoPelaUrl(url)).postagem(postagem).build();
                     postagem.getArquivos().add(midia);
                 } catch (IOException e) {
-                    throw new RuntimeException("Erro ao fazer upload do novo arquivo: " + file.getOriginalFilename(), e);
+                    throw new RuntimeException("Erro upload novo arquivo", e);
                 }
             }
         }
-
-        Postagem atualizada = postagemRepository.save(postagem);
-        return toDTO(atualizada);
+        return toDTO(postagemRepository.save(postagem));
     }
 
     @Transactional
     @CacheEvict(value = "feed-postagens", allEntries = true)
     public void excluirPostagem(Long id, String username) {
         Postagem postagem = buscarPorId(id);
-
         if (!postagem.getAutor().getEmail().equals(username)) {
             throw new SecurityException("Você não pode excluir esta postagem.");
         }
-
-        if (postagem.getArquivos() != null && !postagem.getArquivos().isEmpty()) {
-            for (ArquivoMidia midia : new ArrayList<>(postagem.getArquivos())) {
-                try {
-                    midiaService.deletar(midia.getUrl());
-                } catch (Exception e) {
-                    System.err.println("AVISO: Falha ao deletar arquivo no Cloudinary: " + midia.getUrl() + ". Erro: " + e.getMessage());
-                }
-            }
+        if (postagem.getArquivos() != null) {
+            postagem.getArquivos().forEach(m -> {
+                try { midiaService.deletar(m.getUrl()); } catch (Exception e) {}
+            });
         }
-
         postagemRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
-    // @Cacheable REMOVIDO: Não podemos cachear feed personalizado (like do usuário)
+    @Transactional(readOnly = true) // IMPORTANTE: Transactional evita LazyInitializationException
     public List<PostagemSaidaDTO> buscarPostagensPublicas() {
         List<Postagem> posts = postagemRepository.findTop10ByOrderByDataPostagemDesc();
-
-        return posts.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+        return posts.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     public Postagem buscarPorId(Long id) {
-        return postagemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Postagem não encontrada"));
+        return postagemRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Postagem não encontrada"));
     }
 
     public PostagemSaidaDTO ordenarComentarios(PostagemSaidaDTO postagem) {
         if (postagem.getComentarios() != null && !postagem.getComentarios().isEmpty()) {
-            List<ComentarioSaidaDTO> comentariosOrdenados = postagem.getComentarios().stream()
+            List<ComentarioSaidaDTO> sorted = postagem.getComentarios().stream()
                     .sorted((a, b) -> {
-                        if (a.isDestacado() != b.isDestacado()) {
-                            return Boolean.compare(b.isDestacado(), a.isDestacado());
-                        }
+                        if (a.isDestacado() != b.isDestacado()) return Boolean.compare(b.isDestacado(), a.isDestacado());
                         return a.getDataCriacao().compareTo(b.getDataCriacao());
-                    })
-                    .collect(Collectors.toList());
-
-            postagem.setComentarios(comentariosOrdenados);
+                    }).collect(Collectors.toList());
+            postagem.setComentarios(sorted);
         }
         return postagem;
     }
 
-
     public PostagemSaidaDTO buscarPostagemPorIdComComentarios(Long id) {
-        Postagem postagem = postagemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Postagem não encontrada com o ID: " + id));
-        return toDTO(postagem);
+        return toDTO(buscarPorId(id));
     }
 
     @Transactional(readOnly = true)
     public List<PostagemSaidaDTO> buscarPostagensPorUsuario(Long usuarioId) {
-        List<Postagem> posts = postagemRepository.findByAutorIdOrderByDataPostagemDesc(usuarioId);
-        return posts.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+        return postagemRepository.findByAutorIdOrderByDataPostagemDesc(usuarioId)
+                .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    // Lógica de conversão Entidade -> DTO de Saída
     private PostagemSaidaDTO toDTO(Postagem postagem) {
         List<String> urls = postagem.getArquivos() != null
                 ? postagem.getArquivos().stream().map(ArquivoMidia::getUrl).collect(Collectors.toList())
                 : Collections.emptyList();
 
-        // FIX: Tratamento seguro para obter o utilizador logado e evitar NullPointerException
+        // FIX: Evita erro 500 se o usuário não estiver logado corretamente
         Long usuarioLogadoId = null;
         try {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getPrincipal())) {
-                String username = authentication.getName();
-                usuarioLogadoId = usuarioRepository.findByEmail(username)
-                        .map(Usuario::getId)
-                        .orElse(null);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                usuarioLogadoId = usuarioRepository.findByEmail(auth.getName()).map(Usuario::getId).orElse(null);
             }
         } catch (Exception e) {
-            // Se falhar a autenticação, assume que é um visitante (id = null)
+            System.err.println("Erro ao identificar usuário logado: " + e.getMessage());
         }
 
-        // Necessário ser final ou effectively final para usar no lambda
-        final Long finalUsuarioLogadoId = usuarioLogadoId;
+        final Long userId = usuarioLogadoId;
 
         List<ComentarioSaidaDTO> comentariosDTO = postagem.getComentarios() != null
-                ? postagem.getComentarios().stream().map(comentario -> {
-
-            int totalCurtidasComentario = comentario.getCurtidas() != null ? comentario.getCurtidas().size() : 0;
-
-            boolean curtidoPeloUsuarioComentario = false;
-            if (finalUsuarioLogadoId != null && comentario.getCurtidas() != null) {
-                curtidoPeloUsuarioComentario = comentario.getCurtidas().stream()
-                        .anyMatch(curtida -> curtida.getUsuario().getId().equals(finalUsuarioLogadoId));
+                ? postagem.getComentarios().stream().map(c -> {
+            boolean curtido = false;
+            if (userId != null && c.getCurtidas() != null) {
+                curtido = c.getCurtidas().stream().anyMatch(l -> l.getUsuario().getId().equals(userId));
             }
-
             return ComentarioSaidaDTO.builder()
-                    .id(comentario.getId())
-                    .conteudo(comentario.getConteudo())
-                    .dataCriacao(comentario.getDataCriacao())
-                    .autorId(comentario.getAutor().getId())
-                    .nomeAutor(comentario.getAutor().getNome())
-                    .postagemId(comentario.getPostagem().getId())
-                    .parentId(comentario.getParent() != null ? comentario.getParent().getId() : null)
-                    .replyingToName(comentario.getParent() != null ? comentario.getParent().getAutor().getNome() : null)
-                    .destacado(comentario.isDestacado())
-                    .totalCurtidas(totalCurtidasComentario)
-                    .curtidoPeloUsuario(curtidoPeloUsuarioComentario)
-                    .urlFotoAutor(comentario.getAutor().getFotoPerfil())
+                    .id(c.getId())
+                    .conteudo(c.getConteudo())
+                    .dataCriacao(c.getDataCriacao())
+                    .autorId(c.getAutor().getId())
+                    .nomeAutor(c.getAutor().getNome())
+                    .postagemId(c.getPostagem().getId())
+                    .parentId(c.getParent() != null ? c.getParent().getId() : null)
+                    .replyingToName(c.getParent() != null ? c.getParent().getAutor().getNome() : null)
+                    .destacado(c.isDestacado())
+                    .totalCurtidas(c.getCurtidas() != null ? c.getCurtidas().size() : 0)
+                    .curtidoPeloUsuario(curtido)
+                    .urlFotoAutor(c.getAutor().getFotoPerfil())
                     .build();
+        }).collect(Collectors.toList()) : Collections.emptyList();
 
-        }).collect(Collectors.toList())
-                : Collections.emptyList();
-
-        int totalCurtidasPostagem = postagem.getCurtidas() != null ? postagem.getCurtidas().size() : 0;
-        boolean curtidoPeloUsuarioPostagem = false;
-        if (finalUsuarioLogadoId != null && postagem.getCurtidas() != null) {
-            curtidoPeloUsuarioPostagem = postagem.getCurtidas().stream()
-                    .anyMatch(c -> c.getUsuario().getId().equals(finalUsuarioLogadoId));
+        boolean curtidoPost = false;
+        if (userId != null && postagem.getCurtidas() != null) {
+            curtidoPost = postagem.getCurtidas().stream().anyMatch(l -> l.getUsuario().getId().equals(userId));
         }
 
         return PostagemSaidaDTO.builder()
@@ -267,17 +212,13 @@ public class PostagemService {
                 .nomeAutor(postagem.getAutor().getNome())
                 .urlsMidia(urls)
                 .comentarios(comentariosDTO)
-                .totalCurtidas(totalCurtidasPostagem)
+                .totalCurtidas(postagem.getCurtidas() != null ? postagem.getCurtidas().size() : 0)
                 .urlFotoAutor(postagem.getAutor().getFotoPerfil())
-                .curtidoPeloUsuario(curtidoPeloUsuarioPostagem)
+                .curtidoPeloUsuario(curtidoPost)
                 .build();
     }
 
     private Postagem toEntity(PostagemEntradaDTO dto, Usuario autor) {
-        return Postagem.builder()
-                .conteudo(dto.getConteudo())
-                .dataPostagem(LocalDateTime.now())
-                .autor(autor)
-                .build();
+        return Postagem.builder().conteudo(dto.getConteudo()).dataPostagem(LocalDateTime.now()).autor(autor).build();
     }
 }

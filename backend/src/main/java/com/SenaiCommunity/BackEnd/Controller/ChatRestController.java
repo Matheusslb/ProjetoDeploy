@@ -4,15 +4,13 @@ import com.SenaiCommunity.BackEnd.DTO.ConversaResumoDTO;
 import com.SenaiCommunity.BackEnd.DTO.MensagemGrupoSaidaDTO;
 import com.SenaiCommunity.BackEnd.DTO.MensagemPrivadaSaidaDTO;
 import com.SenaiCommunity.BackEnd.DTO.PostagemSaidaDTO;
-import com.SenaiCommunity.BackEnd.Entity.MensagemGrupo;
-import com.SenaiCommunity.BackEnd.Entity.MensagemPrivada;
-import com.SenaiCommunity.BackEnd.Entity.Postagem;
 import com.SenaiCommunity.BackEnd.Entity.Usuario;
 import com.SenaiCommunity.BackEnd.Service.MensagemGrupoService;
 import com.SenaiCommunity.BackEnd.Service.MensagemPrivadaService;
 import com.SenaiCommunity.BackEnd.Service.PostagemService;
 import com.SenaiCommunity.BackEnd.Service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +21,6 @@ import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/chat")
-//Essa controller serve buscar os históricos de conversa dos chats
 @PreAuthorize("hasRole('ALUNO') or hasRole('PROFESSOR') or hasRole('ADMIN')")
 public class ChatRestController {
 
@@ -39,14 +36,10 @@ public class ChatRestController {
     @Autowired
     private UsuarioService usuarioService;
 
-    //  Histórico de mensagens privadas entre dois usuários
     @GetMapping("/privado/historico/{amigoId}")
     public ResponseEntity<List<MensagemPrivadaSaidaDTO>> getMensagensPrivadasComAmigo(@PathVariable Long amigoId, Principal principal) {
         Usuario usuarioLogado = usuarioService.buscarPorEmail(principal.getName());
-        Long usuarioLogadoId = usuarioLogado.getId();
-
-        // 2. Busca o histórico
-        List<MensagemPrivadaSaidaDTO> historico = mensagemPrivadaService.buscarMensagensPrivadas(usuarioLogadoId, amigoId);
+        List<MensagemPrivadaSaidaDTO> historico = mensagemPrivadaService.buscarMensagensPrivadas(usuarioLogado.getId(), amigoId);
         return ResponseEntity.ok(historico);
     }
 
@@ -56,17 +49,25 @@ public class ChatRestController {
         return ResponseEntity.ok(resumo);
     }
 
-    //  Histórico de mensagens de grupo
     @GetMapping("/grupo/{projetoId}")
     public ResponseEntity<List<MensagemGrupoSaidaDTO>> getMensagensDoGrupo(@PathVariable Long projetoId) {
         List<MensagemGrupoSaidaDTO> mensagens = mensagemGrupoService.buscarMensagensPorProjeto(projetoId);
         return ResponseEntity.ok(mensagens);
     }
 
-    //  Histórico de postagens públicas
+    // --- CORREÇÃO E LOG DE ERRO AQUI ---
     @GetMapping("/publico")
-    public List<PostagemSaidaDTO> getPostagensPublicas() {
-        return postagemService.buscarPostagensPublicas();
+    public ResponseEntity<?> getPostagensPublicas() {
+        try {
+            System.out.println("Recebida requisição para /api/chat/publico");
+            List<PostagemSaidaDTO> postagens = postagemService.buscarPostagensPublicas();
+            return ResponseEntity.ok(postagens);
+        } catch (Exception e) {
+            // Isso vai mostrar o erro real no terminal do Railway
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro interno ao buscar postagens: " + e.getMessage());
+        }
     }
 
     @GetMapping("/privado/nao-lidas/contagem")
@@ -81,12 +82,10 @@ public class ChatRestController {
             mensagemPrivadaService.marcarConversaComoLida(principal.getName(), remetenteId);
             return ResponseEntity.ok().build();
         } catch (NoSuchElementException e) {
-            // Logar o erro se necessário
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            // Logar o erro
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
 }
-

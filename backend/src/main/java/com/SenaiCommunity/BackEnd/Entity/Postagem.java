@@ -1,7 +1,5 @@
 package com.SenaiCommunity.BackEnd.Entity;
 
-
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,7 +22,7 @@ public class Postagem {
     @ManyToOne
     private Usuario autor;
 
-    @Lob // Para textos mais longos
+    @Lob
     private String conteudo;
 
     private LocalDateTime dataPostagem = LocalDateTime.now();
@@ -34,19 +32,17 @@ public class Postagem {
 
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude // CORREÇÃO: Evita loop infinito no Lombok
+    @EqualsAndHashCode.Exclude // FIX: Evita loop infinito
     private List<ArquivoMidia> arquivos = new ArrayList<>();
 
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("dataCriacao ASC")
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude // CORREÇÃO: Evita loop infinito no Lombok
+    @EqualsAndHashCode.Exclude // FIX: Evita loop infinito
     private List<Comentario> comentarios = new ArrayList<>();
 
     @OneToMany(mappedBy = "postagem", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude // CORREÇÃO: Evita loop infinito no Lombok
+    @EqualsAndHashCode.Exclude // FIX: Evita loop infinito
     private Set<Curtida> curtidas;
-
 }
-
