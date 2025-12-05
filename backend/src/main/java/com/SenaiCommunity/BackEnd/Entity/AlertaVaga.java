@@ -3,6 +3,7 @@ package com.SenaiCommunity.BackEnd.Entity;
 import com.SenaiCommunity.BackEnd.Enum.NivelVaga;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -19,5 +20,6 @@ public class AlertaVaga {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
+    @ToString.Exclude
     private Usuario usuario;
 }
