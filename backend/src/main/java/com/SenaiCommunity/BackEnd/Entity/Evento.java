@@ -14,7 +14,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "eventos")
+@Table(name = "eventos", indexes = {
+        @Index(name = "idx_evento_data", columnList = "data")
+})
 @Getter
 @Setter
 @NoArgsConstructor

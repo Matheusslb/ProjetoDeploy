@@ -190,6 +190,10 @@ function checkUserRole() {
 }
 
 // Variáveis globais
+let currentPage = 0;
+let totalPages = 0;
+let isLoadingHistory = false; // Para evitar múltiplas chamadas ao rolar
+const pageSize = 20; // Deve ser igual ao padrão do backend
 let currentProject = null;
 let projectMembers = [];
 let projectMessages = [];
@@ -715,15 +719,38 @@ function createMemberModalElement(member) {
 }
 
 // Carregar mensagens do projeto
+// CORREÇÃO: Carregar mensagens iniciais (Página 0)
 async function loadProjectMessages() {
     try {
+        // Resetar variáveis
+        currentPage = 0;
+        projectMessages = []; 
+        
+        const messagesContainer = document.getElementById('messages-container');
+        if (messagesContainer) messagesContainer.innerHTML = '';
+        
         showLoading("Carregando mensagens...");
 
-        const response = await axios.get(`${backendUrl}/api/mensagens/grupo/projeto/${projectId}`);
-        projectMessages = response.data;
+        // Nota: O backend deve retornar ordenado por data DESC (mais recentes primeiro)
+        const response = await axios.get(`${backendUrl}/api/mensagens/grupo/projeto/${projectId}`, {
+            params: {
+                page: 0,
+                size: pageSize
+            }
+        });
 
-        // Renderizar mensagens
-        renderMessages();
+        const data = response.data;
+        
+        // O Spring Page retorna { content: [], totalPages: N, ... }
+        // Se o backend retornar lista direta, usamos data, senão data.content
+        const newMessages = data.content ? data.content : data;
+        totalPages = data.totalPages || 1;
+
+        // Normaliza e inverte para ordem cronológica (antigas no topo, novas embaixo)
+        projectMessages = newMessages.map(normalizeMessageData).reverse();
+
+        // Renderizar mensagens iniciais
+        renderMessages(true); // true = scroll to bottom
 
     } catch (error) {
         console.error("Erro ao carregar mensagens do projeto:", error);
@@ -731,6 +758,87 @@ async function loadProjectMessages() {
     } finally {
         hideLoading();
     }
+}
+
+// NOVO: Carregar mensagens antigas (Paginação)
+async function loadMoreMessages() {
+    if (isLoadingHistory || currentPage >= totalPages - 1) return;
+
+    isLoadingHistory = true;
+    const messagesContainer = document.getElementById('messages-container');
+    
+    // Guardar altura do scroll antes de carregar para manter a posição visual
+    const previousHeight = messagesContainer.scrollHeight;
+    const previousScrollTop = messagesContainer.scrollTop;
+
+    // Mostrar indicador de loading no topo (opcional)
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.className = 'history-loading';
+    loadingIndicator.innerHTML = '<div class="loading-spinner small"></div>';
+    loadingIndicator.style.textAlign = 'center';
+    loadingIndicator.style.padding = '10px';
+    messagesContainer.prepend(loadingIndicator);
+
+    try {
+        const nextPage = currentPage + 1;
+        
+        const response = await axios.get(`${backendUrl}/api/mensagens/grupo/projeto/${projectId}`, {
+            params: {
+                page: nextPage,
+                size: pageSize
+            }
+        });
+
+        const data = response.data;
+        const newMessagesRaw = data.content ? data.content : data;
+        
+        if (newMessagesRaw.length > 0) {
+            currentPage = nextPage; // Confirma a mudança de página
+            
+            // Normalizar e inverter (pois o backend manda DESC, queremos ASC na tela)
+            const olderMessages = newMessagesRaw.map(normalizeMessageData).reverse();
+            
+            // Adicionar ao INÍCIO da lista global
+            projectMessages = [...olderMessages, ...projectMessages];
+
+            // Renderizar APENAS as novas mensagens antigas no topo
+            loadingIndicator.remove(); // Remove o loader
+            prependMessagesToUI(olderMessages);
+
+            // Ajustar o scroll para o usuário não perder a posição
+            // Nova altura - Altura antiga = Quanto o conteúdo cresceu para cima
+            messagesContainer.scrollTop = messagesContainer.scrollHeight - previousHeight;
+        } else {
+            loadingIndicator.remove();
+        }
+
+    } catch (error) {
+        console.error("Erro ao carregar histórico:", error);
+        if(loadingIndicator) loadingIndicator.remove();
+        showNotification("Erro ao carregar mensagens antigas", "error");
+    } finally {
+        isLoadingHistory = false;
+    }
+}
+
+function prependMessagesToUI(messages) {
+    const messagesContainer = document.getElementById('messages-container');
+    
+    // Criar um fragmento para melhor performance
+    const fragment = document.createDocumentFragment();
+
+    messages.forEach(message => {
+        const messageElement = createMessageElement(message);
+        if (messageElement) {
+            fragment.appendChild(messageElement);
+        }
+    });
+
+    // Inserir antes do primeiro filho atual
+    messagesContainer.insertBefore(fragment, messagesContainer.firstChild);
+    
+    // Configurar eventos de hover nas novas mensagens
+    setupMessageHover();
 }
 
 // CORREÇÃO: Função para mostrar/ocultar loading
@@ -846,8 +954,10 @@ function expandMessage(button) {
         }
     }
 }
+
 // Renderizar mensagens
-function renderMessages() {
+// ATUALIZAÇÃO: Renderizar mensagens (simplificada)
+function renderMessages(shouldScrollToBottom = false) {
     const messagesContainer = document.getElementById('messages-container');
     messagesContainer.innerHTML = '';
 
@@ -856,29 +966,18 @@ function renderMessages() {
         return;
     }
 
-    // NOVO: Otimização para mobile - mostrar apenas mensagens recentes
-    let messagesToRender = projectMessages;
-    if (window.innerWidth <= 768 && projectMessages.length > 100) {
-        messagesToRender = projectMessages.slice(-50);
-    }
-
-    // Ordenar mensagens por data
-    const sortedMessages = [...messagesToRender].sort((a, b) =>
-        new Date(a.dataEnvio || a.dataCriacao) - new Date(b.dataEnvio || b.dataCriacao)
-    );
-
-    // Renderizar cada mensagem
-    sortedMessages.forEach(message => {
+    // Renderizar todas as mensagens atuais da memória
+    projectMessages.forEach(message => {
         const messageElement = createMessageElement(message);
         if (messageElement) {
             messagesContainer.appendChild(messageElement);
         }
     });
 
-    // Rolar para a última mensagem
-    scrollToBottom();
-
-    // CORREÇÃO: Configurar eventos de hover para as mensagens
+    if (shouldScrollToBottom) {
+        scrollToBottom();
+    }
+    
     setupMessageHover();
 }
 
@@ -1246,17 +1345,21 @@ function removeMessageFromUI(messageId) {
 
 // Manipular nova mensagem recebida
 function handleNewMessage(message) {
-    // Adicionar à lista de mensagens
-    projectMessages.push(message);
+    // Normalizar a mensagem recebida do socket, se necessário
+    const normalizedMsg = normalizeMessageData(message);
 
-    // Renderizar a nova mensagem
-    const messageElement = createMessageElement(message);
+    // Evitar duplicatas
+    if (projectMessages.some(m => m.id === normalizedMsg.id)) return;
+
+    projectMessages.push(normalizedMsg);
+
+    const messageElement = createMessageElement(normalizedMsg);
     if (messageElement) {
         document.getElementById('messages-container').appendChild(messageElement);
     }
 
-    // Rolar para a última mensagem
     scrollToBottom();
+    setupMessageHover(); // Reaplicar listeners de hover
 }
 
 // NOVO: Atualizar função de rolagem para mobile
@@ -1715,6 +1818,17 @@ function setupEventListeners() {
             e.preventDefault(); // Previne comportamentos padrão
             console.log("Abrindo solicitações mobile...");
             openSolicitacoesModal();
+        });
+    }
+
+    // Detectar scroll para carregar histórico
+    const messagesContainer = document.getElementById('messages-container');
+    if (messagesContainer) {
+        messagesContainer.addEventListener('scroll', function() {
+            // Se o scroll estiver próximo do topo (ex: 50px) e não estiver carregando
+            if (this.scrollTop < 50 && !isLoadingHistory) {
+                loadMoreMessages();
+            }
         });
     }
 

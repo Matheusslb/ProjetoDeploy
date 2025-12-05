@@ -35,5 +35,6 @@ COPY --from=builder /app/target/*.jar app.jar
 # Expõe a porta padrão
 EXPOSE 8080
 
-# Roda a aplicação
-CMD ["java", "-jar", "app.jar"]
+# Roda a aplicacao
+# Ajuste para container de 512MB (Deixa ~150MB para o OS e Overhead e ~350MB para a Heap)
+CMD ["java", "-Xms256m", "-Xmx350m", "-jar", "app.jar"]

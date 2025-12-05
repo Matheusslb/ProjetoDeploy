@@ -12,7 +12,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Table(indexes = {
+        @Index(name = "idx_msg_grupo_projeto_data", columnList = "projeto_id, dataEnvio")
+})
 public class MensagemGrupo {
 
     @Id

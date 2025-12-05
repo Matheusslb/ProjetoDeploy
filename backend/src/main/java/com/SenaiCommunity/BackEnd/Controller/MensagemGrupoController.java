@@ -17,7 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.List;
+import org.springframework.data.domain.Page;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -56,9 +56,14 @@ public class MensagemGrupoController {
     }
 
     @GetMapping("/projeto/{projetoId}")
-    public ResponseEntity<List<MensagemGrupoSaidaDTO>> getMensagensPorProjeto(@PathVariable Long projetoId) {
+    public ResponseEntity<Page<MensagemGrupoSaidaDTO>> getMensagensPorProjeto(
+            @PathVariable Long projetoId,
+            @RequestParam(defaultValue = "0") int page, // Página atual (começa em 0)
+            @RequestParam(defaultValue = "20") int size // Itens por página
+    ) {
         try {
-            List<MensagemGrupoSaidaDTO> mensagens = mensagemGrupoService.buscarMensagensPorProjeto(projetoId);
+            // Chama o novo método paginado do service
+            Page<MensagemGrupoSaidaDTO> mensagens = mensagemGrupoService.buscarMensagensPorProjetoPaginado(projetoId, page, size);
             return ResponseEntity.ok(mensagens);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

@@ -11,7 +11,10 @@ import com.SenaiCommunity.BackEnd.Repository.MensagemGrupoRepository;
 import com.SenaiCommunity.BackEnd.Repository.ProjetoMembroRepository;
 import com.SenaiCommunity.BackEnd.Repository.ProjetoRepository;
 import com.SenaiCommunity.BackEnd.Repository.UsuarioRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -201,12 +204,10 @@ public class MensagemGrupoService {
     }
 
     // --- BUSCAR MENSAGENS ---
-    public List<MensagemGrupoSaidaDTO> buscarMensagensPorProjeto(Long projetoId) {
-        List<MensagemGrupo> mensagens = mensagemGrupoRepository.findByProjetoIdOrderByDataEnvioAsc(projetoId);
-
-        return mensagens.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public Page<MensagemGrupoSaidaDTO> buscarMensagensPorProjetoPaginado(Long projetoId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size); // PageRequest já existe no Spring
+        return mensagemGrupoRepository.findByProjetoIdOrderByDataEnvioDesc(projetoId, pageable)
+                .map(this::toDTO);
     }
 
     public java.util.Optional<MensagemGrupo> findById(Long id) {

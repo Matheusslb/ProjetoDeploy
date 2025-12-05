@@ -3,14 +3,13 @@ package com.SenaiCommunity.BackEnd.Controller;
 import com.SenaiCommunity.BackEnd.DTO.ConversaResumoDTO;
 import com.SenaiCommunity.BackEnd.DTO.MensagemGrupoSaidaDTO;
 import com.SenaiCommunity.BackEnd.DTO.MensagemPrivadaSaidaDTO;
-import com.SenaiCommunity.BackEnd.DTO.PostagemSaidaDTO;
 import com.SenaiCommunity.BackEnd.Entity.Usuario;
 import com.SenaiCommunity.BackEnd.Service.MensagemGrupoService;
 import com.SenaiCommunity.BackEnd.Service.MensagemPrivadaService;
 import com.SenaiCommunity.BackEnd.Service.PostagemService;
 import com.SenaiCommunity.BackEnd.Service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -50,8 +49,13 @@ public class ChatRestController {
     }
 
     @GetMapping("/grupo/{projetoId}")
-    public ResponseEntity<List<MensagemGrupoSaidaDTO>> getMensagensDoGrupo(@PathVariable Long projetoId) {
-        List<MensagemGrupoSaidaDTO> mensagens = mensagemGrupoService.buscarMensagensPorProjeto(projetoId);
+    public ResponseEntity<Page<MensagemGrupoSaidaDTO>> getMensagensDoGrupo(
+            @PathVariable Long projetoId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        // Agora chamamos o método com os 3 parâmetros corretos
+        Page<MensagemGrupoSaidaDTO> mensagens = mensagemGrupoService.buscarMensagensPorProjetoPaginado(projetoId, page, size);
         return ResponseEntity.ok(mensagens);
     }
 
