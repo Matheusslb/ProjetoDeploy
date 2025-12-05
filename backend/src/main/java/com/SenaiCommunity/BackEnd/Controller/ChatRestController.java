@@ -55,18 +55,15 @@ public class ChatRestController {
         return ResponseEntity.ok(mensagens);
     }
 
-    // --- CORREÇÃO E LOG DE ERRO AQUI ---
     @GetMapping("/publico")
     public ResponseEntity<?> getPostagensPublicas() {
         try {
-            System.out.println("Recebida requisição para /api/chat/publico");
-            List<PostagemSaidaDTO> postagens = postagemService.buscarPostagensPublicas();
-            return ResponseEntity.ok(postagens);
+            // Tenta buscar as postagens
+            return ResponseEntity.ok(postagemService.buscarPostagensPublicas());
         } catch (Exception e) {
-            // Isso vai mostrar o erro real no terminal do Railway
+            // Se der erro, imprime no console do Railway para sabermos o motivo
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro interno ao buscar postagens: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Erro no servidor: " + e.getMessage());
         }
     }
 
