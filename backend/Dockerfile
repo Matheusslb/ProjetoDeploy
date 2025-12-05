@@ -1,30 +1,39 @@
-# --- Estágio 1: Compilação (Build) ---
+# --- Estágio 1: Compilação (Builder) ---
 FROM eclipse-temurin:21-jdk-jammy AS builder
 
 WORKDIR /app
 
-# Copia os arquivos de configuração do Maven
+# Instala dos2unix para corrigir arquivos vindos do Windows
+RUN apt-get update && apt-get install -y dos2unix
+
+# Copia configurações do Maven primeiro (para cachear dependências)
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 
-# Dá permissão de execução ao mvnw e baixa dependências (para cache)
-RUN chmod +x mvnw
-RUN ./mvnw dependency:go-offline
+# Corrige permissões e quebras de linha do Windows
+RUN dos2unix mvnw && chmod +x mvnw
 
-# Copia o código fonte e compila a aplicação
+# Baixa dependências (se o pom.xml não mudou, o Docker usa o cache aqui)
+# Adicionamos flags para reduzir uso de memória
+RUN ./mvnw dependency:go-offline -B
+
+# Copia o código fonte
 COPY src ./src
-RUN ./mvnw clean package -DskipTests
+
+# Compila o projeto sem rodar testes (economiza tempo e RAM)
+# Limitamos a memória do Maven para não estourar o plano do Railway
+RUN export MAVEN_OPTS="-Xmx512m" && ./mvnw clean package -DskipTests
 
 # --- Estágio 2: Execução (Runtime) ---
 FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
 
-# Copia o JAR gerado no estágio anterior
+# Copia apenas o JAR gerado (deixa o lixo do Maven para trás)
 COPY --from=builder /app/target/*.jar app.jar
 
-# Expõe a porta que o Railway usa
+# Expõe a porta padrão
 EXPOSE 8080
 
-# Comando para iniciar a aplicação
+# Roda a aplicação
 CMD ["java", "-jar", "app.jar"]
